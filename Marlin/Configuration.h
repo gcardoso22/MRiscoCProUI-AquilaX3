@@ -24,6 +24,9 @@
 // Created by configs generator for Professional firmware
 // https://github.com/mriscoc/Ender3V2S1
 
+// Special thank to shadow578 for HC32F46x support
+// https://github.com/shadow578/Marlin-H32
+
 /**
  * Configuration.h
  *
@@ -70,7 +73,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_CREALITY_V4 // BOARD_CREALITY_V427 BOARD_VOXELAB_AQUILA BOARD_CREALITY_V422
+  #define MOTHERBOARD BOARD_AQUILA_X2_H32 // BOARD_CREALITY_V427 BOARD_CREALITY_V4 BOARD_VOXELAB_AQUILA BOARD_AQUILA_X2_H32
 #endif
 
 /**
@@ -1611,7 +1614,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 1    // Use a value of (1) with ProUIex, otherwise (2)
+#define MULTIPLE_PROBING 2    // Use a value of (1) with ProUIex, otherwise (2)
 //#define EXTRA_PROBING    1
 
 /**
@@ -1628,7 +1631,7 @@
  * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to nozzle.
  *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   10 // Z Clearance for Deploy/Stow
+#define Z_CLEARANCE_DEPLOY_PROBE    5 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  5 // Z Clearance between probe points
 #define Z_CLEARANCE_MULTI_PROBE     5 // Z Clearance between multiple probes
 //#define Z_AFTER_PROBING           5 // Z position after probing is done
@@ -3352,18 +3355,18 @@
 //#define HAS_DACAI 1
 
 // Professional firmware features:
-#define ProUIex 1
+//#define ProUIex 1
 #ifdef ProUIex
   #define HAS_GCODE_PREVIEW 1
   #define HAS_TOOLBAR 1
 #endif
-  #define HAS_PLOT 1
-  #define HAS_ESDIAG 1
-  #define HAS_CGCODE 1
-  #define HAS_LOCKSCREEN 1
+  //#define HAS_PLOT 1
+  //#define HAS_ESDIAG 1
+  //#define HAS_CGCODE 1
+  //#define HAS_LOCKSCREEN 1
   //#define HAS_SD_EXTENDER 1  // Enable to support SD card extender cables
   #define SHOW_REAL_POS
-  #define ACTIVATE_MESH_ITEM  // Allows temporary enabling of mesh leveling
+  //#define ACTIVATE_MESH_ITEM  // Allows temporary enabling of mesh leveling
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     #define RUNOUT_TUNE_ITEM
   #endif
