@@ -1545,13 +1545,11 @@
       #define BOOTSCREEN_TIMEOUT 4000       // (ms) Total Duration to display the boot screen(s)
       #if EITHER(HAS_MARLINUI_U8GLIB, TFT_COLOR_UI)
         #define BOOT_MARLIN_LOGO_SMALL      // Show a smaller Marlin logo on the Boot Screen (saving lots of flash)
+        //#define BOOT_MARLIN_LOGO_ANIMATED   // Choose either small static logo, large animated logo, or BOTH shows small animated logo
       #endif
       #define SHOW_CUSTOM_BOOTSCREEN      // Show the bitmap in Marlin/_Bootscreen.h on startup.
     #endif
     #if HAS_MARLINUI_U8GLIB
-      #if ENABLED(SHOW_BOOTSCREEN)
-        //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~3260 (or ~940) bytes of flash.
-      #endif
       //#define CUSTOM_STATUS_SCREEN_IMAGE  // Show the bitmap in Marlin/_Statusscreen.h on the status screen.
     #endif
   #endif
@@ -1696,7 +1694,7 @@
    * an option on the LCD screen to continue the print from the last-known
    * point in the file.
    */
-  #define POWER_LOSS_RECOVERY  // Ender Configs
+  //#define POWER_LOSS_RECOVERY  // D9sahle for Aquila w/ UBL + ProUI savemem
   #if ENABLED(POWER_LOSS_RECOVERY)
     #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
     //#define BACKUP_POWER_SUPPLY       // Backup power / UPS to move the steppers on power loss
