@@ -97,7 +97,7 @@
 //
 // Release PB4 (Y_ENABLE_PIN) from JTAG NRST role
 //
-// #define DISABLE_DEBUG
+#define DISABLE_DEBUG
 // #define DISABLE_JTAG
 
 //
@@ -113,13 +113,16 @@
 #define HEATER_BED_PIN PA2 // HOT BED
 
 #define FAN0_PIN PA0 // FAN
-#define FAN_SOFT_PWM
+#ifndef FAN_SOFT_PWM
+  #define FAN_SOFT_PWM
+#endif
 #define FAN_SOFT_PWM_REQUIRED
 
 //
 // SD Card
 //
 #define SD_DETECT_PIN PA10
+//#define SDCARD_CONNECTION ONBOARD
 #define SDIO_SUPPORT
 #define NO_SD_HOST_DRIVE
 
