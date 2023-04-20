@@ -1607,7 +1607,7 @@
 #endif // HAS_DISPLAY
 
 // Add 'M73' to set print job progress, overrides Marlin's built-in estimate
-#define SET_PROGRESS_MANUALLY  // MRiscoC Allow display feedback of host printing through GCode M73
+//#define SET_PROGRESS_MANUALLY  // MRiscoC Allow display feedback of host printing through GCode M73
 #if ENABLED(SET_PROGRESS_MANUALLY)
   #define SET_PROGRESS_PERCENT            // Add 'P' parameter to set percentage done  // MRiscoC Allow display feedback of host printing through GCode M73
   #define SET_REMAINING_TIME              // Add 'R' parameter to set remaining time  // MRiscoC Allow display feedback of host printing through GCode M73
@@ -1762,7 +1762,7 @@
   #define LONG_FILENAME_WRITE_SUPPORT   // Create / delete files with long filenames via M28, M30, and Binary Transfer Protocol  // MRiscoC Enabled
   //#define M20_TIMESTAMP_SUPPORT       // Include timestamps by adding the 'T' flag to M20 commands
 
-  #define SCROLL_LONG_FILENAMES         // Scroll long filenames in the SD card menu  // MRiscoC Enabled
+TEMP_SENSOR_BED  #define SCROLL_LONG_FILENAMES         // Scroll long filenames in the SD card menu  // MRiscoC Enabled
 
   //#define SD_ABORT_NO_COOLDOWN        // Leave the heaters on after Stop Print (not recommended!)
 
