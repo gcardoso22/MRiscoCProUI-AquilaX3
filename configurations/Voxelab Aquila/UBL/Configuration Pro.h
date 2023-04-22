@@ -27,9 +27,6 @@
 // Created from Mriscoc's Professional Firmware
 // https://github.com/mriscoc/Ender3V2S1
 
-// HC32F46x Special Library created by shadow578 for Marlin firmware
-// https://github.com/shadow578/Marlin-H32
-
 /**
  * Configuration.h
  *
@@ -3358,7 +3355,7 @@
   // Professional firmware features:
   #define ProUIex 1
   #ifdef ProUIex
-    #define HAS_GCODE_PREVIEW 1  // Enables the option to turn on/off Part Model Preview
+    #define HAS_GCODE_PREVIEW 1
     #define HAS_TOOLBAR 1
   #endif
   #define HAS_PLOT 1
@@ -3367,7 +3364,7 @@
   //#define HAS_LOCKSCREEN 1
   //#define HAS_SD_EXTENDER 1  // Enable to support SD card extender cables
   #define SHOW_REAL_POS
-  //#define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option
+  #define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     #define RUNOUT_TUNE_ITEM  // Filament Runout option in Tune Menu
   #endif

@@ -21,7 +21,10 @@
  */
 #pragma once
 
-// Created by configs generator for Professional firmware
+// Edited by classicrocker883 for ProUI
+// https://github.com/classicrocker883/MriscocProUI
+
+// Created from Mriscoc's Professional Firmware
 // https://github.com/mriscoc/Ender3V2S1
 
 /**
