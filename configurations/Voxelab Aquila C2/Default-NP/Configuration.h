@@ -21,8 +21,14 @@
  */
 #pragma once
 
-// Created by configs generator for Professional firmware
+// Edited by classicrocker883 for ProUI
+// https://github.com/classicrocker883/MriscocProUI
+
+// Created from Mriscoc's Professional Firmware
 // https://github.com/mriscoc/Ender3V2S1
+
+// HC32F46x Special Library created by shadow578 for Marlin firmware
+// https://github.com/shadow578/Marlin-H32
 
 /**
  * Configuration.h

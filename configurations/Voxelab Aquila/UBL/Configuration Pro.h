@@ -21,8 +21,14 @@
  */
 #pragma once
 
-// Created by configs generator for Professional firmware
+// Edited by classicrocker883 for ProUI
+// https://github.com/classicrocker883/MriscocProUI
+
+// Created from Mriscoc's Professional Firmware
 // https://github.com/mriscoc/Ender3V2S1
+
+// HC32F46x Special Library created by shadow578 for Marlin firmware
+// https://github.com/shadow578/Marlin-H32
 
 /**
  * Configuration.h
@@ -3348,12 +3354,13 @@
 #define DWIN_LCD_PROUI              // Pro UI by MRiscoC
 //#define HAS_DACAI 1
 
-// Professional firmware features:
-#define ProUIex 1
-#ifdef ProUIex
-  #define HAS_GCODE_PREVIEW 1  // Enables the option to turn on/off Part Model Preview
-  #define HAS_TOOLBAR 1
-#endif
+#if ENABLED(DWIN_LCD_PROUI)
+  // Professional firmware features:
+  #define ProUIex 1
+  #ifdef ProUIex
+    #define HAS_GCODE_PREVIEW 1  // Enables the option to turn on/off Part Model Preview
+    #define HAS_TOOLBAR 1
+  #endif
   #define HAS_PLOT 1
   //#define HAS_ESDIAG 1
   #define HAS_CGCODE 1
@@ -3374,11 +3381,13 @@
     #define PLOT_TUNE_ITEM  // Temperature Plot Graph item in Tune Menu
   #endif
   #if DISABLED(CLASSIC_JERK)
-  //#define JD_TUNE_ITEM  // Enable only if Juntion Deviation is enabled
+    //#define JD_TUNE_ITEM  // Enable only if Juntion Deviation is enabled
   #endif
   #define ADVK_TUNE_ITEM  // Linear Advance item in Tune Menu
   //#define ALTCOLOR_MENU_ITEM  // Alternate Color palette option
+  #define TRAMWIZ_MENU_ITEM      // Enable Tramming Wizard
   //#define MEDIASORT_MENU_ITEM  // File list sorting option
+#endif
 
 //#define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers
 //#define DWIN_MARLINUI_PORTRAIT      // MarlinUI (portrait orientation)
