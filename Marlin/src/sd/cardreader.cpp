@@ -22,7 +22,7 @@
 
 #include "../inc/MarlinConfig.h"
 
-#if HAS_MEDIA
+#if ENABLED(SDSUPPORT)
 
 //#define DEBUG_CARDREADER
 
@@ -172,7 +172,7 @@ CardReader::CardReader() {
   workDirDepth = 0;
   ZERO(workDirParents);
 
-  #if BOTH(HAS_MEDIA, HAS_SD_DETECT)
+  #if BOTH(SDSUPPORT, HAS_SD_DETECT)
     SET_INPUT_PULLUP(SD_DETECT_PIN);
   #endif
 
@@ -1368,4 +1368,4 @@ void CardReader::fileHasFinished() {
 
 #endif // POWER_LOSS_RECOVERY
 
-#endif // HAS_MEDIA
+#endif // SDSUPPORT
