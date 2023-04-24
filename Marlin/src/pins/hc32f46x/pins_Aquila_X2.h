@@ -123,7 +123,7 @@
 //
 #define SD_DETECT_PIN PA10
 //#define SDCARD_CONNECTION ONBOARD
-#define SDIO_SUPPORT
+#define ONBOARD_SDIO
 #define NO_SD_HOST_DRIVE
 
 //
