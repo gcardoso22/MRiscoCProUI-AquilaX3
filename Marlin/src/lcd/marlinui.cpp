@@ -177,7 +177,7 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
 #endif
 
 #if HAS_U8GLIB_I2C_OLED && PINS_EXIST(I2C_SCL, I2C_SDA) && DISABLED(SOFT_I2C_EEPROM)
-  #include "Wire.h"
+  #include <Wire.h>
 #endif
 
 // Encoder Handling
@@ -1209,9 +1209,9 @@ void MarlinUI::init() {
           #ifdef NEOPIXEL_BKGD_INDEX_FIRST
             neo.set_background_off();
             neo.show();
-          #elif PIN_EXIST(LCD_BACKLIGHT) && ENABLED(CR10_STOCKDISPLAY)
+          //#elif PIN_EXIST(LCD_BACKLIGHT) && ENABLED(CR10_STOCKDISPLAY)
             WRITE(LCD_BACKLIGHT_PIN, LOW); // Backlight off
-	  #endif
+	        #endif
           // TODO: Backlight off (add function to turn off backlight for LCD-12864)
           backlight_off_ms = 0;
         }
