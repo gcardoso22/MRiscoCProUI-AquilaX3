@@ -4282,7 +4282,7 @@
 
   // Add an LCD menu for MMU2
   //#define MMU2_MENUS
-
+  #if EITHER(MMU2_MENUS, HAS_PRUSA_MMU2S)
     // Settings for filament load / unload from the LCD menu.
     // This is for Průša MK3-style extruders. Customize for your hardware.
     #define MMU2_FILAMENTCHANGE_EJECT_FEED 80.0
@@ -4305,6 +4305,7 @@
       {  10.0,  700 }, \
       { -10.0,  400 }, \
       { -50.0, 2000 }
+  #endif
 
   /**
    * Using a sensor like the MMU2S
