@@ -27,6 +27,9 @@
 // Created from Mriscoc's Professional Firmware
 // https://github.com/mriscoc/Ender3V2S1
 
+// HC32F46x Special Library created by shadow578 for Marlin firmware
+// https://github.com/shadow578/Marlin-H32
+
 /**
  * Configuration.h
  *
@@ -117,6 +120,15 @@
  */
 //#define SERIAL_PORT_3 1
 //#define BAUDRATE_3 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
+
+/**
+ * Select a serial port to communicate with RS485 protocol
+ * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
+ */
+//#define RS485_SERIAL_PORT 1
+#ifdef RS485_SERIAL_PORT
+  //#define RS485_BUS_BUFFER_SIZE 128
+#endif
 
 // Enable the Bluetooth serial interface on AT90USB devices
 //#define BLUETOOTH
@@ -1885,7 +1897,7 @@
   // After a runout is detected, continue printing this length of filament
   // before executing the runout script. Useful for a sensor at the end of
   // a feed tube. Requires 4 bytes SRAM per sensor, plus 4 bytes overhead.
-  #define FILAMENT_RUNOUT_DISTANCE_MM 25    // HC32
+  #define FILAMENT_RUNOUT_DISTANCE_MM 25 // HC32
 
   #ifdef FILAMENT_RUNOUT_DISTANCE_MM
     // Enable this option to use an encoder disc that toggles the runout pin
@@ -3346,7 +3358,6 @@
 //
 // DWIN / DACAI LCD 4.3" 480x272
 
-//#define DWIN_CREALITY_LCD           // Creality UI
 #define DWIN_LCD_PROUI              // Pro UI by MRiscoC
 //#define HAS_DACAI 1
 
@@ -3384,10 +3395,6 @@
   #define TRAMWIZ_MENU_ITEM      // Enable Tramming Wizard
   //#define MEDIASORT_MENU_ITEM  // File list sorting option
 #endif
-
-//#define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers
-//#define DWIN_MARLINUI_PORTRAIT      // MarlinUI (portrait orientation)
-//#define DWIN_MARLINUI_LANDSCAPE     // MarlinUI (landscape orientation)
 
 //
 // Factory display for Creality CR-10
