@@ -62,4 +62,3 @@ if "MARLIN_FEATURES" in env:
 
     else:
        print("Default-No Probe detected")
-       shutil.copy(libpath+arch+'libproui_mbl.a', libpath+'libproui.a')

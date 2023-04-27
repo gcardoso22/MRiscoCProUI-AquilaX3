@@ -73,8 +73,9 @@
 //
 // pulled high, switch to ground closed when filament is present
 // (LOW == present; HIGH == runout)
-#define FIL_RUNOUT_PIN PA4
-
+#ifndef FIL_RUNOUT_PIN
+  #define FIL_RUNOUT_PIN PA4
+#endif
 //
 // Steppers
 //
