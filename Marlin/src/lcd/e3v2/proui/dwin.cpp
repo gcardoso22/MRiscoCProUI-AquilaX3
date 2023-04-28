@@ -167,9 +167,6 @@
   #define BABY_Z_VAR HMI_data.ManualZOffset
 #endif
 
-
-#define BABY_Z_VAR TERN(HAS_BED_PROBE, probe.offset.z, HMI_data.ManualZOffset)
-
 #if ENABLED(MEDIASORT_MENU_ITEM) && DISABLED(SDCARD_SORT_ALPHA)
   #error "MEDIASORT_MENU_ITEM requires SDCARD_SORT_ALPHA."
 #endif
