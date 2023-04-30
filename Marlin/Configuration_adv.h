@@ -2659,7 +2659,7 @@
  *
  * Note that M207 / M208 / M209 settings are saved to EEPROM.
  */
-#define FWRETRACT  // MRiscoC Enabled support for firmware based retract
+//#define FWRETRACT  // MRiscoC Enabled support for firmware based retract
 #if ENABLED(FWRETRACT)
   //#define FWRETRACT_AUTORETRACT             // Override slicer retractions  // MRiscoC use slicer retract
   #if ENABLED(FWRETRACT_AUTORETRACT)
@@ -4029,7 +4029,7 @@
  *
  * Implement M486 to allow Marlin to skip objects
  */
-#define CANCEL_OBJECTS  // MRiscoC Enabled M486 to skip objects
+//#define CANCEL_OBJECTS  // MRiscoC Enabled M486 to skip objects
 #if ENABLED(CANCEL_OBJECTS)
   #define CANCEL_OBJECTS_REPORTING // Emit the current object as a status message
 #endif
