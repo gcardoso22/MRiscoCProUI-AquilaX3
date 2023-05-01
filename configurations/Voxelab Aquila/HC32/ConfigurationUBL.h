@@ -2326,7 +2326,7 @@
  */
 #define EEPROM_SETTINGS       // Persistent storage with M500 and M501  // Ender Configs
 //#define DISABLE_M503        // Saves ~2700 bytes of flash. Disable for release!
-#define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
+//#define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
   #define EEPROM_AUTO_INIT    // Init EEPROM automatically on any errors.
@@ -2368,11 +2368,11 @@
 //#define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
-// #define PREHEAT_2_LABEL       "ABS" //PETG 
-// #define PREHEAT_2_TEMP_HOTEND 240
-// #define PREHEAT_2_TEMP_BED     75
-// //#define PREHEAT_2_TEMP_CHAMBER 35
-// #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
+#define PREHEAT_2_LABEL       "ABS" //PETG 
+#define PREHEAT_2_TEMP_HOTEND 240
+#define PREHEAT_2_TEMP_BED     75
+//#define PREHEAT_2_TEMP_CHAMBER 35
+#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
 // #define PREHEAT_3_LABEL       "Warmup"
 // #define PREHEAT_3_TEMP_HOTEND 200
@@ -3391,7 +3391,7 @@
   #if DISABLED(CLASSIC_JERK)
     //#define JD_TUNE_ITEM  // Enable only if Juntion Deviation is enabled
   #endif
-  #define ADVK_TUNE_ITEM  // Linear Advance item in Tune Menu
+  #define ADVK_TUNE_ITEM         // Linear Advance item in Tune Menu
   //#define ALTCOLOR_MENU_ITEM   // Alternate Color palette option
   #define TRAMWIZ_MENU_ITEM      // Enable Tramming Wizard
   //#define MEDIASORT_MENU_ITEM  // File list sorting option
