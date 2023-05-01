@@ -69,7 +69,7 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "shadow578, Aquila X2 (H32)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "Miguel A. Risco-Castillo (MRiscoC)" // Who made the changes.
 #define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 // @section machine
@@ -2075,6 +2075,7 @@
   // Set the number of grid points per dimension.
   #define GRID_MAX_POINTS_X 5  // HC32
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
+  #define MESH_EDIT_MENU            // Add a menu to edit mesh points
 
   // Probe along the Y axis, advancing X after each column
   //#define PROBE_Y_FIRST
