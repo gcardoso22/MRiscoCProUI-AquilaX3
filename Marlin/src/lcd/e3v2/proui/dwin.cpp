@@ -1944,7 +1944,7 @@ void DWIN_InitScreen() {
     if (bedlevel.storage_slot < 0) bedlevel.storage_slot = 0;
     settings.load_mesh(bedlevel.storage_slot);
   #endif
-  SetMeshArea();
+  //SetMeshArea();
   LCD_MESSAGE(WELCOME_MSG);
   Goto_Main_Menu();
 }
