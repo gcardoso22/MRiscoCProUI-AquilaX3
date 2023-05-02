@@ -1793,13 +1793,13 @@ void DWIN_SetColorDefaults() {
   }
 #endif
 
+// Max X Mesh Inset does not save after restart - it is limited by Probe offset. TODO: this is just a temp workaround,
+#if HAS_MESH
   void SetMeshArea() {
-    PRO_data.mesh_min_x = MESH_INSET;
     PRO_data.mesh_max_x = X_BED_SIZE - MESH_INSET;
-    PRO_data.mesh_min_y = MESH_INSET;
-    PRO_data.mesh_max_y = Y_BED_SIZE - MESH_INSET;
     ProEx.ApplyMeshLimits();
   }
+#endif
 
 void DWIN_SetDataDefaults() {
   DEBUG_ECHOLNPGM("DWIN_SetDataDefaults");
@@ -1855,7 +1855,7 @@ void DWIN_SetDataDefaults() {
     #if HAS_MESH
       PRO_data.grid_max_points = DEF_GRID_MAX_POINTS;
       PRO_data.mesh_min_x = DEF_MESH_MIN_X;
-      PRO_data.mesh_max_x = DEF_MESH_MAX_X; //TODO + abs(probe.offset.x);
+      PRO_data.mesh_max_x = DEF_MESH_MAX_X; // TODO: after restart, does not save value > (X_MAX_POS - NOZZLE_TO_PROBE_OFFSET)
       PRO_data.mesh_min_y = DEF_MESH_MIN_Y;
       PRO_data.mesh_max_y = DEF_MESH_MAX_Y;
     #endif
@@ -1944,7 +1944,9 @@ void DWIN_InitScreen() {
     if (bedlevel.storage_slot < 0) bedlevel.storage_slot = 0;
     settings.load_mesh(bedlevel.storage_slot);
   #endif
-  //SetMeshArea();
+  #if HAS_MESH
+  SetMeshArea();
+  #endif
   LCD_MESSAGE(WELCOME_MSG);
   Goto_Main_Menu();
 }
