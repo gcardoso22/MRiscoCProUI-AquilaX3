@@ -21,7 +21,7 @@
  */
 #pragma once
 
-#include "../../../inc/MarlinConfigPre.h"
+//#include "../../../inc/MarlinConfigPre.h"
 
 #ifndef LOW
   #define LOW  0x0
