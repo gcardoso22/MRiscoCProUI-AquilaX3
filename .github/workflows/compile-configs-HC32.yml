@@ -8,8 +8,8 @@ on:
     - '2.1.3c-hc'
 
 jobs:
-  Build-Default-A:
-    name: Build Default Files
+  Build-Default-NP-ProUI:
+    name: Build Default-NP ProUI Files
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -71,8 +71,8 @@ jobs:
         asset_path: temp/build.bin
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
-  Build-Manual-Mesh-A:
-    name: Build Manual-Mesh Files
+  Build-Manual-Mesh-ProUI:
+    name: Build Manual-Mesh ProUI Files
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -114,7 +114,8 @@ jobs:
         if ($IS); then TEMP=; else TEMP='\/\/'; fi;
         sed -i "s/[^ ]*#define INPUT_SHAPING_X/$TEMP#define INPUT_SHAPING_X/g" Marlin/Configuration_adv.h
         sed -i "s/[^ ]*#define INPUT_SHAPING_Y/$TEMP#define INPUT_SHAPING_Y/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define EXTENDED_CAPABILITIES_REPORT/$TEMP#define EXTENDED_CAPABILITIES_REPORT/g" Marlin/Configuration_adv.h
+        if ($IS); then TEMPE='\/\/'; else TEMPE=; fi;
+        sed -i "s/[^ ]*#define EXTENDED_CAPABILITIES_REPORT/$TEMPE#define EXTENDED_CAPABILITIES_REPORT/g" Marlin/Configuration_adv.h
         pio run
         mkdir temp
         mv .pio/build/HC32F46x_AQUILA_X2/*.bin temp/build.bin
@@ -135,8 +136,8 @@ jobs:
         asset_path: temp/build.bin
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
-  Build-UBL-BLTouch-A-Pro:
-    name: Build UBL Pro Files
+  Build-UBL-NoPro:
+    name: Build UBL NoPro Files
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -258,8 +259,8 @@ jobs:
   #       asset_path: temp/build.bin
   #       asset_name: ${{ steps.build_configs.outputs.filename }}
   #       asset_content_type: application/x-binary
-  Build-BLTouch-A:
-    name: Build BL-Touch Files
+  Build-BLTouch-ProUI:
+    name: Build BL-Touch ProUI Files
     runs-on: ubuntu-latest
     strategy:
       matrix:
