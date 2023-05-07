@@ -24,7 +24,7 @@
 //#include "../../../inc/MarlinConfigPre.h"
 
 #ifndef LOW
-  #define LOW  0x0
+  #define LOW 0x0
 #endif
 #ifndef HIGH
   #define HIGH 0x1

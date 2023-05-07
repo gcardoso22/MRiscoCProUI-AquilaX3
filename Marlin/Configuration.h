@@ -1,4 +1,4 @@
-/** Aquila HC32 BLT Mriscoc ProUI
+/** Aquila HC32 UBL Mriscoc NoProUI
  * Marlin 3D Printer Firmware
  * Copyright (c) 2022 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
@@ -1987,8 +1987,8 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-#define AUTO_BED_LEVELING_BILINEAR
-//#define AUTO_BED_LEVELING_UBL
+//#define AUTO_BED_LEVELING_BILINEAR
+#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
 /**
@@ -2331,7 +2331,7 @@
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
   #define EEPROM_AUTO_INIT    // Init EEPROM automatically on any errors.
-  #define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.
+  //#define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.
 #endif
 
 // @section host
@@ -2375,10 +2375,10 @@
 //#define PREHEAT_2_TEMP_CHAMBER 35
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
-#define PREHEAT_3_LABEL       "Warmup"
-#define PREHEAT_3_TEMP_HOTEND 200
-#define PREHEAT_3_TEMP_BED     50
-#define PREHEAT_3_FAN_SPEED     0
+// #define PREHEAT_3_LABEL       "Warmup"
+// #define PREHEAT_3_TEMP_HOTEND 200
+// #define PREHEAT_3_TEMP_BED     50
+// #define PREHEAT_3_FAN_SPEED     0
 
 //#define PREHEAT_4_LABEL       "TPU"
 //#define PREHEAT_4_TEMP_HOTEND 230
@@ -3365,14 +3365,14 @@
 
 #if ENABLED(DWIN_LCD_PROUI)
   // Professional firmware features:
-  #define ProUIex 1
+  //#define ProUIex 1
   #ifdef ProUIex
     #define HAS_GCODE_PREVIEW 1
     #define HAS_TOOLBAR 1
   #endif
   #define HAS_PLOT 1
   //#define HAS_ESDIAG 1
-  #define HAS_CGCODE 1
+  //#define HAS_CGCODE 1
   //#define HAS_LOCKSCREEN 1
   //#define HAS_SD_EXTENDER 1  // Enable to support SD card extender cables
   #define SHOW_REAL_POS
@@ -3394,7 +3394,7 @@
   #endif
   #define ADVK_TUNE_ITEM         // Linear Advance item in Tune Menu
   //#define ALTCOLOR_MENU_ITEM   // Alternate Color palette option
-  //#define TRAMWIZ_MENU_ITEM      // Enable Tramming Wizard
+  #define TRAMWIZ_MENU_ITEM      // Enable Tramming Wizard
   //#define MEDIASORT_MENU_ITEM  // File list sorting option
 #endif
 
