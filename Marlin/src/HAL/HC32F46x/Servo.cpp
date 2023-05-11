@@ -148,7 +148,7 @@ bool H32Servo::attach(const int32_t inPin, const int32_t inMinAngle, const int32
   stc_timera_base_init_t stcTimeraInit;
   stc_timera_compare_init_t stcTimerCompareInit;
   stc_irq_regi_conf_t stcIrqRegiConf;
-  stc_timera_hw_startup_cofig_t stcTimeraHwConfig;
+  stc_timera_hw_startup_config_t stcTimeraHwConfig;
   stc_port_init_t stcPortInit;
 
   uint32_t u32Pclk1;
