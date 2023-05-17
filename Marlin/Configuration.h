@@ -76,7 +76,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_AQUILA_X2_H32
+  #define MOTHERBOARD BOARD_AQUILA_V101
 #endif
 
 /**
@@ -1624,7 +1624,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 2    // Use a value of (1) with ProUIex, otherwise (2)
+#define MULTIPLE_PROBING 1    // Use a value of (1) with ProUIex, otherwise (2)
 //#define EXTRA_PROBING    1
 
 /**
@@ -3381,7 +3381,7 @@
   #define HAS_CGCODE 1
   //#define HAS_LOCKSCREEN 1
   //#define HAS_SD_EXTENDER 1  // Enable to support SD card extender cables
-  //#define USE_UBL_VIEWER 1     // Enable two graph types to view mesh
+  #define USE_UBL_VIEWER 1     // Enable two graph types to view mesh
   #define SHOW_REAL_POS
   //#define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
@@ -3394,14 +3394,14 @@
     //#define HS_MENU_ITEM  // BLTOUCH_HS_MODE menu option
   #endif
   #if ENABLED(HAS_PLOT)
-    //#define PLOT_TUNE_ITEM  // Temperature Plot Graph item in Tune Menu
+    #define PLOT_TUNE_ITEM  // Temperature Plot Graph item in Tune Menu
   #endif
   #if DISABLED(CLASSIC_JERK)
     //#define JD_TUNE_ITEM  // Enable only if Juntion Deviation is enabled
   #endif
   #define ADVK_TUNE_ITEM         // Linear Advance item in Tune Menu
   //#define ALTCOLOR_MENU_ITEM   // Alternate Color palette option
-  //#define TRAMWIZ_MENU_ITEM      // Enable Tramming Wizard
+  #define TRAMWIZ_MENU_ITEM      // Enable Tramming Wizard
   //#define MEDIASORT_MENU_ITEM  // File list sorting option
 #endif
 

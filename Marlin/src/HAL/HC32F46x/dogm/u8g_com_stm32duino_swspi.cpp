@@ -23,15 +23,14 @@
 #if BOTH(HAS_GRAPHICAL_LCD, FORCE_SOFT_SPI)
 #warning "'u8g_com_stm32duino_swspi' has not been tested to work as expected. Proceed at your own risk"
 
-#include "../../shared/HAL_SPI.h"
-#include <U8glib-HAL.h>
+#include "../HAL.h"
+#include <U8glib.h>
 
-#ifndef LCD_SPI_SPEED
-  #define LCD_SPI_SPEED SPI_FULL_SPEED    // Fastest
-  //#define LCD_SPI_SPEED SPI_QUARTER_SPEED // Slower
-#endif
+#undef SPI_SPEED
+#define SPI_SPEED 0 // Fastest
+// #define SPI_SPEED 2 // Slower
 
-static uint8_t SPI_speed = LCD_SPI_SPEED;
+static uint8_t SPI_speed = SPI_SPEED;
 
 static inline uint8_t swSpiTransfer_mode_0(uint8_t b, const uint8_t spi_speed, const pin_t miso_pin = -1)
 {
@@ -122,7 +121,7 @@ uint8_t u8g_com_HAL_STM32F1_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, 
   switch (msg)
   {
   case U8G_COM_MSG_INIT:
-      SPI_speed = swSpiInit(LCD_SPI_SPEED);
+    SPI_speed = swSpiInit(SPI_SPEED);
     break;
 
   case U8G_COM_MSG_STOP:

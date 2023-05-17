@@ -1442,9 +1442,7 @@ void Stepper::apply_directions() {
  *
  * Directly pulses the stepper motors at high frequency.
  */
-
-//HC32F46x: gcc requires the ISR function to have a return type
-TERN_(TARGET_HC32F46x, void) HAL_STEP_TIMER_ISR() {
+HAL_STEP_TIMER_ISR() {
   HAL_timer_isr_prologue(MF_TIMER_STEP);
 
   Stepper::isr();
@@ -2155,7 +2153,7 @@ hal_timer_t Stepper::calc_timer_interval(uint32_t step_rate) {
   #ifdef CPU_32_BIT
 
     // A fast processor can just do integer division
-    TERN(TARGET_HC32F46x, const, constexpr) uint32_t min_step_rate = uint32_t(STEPPER_TIMER_RATE) / HAL_TIMER_TYPE_MAX;
+    constexpr uint32_t min_step_rate = uint32_t(STEPPER_TIMER_RATE) / HAL_TIMER_TYPE_MAX;
     return step_rate > min_step_rate ? uint32_t(STEPPER_TIMER_RATE) / step_rate : HAL_TIMER_TYPE_MAX;
 
   #else

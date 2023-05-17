@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2021 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -21,14 +21,6 @@
  */
 #pragma once
 
-// If no real EEPROM, Flash emulation, or SRAM emulation is available fall back to SD emulation
-#if USE_FALLBACK_EEPROM
-#define SDCARD_EEPROM_EMULATION
-#elif EITHER(I2C_EEPROM, SPI_EEPROM)
-#define USE_SHARED_EEPROM 1
-#endif
-
-// Allow SDSUPPORT to be disabled
-#if !HAS_MEDIA
-#undef ONBOARD_SDIO
+#ifndef TARGET_HC32F46x
+  #error "Oops! Select an HC32F460 board in 'Tools > Board.'"
 #endif

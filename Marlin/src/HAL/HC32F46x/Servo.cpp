@@ -167,7 +167,7 @@ bool H32Servo::attach(const int32_t inPin, const int32_t inMinAngle, const int32
 
   /* Configuration peripheral clock */
   PWC_Fcg2PeriphClockCmd(TIMERA_UNIT1_CLOCK, Enable);
-  PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_PTDIS, Enable);
+  PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_AOS, Enable);
 
   /* Configuration TIMERA compare pin */
   PORT_SetFunc(TIMERA_UNIT1_CH1_PORT, TIMERA_UNIT1_CH1_PIN, TIMERA_UNIT1_CH1_FUNC, Disable);

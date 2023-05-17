@@ -76,7 +76,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_AQUILA_X2_H32
+  #define MOTHERBOARD BOARD_AQUILA_V101
 #endif
 
 /**
