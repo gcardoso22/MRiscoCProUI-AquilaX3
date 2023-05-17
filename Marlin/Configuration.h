@@ -2383,10 +2383,10 @@
 //#define PREHEAT_2_TEMP_CHAMBER 35
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
-#define PREHEAT_3_LABEL       "Warmup"
-#define PREHEAT_3_TEMP_HOTEND 200
-#define PREHEAT_3_TEMP_BED     50
-#define PREHEAT_3_FAN_SPEED     0
+// #define PREHEAT_3_LABEL       "Warmup"
+// #define PREHEAT_3_TEMP_HOTEND 200
+// #define PREHEAT_3_TEMP_BED     50
+// #define PREHEAT_3_FAN_SPEED     0
 
 //#define PREHEAT_4_LABEL       "TPU"
 //#define PREHEAT_4_TEMP_HOTEND 230
@@ -3381,9 +3381,9 @@
   #define HAS_CGCODE 1
   //#define HAS_LOCKSCREEN 1
   //#define HAS_SD_EXTENDER 1  // Enable to support SD card extender cables
-  #define USE_UBL_VIEWER 1     // Enable two graph types to view mesh
+  //#define USE_UBL_VIEWER 1     // Enable two graph types to view mesh
   #define SHOW_REAL_POS
-  #define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option
+  //#define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     #define RUNOUT_TUNE_ITEM  // Filament Runout option in Tune Menu
   #endif

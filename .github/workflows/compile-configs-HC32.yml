@@ -8,8 +8,8 @@ on:
       - '2.1.3c-hc'
 
 jobs:
-  Build-Default-NP-ProUI:
-    name: Build Default-NP ProUI Files
+  Build-Default:
+    name: Build Default Files
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -71,8 +71,8 @@ jobs:
         asset_path: temp/build.bin
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
-  Build-Manual-Mesh-ProUI:
-    name: Build Manual-Mesh ProUI Files
+  Build-Manual-Mesh:
+    name: Build Manual-Mesh Files
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -136,7 +136,7 @@ jobs:
         asset_path: temp/build.bin
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
-  Build-UBL-NoPro:
+  Build-UBL-NP:
     name: Build UBL NoPro Files
     runs-on: ubuntu-latest
     strategy:
