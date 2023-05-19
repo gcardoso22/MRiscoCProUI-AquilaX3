@@ -139,6 +139,7 @@ typedef struct {
 } HMI_value_t;
 
 typedef struct {
+  uint8_t language;
   bool printing_flag:1; // sd or host printing
   bool abort_flag:1;    // sd or host was aborted
   bool pause_flag:1;    // printing is paused

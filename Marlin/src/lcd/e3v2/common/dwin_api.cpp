@@ -61,7 +61,7 @@ bool DWIN_Handshake() {
   size_t i = 0;
   DWIN_Byte(i, 0x00);
   DWIN_Send(i);
-  delay(10);
+  safe_delay(10);
 
   while (LCD_SERIAL.available() > 0 && recnum < (signed)sizeof(databuf)) {
     databuf[recnum] = LCD_SERIAL.read();

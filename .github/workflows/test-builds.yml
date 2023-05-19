@@ -39,11 +39,11 @@ jobs:
 
         # AVR
         - mega2560
+        - mega1280
         - at90usb1286_dfu
 
         # AVR Extended
         - FYSETC_F6
-        - mega1280
         - melzi_optiboot
         - rambo
         - sanguino1284p
@@ -130,9 +130,7 @@ jobs:
         #- mks_robin_nano_v1v2_maple
         #- STM32F103RC_btt_maple
         #- STM32F103RE_creality_maple
-        #- STM32F103RC_creality_maple
-        - STM32F103RET6_voxelab_maple_GD32
-        - STM32F103RET6_voxelab_maple_N32
+
         # LPC176x - Lengthy tests
         - LPC1768
         - LPC1769

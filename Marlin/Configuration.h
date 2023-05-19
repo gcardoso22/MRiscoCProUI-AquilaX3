@@ -1624,7 +1624,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 1    // Use a value of (1) with ProUIex, otherwise (2)
+#define MULTIPLE_PROBING 2    // Use a value of (1) with ProUIex, otherwise (2)
 //#define EXTRA_PROBING    1
 
 /**
@@ -2338,8 +2338,8 @@
 //#define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
-  #define EEPROM_AUTO_INIT    // Init EEPROM automatically on any errors.
-  #define EEPROM_INIT_NOW   // Init EEPROM on first boot after a new build.
+  #define EEPROM_AUTO_INIT    // Init EEPROM automatically on any errors.  // Ender Configs
+  #define EEPROM_INIT_NOW     // Init EEPROM on first boot after a new build.  // MRiscoC Reset EEPROM on first boot
 #endif
 
 // @section host
@@ -2605,8 +2605,7 @@
  * LCD Character Set
  *
  * Note: This option is NOT applicable to Graphical Displays.
- *
- * All character-based LCDs provide ASCII plus one of these
+ * All character-based LCDs provide ASCII plus one of thesexxx
  * language extensions:
  *
  *  - JAPANESE ... the most common
@@ -3371,7 +3370,7 @@
 
 #if ENABLED(DWIN_LCD_PROUI)
   // Professional firmware features:
-  #define ProUIex 1
+  //#define ProUIex 1
   #ifdef ProUIex
     #define HAS_GCODE_PREVIEW 1
     #define HAS_TOOLBAR 1
