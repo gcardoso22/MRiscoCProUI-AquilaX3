@@ -420,8 +420,8 @@ void ICON_Button(const bool selected, const int iconid, const frame_rect_t &ico,
 // Main Menu: "Print"
 //
 void ICON_Print() {
-  constexpr frame_rect_t ico = { 17, 110 - TERN0(HAS_TOOLBAR, TBOffset), 110, 100};
-  constexpr frame_rect_t ico2 = { 18, 111 - TERN0(HAS_TOOLBAR, TBOffset), 108, 98};
+  constexpr frame_rect_t ico = { 17, 110 - TERN0(HAS_TOOLBAR,  TBOffset), 110, 100};
+  constexpr frame_rect_t ico2 = { 18, 111 - TERN0(HAS_TOOLBAR,  TBOffset), 108, 98};
   constexpr text_info_t txt = { 1, { 405, TERN(USE_STOCK_DWIN_SET, 446, 447) }, 27, 15 };
   ICON_Button(select_page.now == PAGE_PRINT, ICON_Print_0, ico, ico2, txt, GET_TEXT_F(MSG_BUTTON_PRINT));
 }
@@ -430,8 +430,8 @@ void ICON_Print() {
 // Main Menu: "Prepare"
 //
 void ICON_Prepare() {
-  constexpr frame_rect_t ico = { 145, 110 - TERN0(HAS_TOOLBAR,TBOffset), 110, 100};
-  constexpr frame_rect_t ico2 = { 146, 111 - TERN0(HAS_TOOLBAR,TBOffset), 108, 98};
+  constexpr frame_rect_t ico = { 145, 110 - TERN0(HAS_TOOLBAR, TBOffset), 110, 100};
+  constexpr frame_rect_t ico2 = { 146, 111 - TERN0(HAS_TOOLBAR, TBOffset), 108, 98};
   constexpr text_info_t txt = { 31, { 405, TERN(USE_STOCK_DWIN_SET, 446, 447) }, 27, 15 };
   ICON_Button(select_page.now == PAGE_PREPARE, ICON_Prepare_0, ico, ico2, txt, GET_TEXT_F(MSG_PREPARE));
 }
@@ -440,8 +440,8 @@ void ICON_Prepare() {
 // Main Menu: "Control"
 //
 void ICON_Control() {
-  constexpr frame_rect_t ico = { 17, 226 - TERN0(HAS_TOOLBAR,TBOffset), 110, 100};
-  constexpr frame_rect_t ico2 = { 18, 227 - TERN0(HAS_TOOLBAR,TBOffset), 108, 98};
+  constexpr frame_rect_t ico = { 17, 226 - TERN0(HAS_TOOLBAR, TBOffset), 110, 100};
+  constexpr frame_rect_t ico2 = { 18, 227 - TERN0(HAS_TOOLBAR, TBOffset), 108, 98};
   constexpr text_info_t txt = { 61, { 405, TERN(USE_STOCK_DWIN_SET, 446, 447) }, 27, 15 };
   ICON_Button(select_page.now == PAGE_CONTROL, ICON_Control_0, ico, ico2, txt, GET_TEXT_F(MSG_CONTROL));
 }
@@ -451,8 +451,8 @@ void ICON_Control() {
 //
 //
 void ICON_AdvSettings() {
-  constexpr frame_rect_t ico = { 145, 226 - TERN0(HAS_TOOLBAR,TBOffset), 110, 100};
-  constexpr frame_rect_t ico2 = { 146, 227 - TERN0(HAS_TOOLBAR,TBOffset), 108, 98};
+  constexpr frame_rect_t ico = { 145, 226 - TERN0(HAS_TOOLBAR, TBOffset), 110, 100};
+  constexpr frame_rect_t ico2 = { 146, 227 - TERN0(HAS_TOOLBAR, TBOffset), 108, 98};
   constexpr text_info_t txt = { 91, { 405, TERN(USE_STOCK_DWIN_SET, 446, 447) }, 27, 15 };
   #if ANY(AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL, MESH_BED_LEVELING)
   ICON_Button(select_page.now == PAGE_ADVANCE, ICON_Leveling_0, ico, ico2, txt, GET_TEXT_F(MSG_BUTTON_LEVEL));
@@ -4069,7 +4069,7 @@ void Draw_MaxSpeed_Menu() {
 
 void Draw_MaxAccel_Menu() {
   checkkey = Menu;
-  if (SET_MENU_R(MaxAccelMenu, selrect({1, 16, 28, 13}), MSG_AMAX_EN, 5)) {
+  if (SET_MENU_R(MaxAccelMenu, selrect({1, 16, 28, 13}), MSG_ACC, 5)) {
     BACK_ITEM(Draw_Motion_Menu);
     EDIT_ITEM(ICON_MaxAccX, MSG_AMAX_A, onDrawPInt32Menu, SetMaxAccelX, &planner.settings.max_acceleration_mm_per_s2[X_AXIS]);
     EDIT_ITEM(ICON_MaxAccY, MSG_AMAX_B, onDrawPInt32Menu, SetMaxAccelY, &planner.settings.max_acceleration_mm_per_s2[Y_AXIS]);
@@ -4085,7 +4085,7 @@ void Draw_MaxAccel_Menu() {
 
   void Draw_MaxJerk_Menu() {
     checkkey = Menu;
-    if (SET_MENU_R(MaxJerkMenu, selrect({1, 16, 28, 13}), MSG_JERK, 5)) {
+    if (SET_MENU_R(MaxJerkMenu, selrect({1, 16, 28, 13}), MSG_MAX_JERK, 5)) {
       BACK_ITEM(Draw_Motion_Menu);
       EDIT_ITEM(ICON_MaxSpeedJerkX, MSG_VA_JERK, onDrawPFloatMenu, SetMaxJerkX, &planner.max_jerk.x);
       EDIT_ITEM(ICON_MaxSpeedJerkY, MSG_VB_JERK, onDrawPFloatMenu, SetMaxJerkY, &planner.max_jerk.y);
