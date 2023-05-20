@@ -2356,7 +2356,7 @@ void DoCoolDown() { thermalManager.cooldown(); }
 void SetLanguage() {
   HMI_ToggleLanguage();
   CurrentMenu = nullptr;  // Invalidate menu to full redraw
-  Draw_Prepare_Menu();
+  Draw_Control_Menu();
 }
 
 bool EnableLiveMove = false;
@@ -3537,7 +3537,7 @@ void Draw_Tramming_Menu() {
 
 void Draw_Control_Menu() {
   checkkey = Menu;
-  if (SET_MENU_R(ControlMenu, selrect({103, 1, 28, 14}), MSG_CONTROL, 16)) {
+  if (SET_MENU_R(ControlMenu, selrect({103, 1, 28, 14}), MSG_CONTROL, 18)) {
     BACK_ITEM(Goto_Main_Menu);
     #if ENABLED(EEPROM_SETTINGS)
       MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, WriteEeprom);

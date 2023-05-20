@@ -25,7 +25,6 @@
 #include "dwin_defines.h"
 #include "dwinui.h"
 #include "../common/encoder.h"
-#include "../common/limits.h"
 #include "../../../libs/BL24CXX.h"
 
 #if HAS_CGCODE
