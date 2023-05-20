@@ -420,8 +420,8 @@ void ICON_Button(const bool selected, const int iconid, const frame_rect_t &ico,
 // Main Menu: "Print"
 //
 void ICON_Print() {
-  constexpr frame_rect_t ico = { 17, 110 - TERN0(HAS_TOOLBAR,  TBOffset), 110, 100};
-  constexpr frame_rect_t ico2 = { 18, 111 - TERN0(HAS_TOOLBAR,  TBOffset), 108, 98};
+  constexpr frame_rect_t ico = { 17, 110 - TERN0(HAS_TOOLBAR, TBOffset), 110, 100};
+  constexpr frame_rect_t ico2 = { 18, 111 - TERN0(HAS_TOOLBAR, TBOffset), 108, 98};
   constexpr text_info_t txt = { 1, { 405, TERN(USE_STOCK_DWIN_SET, 446, 447) }, 27, 15 };
   ICON_Button(select_page.now == PAGE_PRINT, ICON_Print_0, ico, ico2, txt, GET_TEXT_F(MSG_BUTTON_PRINT));
 }
@@ -3376,7 +3376,7 @@ void onDrawAcc(MenuItemClass* menuitem, int8_t line) {
       menuitem->SetFrame(1, 153, 148, 194, 161);
       DWIN_Frame_AreaCopy(1, 229, 133, 236, 147, LBLX + 44, MBASE(line));      // X
     }
-    onDrawPFloatMenu(menuitem, line);
+    onDrawPFloat2Menu(menuitem, line);
   }
 #endif
 
@@ -3386,7 +3386,7 @@ void onDrawAcc(MenuItemClass* menuitem, int8_t line) {
       menuitem->SetFrame(1, 153, 148, 194, 161);
       DWIN_Frame_AreaCopy(1,   1, 150,   7, 160, LBLX + 44, MBASE(line));      // Y
     }
-    onDrawPFloatMenu(menuitem, line);
+    onDrawPFloat2Menu(menuitem, line);
   }
 #endif
 
@@ -3396,7 +3396,7 @@ void onDrawAcc(MenuItemClass* menuitem, int8_t line) {
       menuitem->SetFrame(1, 153, 148, 194, 161);
       DWIN_Frame_AreaCopy(1,   9, 150,  16, 160, LBLX + 44, MBASE(line));      // Z
     }
-    onDrawPFloatMenu(menuitem, line);
+    onDrawPFloat2Menu(menuitem, line);
   }
 #endif
 
@@ -3407,7 +3407,7 @@ void onDrawAcc(MenuItemClass* menuitem, int8_t line) {
       menuitem->SetFrame(1, 153, 148, 194, 161);
       DWIN_Frame_AreaCopy(1,  18, 150,  25, 160, LBLX + 44, MBASE(line));    // E
     }
-    onDrawPFloatMenu(menuitem, line);
+    onDrawPFloat2Menu(menuitem, line);
   }
 
 #endif
@@ -3486,7 +3486,7 @@ void Draw_Prepare_Menu() {
   checkkey = Menu;
   if (SET_MENU_R(PrepareMenu, selrect({133, 1, 28, 13}), MSG_PREPARE, 8 + PREHEAT_COUNT)) {
     BACK_ITEM(Goto_Main_Menu);
-    MENU_ITEM(ICON_Axis, MSG_MOVE_AXIS, onDrawSubMenu, Draw_Move_Menu);
+    MENU_ITEM(ICON_Axis, MSG_MOVE_AXIS, onDrawMoveSubMenu, Draw_Move_Menu);
     #if ENABLED(INDIVIDUAL_AXIS_HOMING_SUBMENU)
       MENU_ITEM(ICON_Homing, MSG_HOMING, onDrawSubMenu, Draw_Homing_Menu);
     #else
@@ -3540,10 +3540,10 @@ void Draw_Control_Menu() {
   if (SET_MENU_R(ControlMenu, selrect({103, 1, 28, 14}), MSG_CONTROL, 18)) {
     BACK_ITEM(Goto_Main_Menu);
     #if ENABLED(EEPROM_SETTINGS)
-      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, WriteEeprom);
+      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawWriteEeprom, WriteEeprom);
     #endif
-      MENU_ITEM(ICON_Temperature, MSG_TEMPERATURE, onDrawSubMenu, Draw_Temperature_Menu);
-      MENU_ITEM(ICON_Motion, MSG_MOTION, onDrawSubMenu, Draw_Motion_Menu);
+      MENU_ITEM(ICON_Temperature, MSG_TEMPERATURE, onDrawTempSubMenu, Draw_Temperature_Menu);
+      MENU_ITEM(ICON_Motion, MSG_MOTION, onDrawMotionSubMenu, Draw_Motion_Menu);
     #if HAS_LCD_BRIGHTNESS
       MENU_ITEM(ICON_Box, MSG_BRIGHTNESS_OFF, onDrawMenuItem, TurnOffBacklight);
     #endif
@@ -3581,7 +3581,7 @@ void Draw_Control_Menu() {
     #if ENABLED(PRINTCOUNTER)
       MENU_ITEM(ICON_PrintStats, MSG_INFO_STATS_MENU, onDrawSubMenu, Goto_PrintStats);
     #endif
-      MENU_ITEM(ICON_Info, MSG_INFO_SCREEN, onDrawSubMenu, Goto_Info_Menu);
+      MENU_ITEM(ICON_Info, MSG_INFO_SCREEN, onDrawInfoSubMenu, Goto_Info_Menu);
   }
   ui.reset_status(true);
   UpdateMenu(ControlMenu);
@@ -3591,12 +3591,12 @@ void Draw_Move_Menu() {
   checkkey = Menu;
   if (SET_MENU_R(MoveMenu, selrect({192, 1, 42, 14}), MSG_MOVE_AXIS, 6)) {
     BACK_ITEM(Draw_Prepare_Menu);
-    EDIT_ITEM(ICON_MoveX, MSG_MOVE_X, onDrawPFloatMenu, SetMoveX, &current_position.x);
-    EDIT_ITEM(ICON_MoveY, MSG_MOVE_Y, onDrawPFloatMenu, SetMoveY, &current_position.y);
-    EDIT_ITEM(ICON_MoveZ, MSG_MOVE_Z, onDrawPFloatMenu, SetMoveZ, &current_position.z);
+    EDIT_ITEM(ICON_MoveX, MSG_MOVE_X, onDrawMoveX, SetMoveX, &current_position.x);
+    EDIT_ITEM(ICON_MoveY, MSG_MOVE_Y, onDrawMoveY, SetMoveY, &current_position.y);
+    EDIT_ITEM(ICON_MoveZ, MSG_MOVE_Z, onDrawMoveZ, SetMoveZ, &current_position.z);
     #if HAS_HOTEND
       gcode.process_subcommands_now(F("G92E0"));  // reset extruder position
-      EDIT_ITEM(ICON_Extruder, MSG_MOVE_E, onDrawPFloatMenu, SetMoveE, &current_position.e);
+      EDIT_ITEM(ICON_Extruder, MSG_MOVE_E, onDrawMoveE, SetMoveE, &current_position.e);
     #endif
     EDIT_ITEM(ICON_Axis, MSG_LIVE_MOVE, onDrawChkbMenu, SetLiveMove, &EnableLiveMove);
   }
@@ -3812,19 +3812,19 @@ void Draw_Tune_Menu() {
     #if HAS_LCD_BRIGHTNESS
       MENU_ITEM(ICON_Box, MSG_BRIGHTNESS_OFF, onDrawMenuItem, TurnOffBacklight);
     #endif
-    EDIT_ITEM(ICON_Speed, MSG_SPEED, onDrawPIntMenu, SetSpeed, &feedrate_percentage);
+    EDIT_ITEM(ICON_Speed, MSG_SPEED, onDrawSpeedItem, SetSpeed, &feedrate_percentage);
     EDIT_ITEM(ICON_Flow, MSG_FLOW, onDrawPIntMenu, SetFlow, &planner.flow_percentage[0]);
     #if HAS_HOTEND
-      HotendTargetItem = EDIT_ITEM(ICON_HotendTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawPIntMenu, SetHotendTemp, &thermalManager.temp_hotend[0].target);
+      HotendTargetItem = EDIT_ITEM(ICON_HotendTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawHotendTemp, SetHotendTemp, &thermalManager.temp_hotend[0].target);
     #endif
     #if HAS_HEATED_BED
-      BedTargetItem = EDIT_ITEM(ICON_BedTemp, MSG_UBL_SET_TEMP_BED, onDrawPIntMenu, SetBedTemp, &thermalManager.temp_bed.target);
+      BedTargetItem = EDIT_ITEM(ICON_BedTemp, MSG_UBL_SET_TEMP_BED, onDrawBedTemp, SetBedTemp, &thermalManager.temp_bed.target);
     #endif
     #if HAS_FAN
-      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawPInt8Menu, SetFanSpeed, &thermalManager.fan_speed[0]);
+      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawFanSpeed, SetFanSpeed, &thermalManager.fan_speed[0]);
     #endif
     #if HAS_ZOFFSET_ITEM && EITHER(BABYSTEP_ZPROBE_OFFSET, JUST_BABYSTEP)
-    EDIT_ITEM(ICON_Zoffset, MSG_ZPROBE_ZOFFSET, onDrawPFloat2Menu, SetZOffset, &BABY_Z_VAR);
+    EDIT_ITEM(ICON_Zoffset, MSG_ZPROBE_ZOFFSET, onDrawZOffset, SetZOffset, &BABY_Z_VAR);
     #endif
     #if ENABLED(HAS_PLOT) && ENABLED(PLOT_TUNE_ITEM)
       MENU_ITEM_F(ICON_PIDNozzle, "Hotend Temp Graph", onDrawMenuItem, DWIN_Draw_Plot_Nozzle);
@@ -3947,14 +3947,14 @@ void Draw_Motion_Menu() {
   checkkey = Menu;
   if (SET_MENU_R(MotionMenu, selrect({1, 16, 28, 13}), MSG_MOTION, 8)) {
     BACK_ITEM(Draw_Control_Menu);
-    MENU_ITEM(ICON_MaxSpeed, MSG_SPEED, onDrawSubMenu, Draw_MaxSpeed_Menu);
-    MENU_ITEM(ICON_MaxAccelerated, MSG_ACCELERATION, onDrawSubMenu, Draw_MaxAccel_Menu);
+    MENU_ITEM(ICON_MaxSpeed, MSG_SPEED, onDrawSpeed, Draw_MaxSpeed_Menu);
+    MENU_ITEM(ICON_MaxAccelerated, MSG_ACCELERATION, onDrawAcc, Draw_MaxAccel_Menu);
     #if HAS_CLASSIC_JERK
-      MENU_ITEM(ICON_MaxJerk, MSG_JERK, onDrawSubMenu, Draw_MaxJerk_Menu);
+      MENU_ITEM(ICON_MaxJerk, MSG_JERK, onDrawJerk, Draw_MaxJerk_Menu);
     #elif HAS_JUNCTION_DEVIATION
       EDIT_ITEM(ICON_JDmm, MSG_JUNCTION_DEVIATION, onDrawPFloat3Menu, SetJDmm, &planner.junction_deviation_mm);
     #endif
-    MENU_ITEM(ICON_Step, MSG_STEPS_PER_MM, onDrawSubMenu, Draw_Steps_Menu);
+    MENU_ITEM(ICON_Step, MSG_STEPS_PER_MM, onDrawSteps, Draw_Steps_Menu);
     #if ENABLED(SHAPING_MENU)
       MENU_ITEM(ICON_InputShaping, MSG_INPUT_SHAPING, onDrawSubMenu, Draw_InputShaping_Menu);
     #endif
@@ -3997,16 +3997,16 @@ void Draw_Motion_Menu() {
     if (NotCurrent) {
       BACK_ITEM(Draw_Temperature_Menu);
       #if HAS_HOTEND
-        EDIT_ITEM(ICON_SetEndTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawPIntMenu, SetPreheatEndTemp, &ui.material_preset[HMI_value.Select].hotend_temp);
+        EDIT_ITEM(ICON_SetEndTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawSetPreheatHotend, SetPreheatEndTemp, &ui.material_preset[HMI_value.Select].hotend_temp);
       #endif
       #if HAS_HEATED_BED
-        EDIT_ITEM(ICON_SetBedTemp, MSG_UBL_SET_TEMP_BED, onDrawPIntMenu, SetPreheatBedTemp, &ui.material_preset[HMI_value.Select].bed_temp);
+        EDIT_ITEM(ICON_SetBedTemp, MSG_UBL_SET_TEMP_BED, onDrawSetPreheatBed, SetPreheatBedTemp, &ui.material_preset[HMI_value.Select].bed_temp);
       #endif
       #if HAS_FAN
-        EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawPIntMenu, SetPreheatFanSpeed, &ui.material_preset[HMI_value.Select].fan_speed);
+        EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawSetPreheatFan, SetPreheatFanSpeed, &ui.material_preset[HMI_value.Select].fan_speed);
       #endif
       #if ENABLED(EEPROM_SETTINGS)
-        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, WriteEeprom);
+        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawWriteEeprom, WriteEeprom);
       #endif
     }
     UpdateMenu(PreheatMenu);
@@ -4026,13 +4026,13 @@ void Draw_Temperature_Menu() {
   if (SET_MENU_R(TemperatureMenu, selrect({236, 2, 28, 12}), MSG_TEMPERATURE, 7 + PREHEAT_COUNT)) {
     BACK_ITEM(Draw_Control_Menu);
     #if HAS_HOTEND
-      HotendTargetItem = EDIT_ITEM(ICON_SetEndTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawPIntMenu, SetHotendTemp, &thermalManager.temp_hotend[0].target);
+      HotendTargetItem = EDIT_ITEM(ICON_SetEndTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawHotendTemp, SetHotendTemp, &thermalManager.temp_hotend[0].target);
     #endif
     #if HAS_HEATED_BED
-      BedTargetItem = EDIT_ITEM(ICON_SetBedTemp, MSG_UBL_SET_TEMP_BED, onDrawPIntMenu, SetBedTemp, &thermalManager.temp_bed.target);
+      BedTargetItem = EDIT_ITEM(ICON_SetBedTemp, MSG_UBL_SET_TEMP_BED, onDrawBedTemp, SetBedTemp, &thermalManager.temp_bed.target);
     #endif
     #if HAS_FAN
-      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawPInt8Menu, SetFanSpeed, &thermalManager.fan_speed[0]);
+      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawFanSpeed, SetFanSpeed, &thermalManager.fan_speed[0]);
     #endif
     #if ENABLED(PIDTEMP) && ENABLED(PIDTEMPBED)
       MENU_ITEM_F(ICON_Temperature, "PID Settings", onDrawSubMenu, Draw_PID_Menu);
@@ -4057,11 +4057,11 @@ void Draw_MaxSpeed_Menu() {
   checkkey = Menu;
   if (SET_MENU_R(MaxSpeedMenu, selrect({1, 16, 28, 13}), MSG_MAX_SPEED, 5)) {
     BACK_ITEM(Draw_Motion_Menu);
-    EDIT_ITEM(ICON_MaxSpeedX, MSG_VMAX_A, onDrawPFloatMenu, SetMaxSpeedX, &planner.settings.max_feedrate_mm_s[X_AXIS]);
-    EDIT_ITEM(ICON_MaxSpeedY, MSG_VMAX_B, onDrawPFloatMenu, SetMaxSpeedY, &planner.settings.max_feedrate_mm_s[Y_AXIS]);
-    EDIT_ITEM(ICON_MaxSpeedZ, MSG_VMAX_C, onDrawPFloatMenu, SetMaxSpeedZ, &planner.settings.max_feedrate_mm_s[Z_AXIS]);
+    EDIT_ITEM(ICON_MaxSpeedX, MSG_VMAX_A, onDrawMaxSpeedX, SetMaxSpeedX, &planner.settings.max_feedrate_mm_s[X_AXIS]);
+    EDIT_ITEM(ICON_MaxSpeedY, MSG_VMAX_B, onDrawMaxSpeedY, SetMaxSpeedY, &planner.settings.max_feedrate_mm_s[Y_AXIS]);
+    EDIT_ITEM(ICON_MaxSpeedZ, MSG_VMAX_C, onDrawMaxSpeedZ, SetMaxSpeedZ, &planner.settings.max_feedrate_mm_s[Z_AXIS]);
     #if HAS_HOTEND
-      EDIT_ITEM(ICON_MaxSpeedE, MSG_VMAX_E, onDrawPFloatMenu, SetMaxSpeedE, &planner.settings.max_feedrate_mm_s[E_AXIS]);
+      EDIT_ITEM(ICON_MaxSpeedE, MSG_VMAX_E, onDrawMaxSpeedE, SetMaxSpeedE, &planner.settings.max_feedrate_mm_s[E_AXIS]);
     #endif
   }
   UpdateMenu(MaxSpeedMenu);
@@ -4071,11 +4071,11 @@ void Draw_MaxAccel_Menu() {
   checkkey = Menu;
   if (SET_MENU_R(MaxAccelMenu, selrect({1, 16, 28, 13}), MSG_ACC, 5)) {
     BACK_ITEM(Draw_Motion_Menu);
-    EDIT_ITEM(ICON_MaxAccX, MSG_AMAX_A, onDrawPInt32Menu, SetMaxAccelX, &planner.settings.max_acceleration_mm_per_s2[X_AXIS]);
-    EDIT_ITEM(ICON_MaxAccY, MSG_AMAX_B, onDrawPInt32Menu, SetMaxAccelY, &planner.settings.max_acceleration_mm_per_s2[Y_AXIS]);
-    EDIT_ITEM(ICON_MaxAccZ, MSG_AMAX_C, onDrawPInt32Menu, SetMaxAccelZ, &planner.settings.max_acceleration_mm_per_s2[Z_AXIS]);
+    EDIT_ITEM(ICON_MaxAccX, MSG_AMAX_A, onDrawMaxAccelX, SetMaxAccelX, &planner.settings.max_acceleration_mm_per_s2[X_AXIS]);
+    EDIT_ITEM(ICON_MaxAccY, MSG_AMAX_B, onDrawMaxAccelY, SetMaxAccelY, &planner.settings.max_acceleration_mm_per_s2[Y_AXIS]);
+    EDIT_ITEM(ICON_MaxAccZ, MSG_AMAX_C, onDrawMaxAccelZ, SetMaxAccelZ, &planner.settings.max_acceleration_mm_per_s2[Z_AXIS]);
     #if HAS_HOTEND
-      EDIT_ITEM(ICON_MaxAccE, MSG_AMAX_E, onDrawPInt32Menu, SetMaxAccelE, &planner.settings.max_acceleration_mm_per_s2[E_AXIS]);
+      EDIT_ITEM(ICON_MaxAccE, MSG_AMAX_E, onDrawMaxAccelE, SetMaxAccelE, &planner.settings.max_acceleration_mm_per_s2[E_AXIS]);
     #endif
   }
   UpdateMenu(MaxAccelMenu);
@@ -4087,11 +4087,11 @@ void Draw_MaxAccel_Menu() {
     checkkey = Menu;
     if (SET_MENU_R(MaxJerkMenu, selrect({1, 16, 28, 13}), MSG_MAX_JERK, 5)) {
       BACK_ITEM(Draw_Motion_Menu);
-      EDIT_ITEM(ICON_MaxSpeedJerkX, MSG_VA_JERK, onDrawPFloatMenu, SetMaxJerkX, &planner.max_jerk.x);
-      EDIT_ITEM(ICON_MaxSpeedJerkY, MSG_VB_JERK, onDrawPFloatMenu, SetMaxJerkY, &planner.max_jerk.y);
-      EDIT_ITEM(ICON_MaxSpeedJerkZ, MSG_VC_JERK, onDrawPFloatMenu, SetMaxJerkZ, &planner.max_jerk.z);
+      EDIT_ITEM(ICON_MaxSpeedJerkX, MSG_VA_JERK, onDrawMaxJerkX, SetMaxJerkX, &planner.max_jerk.x);
+      EDIT_ITEM(ICON_MaxSpeedJerkY, MSG_VB_JERK, onDrawMaxJerkY, SetMaxJerkY, &planner.max_jerk.y);
+      EDIT_ITEM(ICON_MaxSpeedJerkZ, MSG_VC_JERK, onDrawMaxJerkZ, SetMaxJerkZ, &planner.max_jerk.z);
       #if HAS_HOTEND
-        EDIT_ITEM(ICON_MaxSpeedJerkE, MSG_VE_JERK, onDrawPFloatMenu, SetMaxJerkE, &planner.max_jerk.e);
+        EDIT_ITEM(ICON_MaxSpeedJerkE, MSG_VE_JERK, onDrawMaxJerkE, SetMaxJerkE, &planner.max_jerk.e);
       #endif
     }
     UpdateMenu(MaxJerkMenu);
@@ -4103,11 +4103,11 @@ void Draw_Steps_Menu() {
   checkkey = Menu;
   if (SET_MENU_R(StepsMenu, selrect({1, 16, 28, 13}), MSG_STEPS_PER_MM, 5)) {
     BACK_ITEM(Draw_Motion_Menu);
-    EDIT_ITEM(ICON_StepX, MSG_A_STEPS, onDrawPFloat2Menu, SetStepsX, &planner.settings.axis_steps_per_mm[X_AXIS]);
-    EDIT_ITEM(ICON_StepY, MSG_B_STEPS, onDrawPFloat2Menu, SetStepsY, &planner.settings.axis_steps_per_mm[Y_AXIS]);
-    EDIT_ITEM(ICON_StepZ, MSG_C_STEPS, onDrawPFloat2Menu, SetStepsZ, &planner.settings.axis_steps_per_mm[Z_AXIS]);
+    EDIT_ITEM(ICON_StepX, MSG_A_STEPS, onDrawStepsX, SetStepsX, &planner.settings.axis_steps_per_mm[X_AXIS]);
+    EDIT_ITEM(ICON_StepY, MSG_B_STEPS, onDrawStepsY, SetStepsY, &planner.settings.axis_steps_per_mm[Y_AXIS]);
+    EDIT_ITEM(ICON_StepZ, MSG_C_STEPS, onDrawStepsZ, SetStepsZ, &planner.settings.axis_steps_per_mm[Z_AXIS]);
     #if HAS_HOTEND
-      EDIT_ITEM(ICON_StepE, MSG_E_STEPS, onDrawPFloat2Menu, SetStepsE, &planner.settings.axis_steps_per_mm[E_AXIS]);
+      EDIT_ITEM(ICON_StepE, MSG_E_STEPS, onDrawStepsE, SetStepsE, &planner.settings.axis_steps_per_mm[E_AXIS]);
     #endif
   }
   UpdateMenu(StepsMenu);
@@ -4140,7 +4140,7 @@ void Draw_Steps_Menu() {
       EDIT_ITEM(ICON_Temperature, MSG_TEMPERATURE, onDrawPIntMenu, SetHotendPidT, &HMI_data.HotendPidT);
       EDIT_ITEM(ICON_PIDCycles, MSG_PID_CYCLE, onDrawPIntMenu, SetPidCycles, &HMI_data.PidCycles);
       #if ENABLED(EEPROM_SETTINGS)
-        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, WriteEeprom);
+        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawWriteEeprom, WriteEeprom);
       #endif
     }
     UpdateMenu(HotendPIDMenu);
@@ -4201,7 +4201,7 @@ void Draw_Steps_Menu() {
       EDIT_ITEM(ICON_Temperature, MSG_TEMPERATURE, onDrawPIntMenu, SetBedPidT, &HMI_data.BedPidT);
       EDIT_ITEM(ICON_PIDCycles, MSG_PID_CYCLE, onDrawPIntMenu, SetPidCycles, &HMI_data.PidCycles);
       #if ENABLED(EEPROM_SETTINGS)
-        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, WriteEeprom);
+        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawWriteEeprom, WriteEeprom);
       #endif
     }
     UpdateMenu(BedPIDMenu);
@@ -4217,7 +4217,7 @@ void Draw_Steps_Menu() {
       BACK_ITEM(Draw_Prepare_Menu);
       MENU_ITEM(ICON_Homing, MSG_AUTO_HOME, onDrawMenuItem, AutoHome);
       MENU_ITEM(ICON_SetHome, MSG_MOVE_NOZZLE_TO_BED, onDrawMenuItem, SetMoveZto0);
-      EDIT_ITEM(ICON_Fade, MSG_XATC_UPDATE_Z_OFFSET, onDrawPFloat2Menu, SetZOffset, &BABY_Z_VAR);
+      EDIT_ITEM(ICON_Fade, MSG_XATC_UPDATE_Z_OFFSET, onDrawZOffset, SetZOffset, &BABY_Z_VAR);
       MENU_ITEM_F(0,"For Best Results:\n", onDrawMenuItem);
       MENU_ITEM_F(ICON_More, "Have Nozzle Touch Bed", onDrawMenuItem);
     }
@@ -4522,7 +4522,7 @@ void Draw_AdvancedSettings_Menu() {
   if (SET_MENU(AdvancedSettings, MSG_UBL_LEVELING, 14)) {
     BACK_ITEM(Goto_Main_Menu);
     #if ENABLED(EEPROM_SETTINGS)
-      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, WriteEeprom);
+      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawWriteEeprom, WriteEeprom);
     #endif
     #if HAS_MESH
       #if HAS_BED_PROBE
@@ -4555,7 +4555,7 @@ void Draw_AdvancedSettings_Menu() {
   if (SET_MENU(AdvancedSettings, MSG_BILINEAR_LEVELING, 9)) {
     BACK_ITEM(Goto_Main_Menu);
     #if ENABLED(EEPROM_SETTINGS)
-      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, WriteEeprom);
+      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawWriteEeprom, WriteEeprom);
     #endif
     #if HAS_MESH
       #if HAS_BED_PROBE
@@ -4583,7 +4583,7 @@ void Draw_AdvancedSettings_Menu() {
   if (SET_MENU(AdvancedSettings, MSG_UBL_MESH_LEVELING, 10)) {
     BACK_ITEM(Goto_Main_Menu);
     MENU_ITEM(ICON_ManualMesh, MSG_UBL_CONTINUE_MESH, onDrawMenuItem, ManualMeshStart);
-    MMeshMoveZItem = EDIT_ITEM(ICON_Zoffset, MSG_MESH_EDIT_Z, onDrawPFloat2Menu, SetMMeshMoveZ, &current_position.z);
+    MMeshMoveZItem = EDIT_ITEM(ICON_Zoffset, MSG_MESH_EDIT_Z, onDrawMMeshMoveZ, SetMMeshMoveZ, &current_position.z);
     MENU_ITEM(ICON_Axis, MSG_LEVEL_BED_NEXT_POINT, onDrawMenuItem, ManualMeshContinue);
     MENU_ITEM(ICON_PrintSize, MSG_MESH_LEVELING, onDrawSubMenu, Draw_MeshSet_Menu);
     #if ENABLED(USE_UBL_VIEWER)
@@ -4646,8 +4646,8 @@ void Draw_AdvancedSettings_Menu() {
       MENU_ITEM(ICON_TMCSet, MSG_TMC_DRIVERS, onDrawSubMenu, Draw_TrinamicConfig_menu);
     #endif
     #if ENABLED(EEPROM_SETTINGS)
-      MENU_ITEM(ICON_ReadEEPROM, MSG_LOAD_EEPROM, onDrawMenuItem, ReadEeprom);
-      MENU_ITEM(ICON_ResumeEEPROM, MSG_RESTORE_DEFAULTS, onDrawMenuItem, ResetEeprom);
+      MENU_ITEM(ICON_ReadEEPROM, MSG_LOAD_EEPROM, onDrawReadEeprom, ReadEeprom);
+      MENU_ITEM(ICON_ResumeEEPROM, MSG_RESTORE_DEFAULTS, onDrawResetEeprom, ResetEeprom);
     #endif
     #if ENABLED(PRINTCOUNTER)
       MENU_ITEM(ICON_PrintStatsReset, MSG_INFO_PRINT_COUNT_RESET, onDrawSubMenu, PrintStatsReset);
@@ -4697,8 +4697,8 @@ void Draw_Advanced_Menu() { // Control --> Advaned Settings Menu
       MENU_ITEM(ICON_TMCSet, MSG_TMC_DRIVERS, onDrawSubMenu, Draw_TrinamicConfig_menu);
     #endif
     #if ENABLED(EEPROM_SETTINGS)
-      MENU_ITEM(ICON_ReadEEPROM, MSG_LOAD_EEPROM, onDrawMenuItem, ReadEeprom);
-      MENU_ITEM(ICON_ResumeEEPROM, MSG_RESTORE_DEFAULTS, onDrawMenuItem, ResetEeprom);
+      MENU_ITEM(ICON_ReadEEPROM, MSG_LOAD_EEPROM, onDrawReadEeprom, ReadEeprom);
+      MENU_ITEM(ICON_ResumeEEPROM, MSG_RESTORE_DEFAULTS, onDrawResetEeprom, ResetEeprom);
     #endif
     #if ENABLED(PRINTCOUNTER)
       MENU_ITEM(ICON_PrintStatsReset, MSG_INFO_PRINT_COUNT_RESET, onDrawSubMenu, PrintStatsReset);
