@@ -76,7 +76,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_AQUILA_V101
+  #define MOTHERBOARD BOARD_CREALITY_V422
 #endif
 
 /**
@@ -87,7 +87,7 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT 2
+#define SERIAL_PORT 1
 #define NO_AUTO_ASSIGN_WARNING  // Disable serial warnings
 
 /**
@@ -2000,8 +2000,8 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-#define AUTO_BED_LEVELING_BILINEAR
-//#define AUTO_BED_LEVELING_UBL
+//#define AUTO_BED_LEVELING_BILINEAR
+#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
 /**
@@ -3379,33 +3379,33 @@
 
 #if ENABLED(DWIN_LCD_PROUI)
 // Professional firmware features:
-  #define PROUI_EX 1            // Extended UI features
+  #define PROUI_EX 1            // Extended UI features (272 bytes of flash)
   #ifdef PROUI_EX
     #define HAS_GCODE_PREVIEW 1
     #define HAS_TOOLBAR 1
   #endif
   #define HAS_PLOT 1            // Graph Temp as grid plot - PID/MPC Tuning
-  //#define HAS_ESDIAG 1        // View End-stop switch continuity
+  //#define HAS_ESDIAG 1        // View End-stop switch continuity (272 bytes of flash)
   #define HAS_CGCODE 1          // Extra Gcode options
-  //#define HAS_LOCKSCREEN 1    // Simple lockscreen as to not accidentally change something
-  //#define HAS_SD_EXTENDER 1   // Enable to support SD card extender cables
-  #define USE_GRID_MESHVIEWER 1 // Enable two graph types to view mesh : one
+  //#define HAS_LOCKSCREEN 1    // Simple lockscreen as to not accidentally change something (272 bytes of flash)
+  //#define HAS_SD_EXTENDER 1   // Enable to support SD card extender cables (272 bytes of flash)
+  #define USE_GRID_MESHVIEWER 1 // Enable two mesh graph types : one (272 bytes of flash)
   #define HAS_CUSTOM_COLORS 1   // Able to change display colors
-  #define ALTCOLOR_MENU_ITEM 1  // Color palette options => Disabled or 0 = Voxelab Default | 1 = Alternate Aquila | 2 = Ender3v2 Default
+  #define ALTCOLOR_MENU_ITEM 1  // Color palette options => Disabled or 0 = Voxelab Default | 1 = Alternate Aquila | 2 = Ender3V2 Default
   #if ENABLED(AUTO_BED_LEVELING_UBL)
-    #define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option
+    #define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option (272 bytes of flash)
   #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
-    #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu
+    #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu (272 bytes of flash)
   #endif
   #if ENABLED(POWER_LOSS_RECOVERY)
-    #define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu
+    #define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu (272 bytes of flash)
   #endif
   #if ENABLED(BLTOUCH)
-    //#define HS_MENU_ITEM      // BLTOUCH_HS_MODE menu option
+    //#define HS_MENU_ITEM      // BLTOUCH_HS_MODE menu option (272 bytes of flash)
   #endif
   #if ENABLED(HAS_PLOT)
-    #define PLOT_TUNE_ITEM      // Temperature Plot Graph item in Tune Menu
+    #define PLOT_TUNE_ITEM      // Temperature Plot Graph item in Tune Menu (272 bytes of flash)
   #endif
   #if DISABLED(CLASSIC_JERK)
     //#define JD_TUNE_ITEM      // Enable only if Juntion Deviation is enabled
@@ -3415,10 +3415,10 @@
   #endif
   #define SHOW_REAL_POS
   #define CCLOUD_PRINT_SUPPORT  // Menu item: enable/disable Creality Cloud Print Support
-  #define TRAMWIZ_MENU_ITEM     // Menu item: enable Tramming Wizard
-  #define MEDIASORT_MENU_ITEM   // Menu item: enable/disable file list sorting
-  #define ENC_MENU_ITEM         // Menu item: faster/slower encoder rate
-  #define SHOW_SPEED_IND        // Menu item: blink speed in mm/s along with speed percentage
+  //#define TRAMWIZ_MENU_ITEM     // Menu item: enable Tramming Wizard (2304 bytes of flash)
+  //#define MEDIASORT_MENU_ITEM   // Menu item: enable/disable file list sorting (104 bytes of flash)
+  #define ENC_MENU_ITEM         // Menu item: faster/slower encoder rate (272 bytes of flash)
+  //#define SHOW_SPEED_IND        // Menu item: blink speed in mm/s along with speed percentage (296 bytes of flash)
   //#define NO_BLINK_IND        // Disables dashboard icon blink indicator highlighted background
   //#define ZHOME_BEFORE_LEVELING
 

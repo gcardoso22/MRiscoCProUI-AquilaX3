@@ -32,6 +32,7 @@ if "MARLIN_FEATURES" in env:
     stm32f4 = _GetMarlinEnv(MarlinEnv, 'MCU_STM32F4')
     stm32g0 = _GetMarlinEnv(MarlinEnv, 'MCU_STM32G0')
     gd32f10 = _GetMarlinEnv(MarlinEnv, 'MAPLE_STM32F1')
+    hc32f46 = _GetMarlinEnv(MarlinEnv, 'TARGET_HC32F46x')
 
     if (prouiex):
       print('ProUI extension detected')
@@ -47,6 +48,9 @@ if "MARLIN_FEATURES" in env:
       elif (gd32f10):
          arch = 'gd32f10/'
          print ('GD32F1 Architecture detected')
+      elif (hc32f46):
+         arch = 'gd32f10/'
+         print ('HC32F46x Architecture detected')
       else:
          print("Error: can't detect the correct architecture")
          exit()
@@ -61,5 +65,5 @@ if "MARLIN_FEATURES" in env:
          print("Unified Mesh Bed Leveling detected")
          shutil.copy(libpath+arch+'libproui_ubl.a', libfile)
       else:
-         print("Error: can't detect a supported leveling system")
-         exit()
+         print("Default-No Probe detected")
+         shutil.copy(libpath+arch+'libproui_mbl.a', libfile)
