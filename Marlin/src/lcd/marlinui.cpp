@@ -67,6 +67,18 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
   float MarlinUI::screw_pos = BED_SCREW_INSET; 
 #endif
 
+#if PROUI_EX && HAS_MESH
+  float MarlinUI::mesh_inset_min_x = MESH_INSET;
+  float MarlinUI::mesh_inset_max_x = X_BED_SIZE - MESH_INSET;
+  float MarlinUI::mesh_inset_min_y = MESH_INSET;
+  float MarlinUI::mesh_inset_max_y = Y_BED_SIZE - MESH_INSET;
+#endif
+
+#if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+  int MarlinUI::enc_rateA;
+  int MarlinUI::enc_rateB;
+#endif
+
 #if HAS_STATUS_MESSAGE
   #if ENABLED(STATUS_MESSAGE_SCROLLING) && EITHER(HAS_WIRED_LCD, DWIN_LCD_PROUI)
     uint8_t MarlinUI::status_scroll_offset; // = 0
@@ -1498,8 +1510,11 @@ void MarlinUI::init() {
         return set_status(card.longest_filename(), true);
     #endif
     else if (print_job_timer.isRunning())
-      msg = GET_TEXT_F(MSG_PRINTING);
-
+      #if ENABLED(CV_LASER_MODULE)
+        msg = laser_device.is_laser_device() ? GET_TEXT_F(MSG_ENGRAVING) : GET_TEXT_F(MSG_PRINTING);
+      #else
+        msg = GET_TEXT_F(MSG_PRINTING);
+      #endif
     #if SERVICE_INTERVAL_1 > 0
       else if (print_job_timer.needsService(1)) msg = FPSTR(service1);
     #endif
@@ -1658,6 +1673,9 @@ void MarlinUI::init() {
   #endif
 
   void MarlinUI::abort_print() {
+    #if ENABLED(CV_LASER_MODULE)
+      if (laser_device.is_laser_device()) laser_device.quick_stop();
+    #endif
     #if HAS_MEDIA
       wait_for_heatup = wait_for_user = false;
       card.abortFilePrintSoon();
@@ -1699,8 +1717,14 @@ void MarlinUI::init() {
     LCD_MESSAGE(MSG_PRINT_PAUSED);
 
     #if ENABLED(PARK_HEAD_ON_PAUSE)
-      pause_show_message(PAUSE_MESSAGE_PARKING, PAUSE_MODE_PAUSE_PRINT); // Show message immediately to let user know about pause in progress
-      queue.inject(F("M25 P\nM24"));
+      #if ENABLED(CV_LASER_MODULE)
+        if (laser_device.is_laser_device()) queue.inject(F("M25"));
+        else
+      #endif
+      {
+        pause_show_message(PAUSE_MESSAGE_PARKING, PAUSE_MODE_PAUSE_PRINT); // Show message immediately to let user know about pause in progress
+        queue.inject(F("M25 P\nM24"));
+      }
     #elif HAS_MEDIA
       queue.inject(F("M25"));
     #elif defined(ACTION_ON_PAUSE)

@@ -78,6 +78,8 @@ namespace Language_en {
   LSTR MSG_DISABLE_STEPPERS               = _UxGT("Disable Steppers");
   LSTR MSG_DEBUG_MENU                     = _UxGT("Debug Menu");
   LSTR MSG_PROGRESS_BAR_TEST              = _UxGT("Progress Bar Test");
+  LSTR MSG_ENDSTOP_TEST                   = _UxGT("End-stop Diagnostic");
+  LSTR MSG_Z_PROBE                        = _UxGT("Z Probe");
   LSTR MSG_HOMING                         = _UxGT("Homing");
   LSTR MSG_AUTO_HOME                      = _UxGT("Auto Home");
   LSTR MSG_AUTO_HOME_A                    = _UxGT("Home @");
@@ -188,7 +190,8 @@ namespace Language_en {
   LSTR MSG_MESH_AMAX                      = _UxGT("Maximize Area");
   LSTR MSG_MESH_CENTER                    = _UxGT("Center Area");
   LSTR MSG_MESH_EDIT_Z                    = _UxGT("Z Value");
-  LSTR MSG_MESH_CANCEL                    = _UxGT("Mesh cancelled");
+  LSTR MSG_MESH_CANCEL                    = _UxGT("Mesh Cancelled");
+  LSTR MSG_MESH_RESET                     = _UxGT("Mesh Reset");
   LSTR MSG_CUSTOM_COMMANDS                = _UxGT("Custom Commands");
   LSTR MSG_M48_TEST                       = _UxGT("M48 Probe Test");
   LSTR MSG_M48_POINT                      = _UxGT("M48 Point");
@@ -442,6 +445,7 @@ namespace Language_en {
   LSTR MSG_TEMPERATURE                    = _UxGT("Temperature");
   LSTR MSG_MOTION                         = _UxGT("Motion");
   LSTR MSG_FILAMENT                       = _UxGT("Filament");
+  LSTR MSG_FILAMENT_EN                    = _UxGT("Filament *");
   LSTR MSG_VOLUMETRIC_ENABLED             = _UxGT("E in mm") SUPERSCRIPT_THREE;
   LSTR MSG_VOLUMETRIC_LIMIT               = _UxGT("E Limit in mm") SUPERSCRIPT_THREE;
   LSTR MSG_VOLUMETRIC_LIMIT_E             = _UxGT("E Limit *");
@@ -537,6 +541,7 @@ namespace Language_en {
   LSTR MSG_USERWAIT                       = _UxGT("Click to Resume...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Print Paused");
   LSTR MSG_PRINTING                       = _UxGT("Printing...");
+  LSTR MSG_ENGRAVING                      = _UxGT("Engraving...");
   LSTR MSG_STOPPING                       = _UxGT("Stopping...");
   LSTR MSG_REMAINING_TIME                 = _UxGT("Remaining");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Print Aborted");
@@ -569,13 +574,13 @@ namespace Language_en {
   LSTR MSG_PARK_ZRAISE                    = _UxGT("Park Z Raise");
   LSTR MSG_PARK_FAILED                    = _UxGT("Head cannot be parked");
   LSTR MSG_PHY_SET                        = _UxGT("Physical settings");
-  LSTR MSG_PHY_XBEDSIZE                   = _UxGT("X bed size");
-  LSTR MSG_PHY_YBEDSIZE                   = _UxGT("Y bed size");
-  LSTR MSG_PHY_XMINPOS                    = _UxGT("X min position");
-  LSTR MSG_PHY_YMINPOS                    = _UxGT("Y min position");
-  LSTR MSG_PHY_XMAXPOS                    = _UxGT("X max position");
-  LSTR MSG_PHY_YMAXPOS                    = _UxGT("Y max position");
-  LSTR MSG_PHY_ZMAXPOS                    = _UxGT("Z max position");
+  LSTR MSG_PHY_XBEDSIZE                   = _UxGT("X Bed Size");
+  LSTR MSG_PHY_YBEDSIZE                   = _UxGT("Y Bed Size");
+  LSTR MSG_PHY_XMINPOS                    = _UxGT("X Min Position");
+  LSTR MSG_PHY_YMINPOS                    = _UxGT("Y Min Position");
+  LSTR MSG_PHY_XMAXPOS                    = _UxGT("X Max Position");
+  LSTR MSG_PHY_YMAXPOS                    = _UxGT("Y Max Position");
+  LSTR MSG_PHY_ZMAXPOS                    = _UxGT("Z Max Position");
   LSTR MSG_SINGLENOZZLE_UNRETRACT_SPEED   = _UxGT("Recover Speed");
   LSTR MSG_SINGLENOZZLE_FAN_SPEED         = _UxGT("Fan Speed");
   LSTR MSG_SINGLENOZZLE_FAN_TIME          = _UxGT("Fan Time");
@@ -771,9 +776,9 @@ namespace Language_en {
   LSTR MSG_MMU2_EJECT_FILAMENT            = _UxGT("MMU Eject");
   LSTR MSG_MMU2_EJECT_FILAMENT_N          = _UxGT("MMU Eject ~");
   LSTR MSG_MMU2_UNLOAD_FILAMENT           = _UxGT("MMU Unload");
-  LSTR MSG_MMU2_LOADING_FILAMENT          = _UxGT("Loading Fil. %i...");
-  LSTR MSG_MMU2_EJECTING_FILAMENT         = _UxGT("Ejecting Fil. ...");
-  LSTR MSG_MMU2_UNLOADING_FILAMENT        = _UxGT("Unloading Fil....");
+  LSTR MSG_MMU2_LOADING_FILAMENT          = _UxGT("Filament %i Load...");
+  LSTR MSG_MMU2_EJECTING_FILAMENT         = _UxGT("Filament Eject...");
+  LSTR MSG_MMU2_UNLOADING_FILAMENT        = _UxGT("Filament Unload...");
   LSTR MSG_MMU2_ALL                       = _UxGT("All");
   LSTR MSG_MMU2_FILAMENT_N                = _UxGT("Filament ~");
   LSTR MSG_MMU2_RESET                     = _UxGT("Reset MMU");
@@ -851,6 +856,10 @@ namespace Language_en {
   #endif
   LSTR MSG_TMC_DRIVERS                    = _UxGT("TMC Drivers");
   LSTR MSG_TMC_CURRENT                    = _UxGT("Driver Current");
+  LSTR MSG_TMC_ACURRENT                   = STR_A _UxGT("Driver Current");
+  LSTR MSG_TMC_BCURRENT                   = STR_B _UxGT("Driver Current");
+  LSTR MSG_TMC_CCURRENT                   = STR_C _UxGT("Driver Current");
+  LSTR MSG_TMC_ECURRENT                   = _UxGT("E Driver Current");
   LSTR MSG_TMC_HYBRID_THRS                = _UxGT("Hybrid Threshold");
   LSTR MSG_TMC_HOMING_THRS                = _UxGT("Sensorless Homing");
   LSTR MSG_TMC_STEPPING_MODE              = _UxGT("Stepping Mode");

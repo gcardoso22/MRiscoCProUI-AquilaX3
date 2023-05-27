@@ -73,9 +73,9 @@
 #if ENABLED(SPI_FLASH)
   #define SPI_FLASH_SIZE                0x200000  // 2MB
   #define SPI_FLASH_CS_PIN                  PG15  // SPI2
-  #define SPI_FLASH_MOSI_PIN                PB5
-  #define SPI_FLASH_MISO_PIN                PB4
   #define SPI_FLASH_SCK_PIN                 PB3
+  #define SPI_FLASH_MISO_PIN                PB4
+  #define SPI_FLASH_MOSI_PIN                PB5
 #endif
 
 //
@@ -256,9 +256,9 @@
 #define SDIO_CLOCK                       4500000
 #define SDIO_READ_RETRIES                     16
 
-#define SDIO_D0_PIN                         PC8
-#define SDIO_D1_PIN                         PC9
-#define SDIO_D2_PIN                         PC10
-#define SDIO_D3_PIN                         PC11
-#define SDIO_CK_PIN                         PC12
-#define SDIO_CMD_PIN                        PD2
+#define BOARD_SDIO_D0                        PC8
+#define BOARD_SDIO_D1                        PC9
+#define BOARD_SDIO_D2                        PC10
+#define BOARD_SDIO_D3                        PC11
+#define BOARD_SDIO_CK                        PC12
+#define BOARD_SDIO_CMD                       PD2

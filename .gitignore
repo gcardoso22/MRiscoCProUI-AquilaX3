@@ -122,9 +122,7 @@ vc-fileutils.settings
 
 # Visual Studio Code
 .vscode/*
-.vscode/extensions.json
-.vscode/tasks.json
-.vscode/c_cpp_properties.json
+!.vscode/extensions.json
 
 # Simulation files
 imgui.ini
@@ -166,3 +164,4 @@ __pycache__
 tags
 *.logs
 *.bak
+desktop.ini

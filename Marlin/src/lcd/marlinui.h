@@ -197,8 +197,22 @@ public:
   MarlinUI() {
     TERN_(HAS_MARLINUI_MENU, currentScreen = status_screen);
   }
+  
+  #ifdef BED_SCREW_INSET
+    static float screw_pos; // bed corner screw inset
+  #endif
 
-  static float screw_pos; //changed added
+  #if PROUI_EX && HAS_MESH // workaround for mesh inset not saving on restart
+    static float mesh_inset_min_x;
+    static float mesh_inset_max_x;
+    static float mesh_inset_min_y;
+    static float mesh_inset_max_y;
+  #endif 
+
+  #if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+    static int enc_rateA;
+    static int enc_rateB;
+  #endif
 
   static void init();
 
@@ -227,7 +241,7 @@ public:
 
   #if ENABLED(SOUND_MENU_ITEM)
     static bool sound_on; // Initialized by settings.load()
-    static bool no_tick; //changed added
+    static bool no_tick; // added to disable encoder tick/beep while keeping sound on
   #else
     static constexpr bool sound_on = true;
   #endif
