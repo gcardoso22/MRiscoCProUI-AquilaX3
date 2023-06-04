@@ -61,7 +61,7 @@
   #endif
 #endif
 
-#if !(BOTH(HAS_WIRED_LCD, IS_NEWPANEL) && ANY(PANEL_ONE, VIKI2, miniVIKI, WYH_L12864, MINIPANEL, REPRAPWORLD_KEYPAD))
+#if !(ALL(HAS_WIRED_LCD, IS_NEWPANEL) && ANY(PANEL_ONE, VIKI2, miniVIKI, WYH_L12864, MINIPANEL, REPRAPWORLD_KEYPAD))
   #define HAS_FREE_AUX2_PINS 1
 #endif
 
@@ -93,7 +93,7 @@
 #if _ENDSTOP_IS_ANY(Y_MIN_PIN) || _ENDSTOP_IS_ANY(Y_MAX_PIN)
   #define NEEDS_Y_MINMAX 1
 #endif
-#if _ENDSTOP_IS_ANY(Z_MIN_PIN) || _ENDSTOP_IS_ANY(Z_MAX_PIN) || BOTH(Z_HOME_TO_MAX, Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
+#if _ENDSTOP_IS_ANY(Z_MIN_PIN) || _ENDSTOP_IS_ANY(Z_MAX_PIN) || ALL(Z_HOME_TO_MAX, Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
   #define NEEDS_Z_MINMAX 1
 #endif
 #undef _ENDSTOP_IS_ANY
@@ -687,7 +687,7 @@
 #elif MB(AQUILA_V101)
   #include "hc32f46x/pins_Aquila_V101.h"        // HC32F46x                               env:HC32F460xCxx_AQUILA_V101
 #elif MB(VOXELAB_AQUILA)
-  #include "stm32f1/pins_CREALITY_V4.h"         // STM32F1                                env:GD32F103RC_voxelab_maple env:N32F103RC_voxelab_maple
+  #include "gd32f1/pins_VOXELAB_AQUILA.h"       // GD32F1, N32F1                          env:GD32F103RC_voxelab_maple env:N32F103RC_voxelab_maple env:STM32F103RE_creality_maple env:STM32F103RE_creality
 #elif MB(SOVOL_V131)
   #include "gd32f1/pins_SOVOL_V131.h"           // GD32F1                                 env:GD32F103RET6_sovol_maple
 #elif MB(TRIGORILLA_V006)
