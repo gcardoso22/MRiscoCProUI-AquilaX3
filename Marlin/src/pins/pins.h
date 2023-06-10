@@ -687,7 +687,7 @@
 #elif MB(AQUILA_V101)
   #include "hc32f46x/pins_Aquila_V101.h"        // HC32F46x                               env:HC32F460xCxx_AQUILA_V101
 #elif MB(VOXELAB_AQUILA)
-  #include "gd32f1/pins_VOXELAB_AQUILA.h"       // GD32F1, N32F1                          env:GD32F103RC_voxelab_maple env:N32F103RC_voxelab_maple env:STM32F103RE_creality_maple env:STM32F103RE_creality
+  #include "gd32f1/pins_VOXELAB_AQUILA.h"       // GD32F1, N32F1                          env:GD32F103RC_voxelab_maple env:N32F103RC_voxelab_maple env:STM32F103RE_creality_maple env:STM32F103RC_creality_maple env:STM32F103RE_creality env:STM32F103RC_creality
 #elif MB(SOVOL_V131)
   #include "gd32f1/pins_SOVOL_V131.h"           // GD32F1                                 env:GD32F103RET6_sovol_maple
 #elif MB(TRIGORILLA_V006)
