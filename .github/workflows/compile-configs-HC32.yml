@@ -44,8 +44,8 @@ jobs:
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;        
         if [ "$AQUILA_VER" = HC32 ]; then AVTMP="HC32"; fi;
         echo "filename=${AVTMP}_Default-NP-ProUI${ISTMP}.bin" >> $GITHUB_OUTPUT
-        sed -i "s/[^ ]*#define LOW/\/\/#define LOW/g" ~/home/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
-        sed -i "s/[^ ]*#define HIGH/\/\/#define HIGH/g" ~/home/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+        sed -i "s/[^ ]*#define LOW/\/\/#define LOW/g" ~/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+        sed -i "s/[^ ]*#define HIGH/\/\/#define HIGH/g" ~/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
         cp configurations/Voxelab\ Aquila/HC32/ConfigurationDNP.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/HC32/Configuration_advDNP.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/HC32/Version.h Marlin/Version.h
@@ -109,8 +109,8 @@ jobs:
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;        
         if [ "$AQUILA_VER" = HC32 ]; then AVTMP="HC32"; fi;
         echo "filename=${AVTMP}-MM-ProUI${ISTMP}.bin" >> $GITHUB_OUTPUT
-        sed -i "s/[^ ]*#define LOW/\/\/#define LOW/g" ~home/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
-        sed -i "s/[^ ]*#define HIGH/\/\/#define HIGH/g" ~home/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+        sed -i "s/[^ ]*#define LOW/\/\/#define LOW/g" ~/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+        sed -i "s/[^ ]*#define HIGH/\/\/#define HIGH/g" ~/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
         cp configurations/Voxelab\ Aquila/HC32/ConfigurationMM.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/HC32/Configuration_advMM.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/HC32/Version.h Marlin/Version.h
@@ -174,8 +174,10 @@ jobs:
       run: |
         if [ "$AQUILA_VER" = HC32 ]; then AVTMP="HC32"; fi;
         echo "filename=${AVTMP}_UBL-ProUI.bin" >> $GITHUB_OUTPUT
-        sed -i "s/[^ ]*#define LOW/\/\/#define LOW/g" home/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
-        sed -i "s/[^ ]*#define HIGH/\/\/#define HIGH/g" home/runner/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+
+        
+        sed -i "s/[^ ]*#define LOW/\/\/#define LOW/g" cd ..  cd .. .platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+        sed -i "s/[^ ]*#define HIGH/\/\/#define HIGH/g" cd .. .platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
         cp configurations/Voxelab\ Aquila/HC32/ConfigurationUBL.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/HC32/Configuration_advUBL.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/HC32/Version.h Marlin/Version.h
@@ -299,8 +301,8 @@ jobs:
       run: |
         if [ "$AQUILA_VER" = HC32 ]; then AVTMP="HC32"; fi;
         echo "filename=${AVTMP}_BLT-ProUI.bin" >> $GITHUB_OUTPUT
-        sed -i "s/[^ ]*#define LOW/\/\/#define LOWW/g" ~.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
-        sed -i "s/[^ ]*#define HIGH/#define HIGHH/g" ~.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+        sed -i "s/[^ ]*#define LOW/\/\/#define LOWW/g" ~/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
+        sed -i "s/[^ ]*#define HIGH/#define HIGHH/g" ~/.platformio/packages/framework-arduino-hc32f46x/cores/arduino/io.h
         cp configurations/Voxelab\ Aquila/HC32/ConfigurationBLT.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/HC32/Configuration_advBLT.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/HC32/Version.h Marlin/Version.h
