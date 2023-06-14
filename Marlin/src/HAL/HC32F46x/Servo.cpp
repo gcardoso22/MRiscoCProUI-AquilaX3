@@ -42,7 +42,8 @@ uint8_t ServoCount = 0;
 #define TIMERA_UNIT1_CH1_FUNC Func_Tima0
 
 #include "../../core/boards.h"
-#include <io.h>
+#include "io.h" // added extra io.h because the framework <io.h> doesn't #ifndef LOW + HIGH, redefine error
+//#include <io.h>
 #ifndef TARGET_HC32F46x
 #include <pwm.h>
 #endif
