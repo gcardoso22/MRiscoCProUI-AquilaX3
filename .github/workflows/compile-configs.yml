@@ -1,9 +1,10 @@
 name: Build Configs
 
 on:
-  push:
-    tags:
-      - '2.1.3d-hc'
+  workflow_dispatch:
+  release:
+    types: [created]
+
 jobs:
   Build-Default-A:            # Default-NP for Aquila
     name: Build Default Files
