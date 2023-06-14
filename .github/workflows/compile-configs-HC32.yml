@@ -125,8 +125,17 @@ jobs:
         sed -i "s/[^ ]*#define PIDTEMP/$PTEMP#define PIDTEMP/g" Marlin/Configuration.h
         if ($TP); then MTEMP=; else MTEMP='\/\/'; fi;
         sed -i "s/[^ ]*#define MPCTEMP/$MTEMP#define MPCTEMP/g" Marlin/Configuration.h
-        if ($IS); then TEMPE='\/\/'; else TEMPE=; fi;
-        sed -i "s/[^ ]*#define EXTENDED_CAPABILITIES_REPORT/$TEMPE#define EXTENDED_CAPABILITIES_REPORT/g" Marlin/Configuration_adv.h
+        if ($IS); then ITEMP='\/\/'; else ITEMP=; fi;
+        sed -i "s/[^ ]*#define EXTENDED_CAPABILITIES_REPORT/$ITEMP#define EXTENDED_CAPABILITIES_REPORT/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define HAS_LOCKSCREEN/$ITEMP#define HAS_LOCKSCREEN/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define AUTO_REPORT_POSITION/$ITEMP#define AUTO_REPORT_POSITION/g" Marlin/Configuration_adv.h
+        if ($IS) && ($TP); then ETEMP='\/\/'; else ETEMP=; fi;
+        sed -i "s/[^ ]*#define EXTENDED_CAPABILITIES_REPORT/$ETEMP#define EXTENDED_CAPABILITIES_REPORT/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define AUTO_REPORT_POSITION/$ETEMP#define AUTO_REPORT_POSITION/g" Marlin/Configuration_adv.h
+        sed -i "s/[^ ]*#define HAS_LOCKSCREEN/$ETEMP#define HAS_LOCKSCREEN/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define USE_GRID_MESHVIEWER/$ETEMP#define USE_GRID_MESHVIEWER/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define HAS_CUSTOM_COLORS/$ETEMP#define HAS_CUSTOM_COLORS/g" Marlin/Configuration.h
+        sed -i "s/[^ ]*#define FILAMENT_RUNOUT_SENSOR/$ETEMP#define FILAMENT_RUNOUT_SENSOR/g" Marlin/Configuration.h
         pio run
         mkdir temp
         mv .pio/build/HC32F460xCxx_AQUILA_V101/*.bin temp/build.bin
