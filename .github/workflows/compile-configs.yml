@@ -2,8 +2,8 @@ name: Build Configs
 
 on:
   workflow_dispatch:
-  release:
-    types: [created]
+  #release:
+   # types: [created]
 
 jobs:
   Build-Default-A:            # Default-NP for Aquila
