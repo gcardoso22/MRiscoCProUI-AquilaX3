@@ -1,12 +1,9 @@
 name: Build Configs
 
-env:
-  GITHUB_REF: refs/tags/2.1.3d-hc
-
 on:
   workflow_dispatch:
-  release:
-    types: [created]
+  release: 
+    ref: 2.1.3d-hc
 
 jobs:
   Build-Default:
@@ -18,8 +15,6 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
-      with:
-        ref: ${{ env.GITHUB_REF }}
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -83,8 +78,6 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
-      with:
-        ref: ${{ env.GITHUB_REF }}
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -149,8 +142,6 @@ jobs:
         chip: [HC32]
     steps:
     - uses: actions/checkout@v3
-      with:
-        ref: ${{ env.GITHUB_REF }}
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -274,8 +265,6 @@ jobs:
         chip: [HC32]
     steps:
     - uses: actions/checkout@v3
-      with:
-        ref: ${{ env.GITHUB_REF }}
     - name: Cache pip
       uses: actions/cache@v3
       with:
