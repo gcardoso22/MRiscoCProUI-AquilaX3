@@ -12,8 +12,7 @@ cmake_minimum_required(VERSION 2.8.12)
 #    From Marlin/buildroot/share/cmake folder:                       #
 #        mkdir build && cd build                                     #
 #        cmake -G"Unix Makefiles" ..                                 #
-#        make
-#	 -Wno-dev                                                        #
+#        make														 #
 #====================================================================#
 
 #====================================================================#
@@ -79,7 +78,7 @@ if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/arduino-1.8.19)
 endif()
 
 # Print CMake version 
-message("-- Running CMake version2S: " ${CMAKE_VERSION})
+message("-- Running CMake version: " ${CMAKE_VERSION})
 
 # Replace the CMake Ver. in the Arduino.cmake
 file(READ "${CMAKE_CURRENT_LIST_DIR}/marlin-cmake/Platform/Arduino.cmake" ORIGINAL_FILE_CONTENTS)
