@@ -128,6 +128,13 @@ static_assert(COUNT(arm) == LOGICAL_AXES, "AXIS_RELATIVE_MODES must contain " _L
 #undef _ISSNS_1
 
 /**
+ * RADDS is forbidden for non-DUE boards, for now.
+ */
+#if ENABLED(RADDS_DISPLAY) && !defined(__SAM3X8E__)
+  #error "RADDS_DISPLAY is currently only incompatible with DUE boards."
+#endif
+
+/**
  * Heated Bed requirements
  */
 #if HAS_HEATED_BED
@@ -1287,8 +1294,8 @@ static_assert(COUNT(arm) == LOGICAL_AXES, "AXIS_RELATIVE_MODES must contain " _L
 
     #if HAS_BLTOUCH_HS_MODE
       constexpr char hs[] = STRINGIFY(BLTOUCH_HS_MODE);
-      /*static_assert(!(strcmp(hs, "1") && strcmp(hs, "true") && strcmp(hs, "0") && strcmp(hs, "false")), \
-        "BLTOUCH_HS_MODE must now be defined as true or false, indicating the default state.");*/
+      static_assert(!(strcmp(hs, "1") && strcmp(hs, "0x1") && strcmp(hs, "true") && strcmp(hs, "0") && strcmp(hs, "0x0") && strcmp(hs, "false")), \
+        "BLTOUCH_HS_MODE must now be defined as true or false, indicating the default state.");
       #ifdef BLTOUCH_HS_EXTRA_CLEARANCE
         static_assert(BLTOUCH_HS_EXTRA_CLEARANCE >= 0, "BLTOUCH_HS_MODE requires BLTOUCH_HS_EXTRA_CLEARANCE >= 0.");
       #endif
@@ -1441,15 +1448,22 @@ static_assert(COUNT(arm) == LOGICAL_AXES, "AXIS_RELATIVE_MODES must contain " _L
     static_assert(Z_AFTER_PROBING >= 0, "Probes require Z_AFTER_PROBING >= 0.");
   #endif
 
-  #if MULTIPLE_PROBING > 0 || EXTRA_PROBING > 0
-    #if MULTIPLE_PROBING == 0
-      #error "EXTRA_PROBING requires MULTIPLE_PROBING."
-    #elif MULTIPLE_PROBING < 2
-      #if DISABLED(PROUI_EX)
+  #if PROUI_EX
+    #if MULTIPLE_PROBING == 1
+        #error "MULTIPLE_PROBING must be 0 or more than 2."
+    #endif
+    #if MULTIPLE_PROBING > 0 && EXTRA_PROBING != 1
+      #error "PROUI_EX requires an EXTRA_PROBING value of 1"
+    #endif
+  #else
+    #if MULTIPLE_PROBING > 0 || EXTRA_PROBING > 0
+      #if MULTIPLE_PROBING == 0
+        #error "EXTRA_PROBING requires MULTIPLE_PROBING."
+      #elif MULTIPLE_PROBING < 2
         #error "MULTIPLE_PROBING must be 2 or more."
+      #elif MULTIPLE_PROBING <= EXTRA_PROBING
+        #error "EXTRA_PROBING must be less than MULTIPLE_PROBING."
       #endif
-    #elif MULTIPLE_PROBING <= EXTRA_PROBING
-      #error "EXTRA_PROBING must be less than MULTIPLE_PROBING."
     #endif
   #endif
 

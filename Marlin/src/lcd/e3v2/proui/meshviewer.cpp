@@ -34,7 +34,7 @@
   #include "bedlevel_tools.h"
 #endif
 
-bool meshredraw;                            // Redraw mesh points
+//bool meshredraw;                            // Redraw mesh points
 uint8_t sizex, sizey;                       // Mesh XY size
 uint8_t rmax;                               // Maximum radius
 #define margin 25                           // XY Margins
@@ -76,7 +76,7 @@ void MeshViewerClass::DrawMeshPoint(const uint8_t x, const uint8_t y, const floa
   NOMORE(min, z);
   const uint16_t color = DWINUI::RainbowInt(v, zmin, zmax);
   DWINUI::Draw_FillCircle(color, px(x), py(y), r(v));
-  TERN_(TJC_DISPLAY, delay(100));
+  TERN_(TJC_DISPLAY, delay(100);)
   if (sizex < (ENABLED(TJC_DISPLAY) ? 8 : 9)) {
     if (v == 0) DWINUI::Draw_Float(meshfont, 1, 2, px(x) - 2*fs, py(y) - fs, 0);
     else DWINUI::Draw_Signed_Float(meshfont, 1, 2, px(x) - 3*fs, py(y) - fs, z);
@@ -120,47 +120,47 @@ void MeshViewerClass::Draw(bool withsave /*=false*/, bool redraw /*=true*/) {
   if(bedLevelTools.view_mesh) {
     DWINUI::ClearMainArea();
     bedLevelTools.viewer_print_value = true;
-    bedLevelTools.Draw_Bed_Mesh(-1, 1, 8, 10 + TITLE_HEIGHT);}
-    else
-      if (redraw) DrawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y);
-      else DWINUI::Draw_Box(1, HMI_data.Background_Color, {89,305,99,38});
+    bedLevelTools.Draw_Bed_Mesh(-1, 1, 8, 10 + TITLE_HEIGHT);
+  }
+  else {
+    if (redraw) DrawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y);
+    else DWINUI::Draw_Box(1, HMI_data.Background_Color, {89,305,99,38});
+  }
   #else
     if (redraw) DrawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y);
     else DWINUI::Draw_Box(1, HMI_data.Background_Color, {89,305,99,38});
   #endif
   if (withsave) {
-    DWINUI::Draw_Button(BTN_Save, 26, 305, false);
-    DWINUI::Draw_Button(BTN_Continue, 146, 305, false);
+    DWIN_Draw_Box(1, HMI_data.Background_Color, 120, 300, 31, 42);
+    DWINUI::Draw_Button(BTN_Continue, 146, 305);
+    DWINUI::Draw_Button(BTN_Save, 26, 305);
     Draw_Select_Highlight(HMI_flag.select_flag, 305);
   }
   else {
     DWINUI::Draw_Button(BTN_Continue, 86, 305, true);
-    //Draw_Select_Box(86, 305);
   }
   #if ENABLED(USE_GRID_MESHVIEWER)
     if(bedLevelTools.view_mesh) {
-      bedLevelTools.Set_Mesh_Viewer_Status();}
+      bedLevelTools.Set_Mesh_Viewer_Status(); }
     else {
     char str_1[6], str_2[6] = "";
     ui.status_printf(0, F("minZ: %s | maxZ: +%s"),
       dtostrf(min, 1, 2, str_1),
-      dtostrf(max, 1, 2, str_2)
-    );}
+      dtostrf(max, 1, 2, str_2));
+    }
   #else
     char str_1[6], str_2[6] = "";
     ui.status_printf(0, F("minZ: %s | maxZ: +%s"),
       dtostrf(min, 1, 2, str_1),
-      dtostrf(max, 1, 2, str_2)
-    );
+      dtostrf(max, 1, 2, str_2));
   #endif
 }
 
-void Draw_MeshViewer() { MeshViewer.Draw(true, meshredraw); }
+void Draw_MeshViewer() { MeshViewer.Draw(true, true); }
 
-void onClick_MeshViewer() { if (HMI_flag.select_flag) { SaveMesh(); HMI_ReturnScreen(); } }
+void onClick_MeshViewer() { if (HMI_flag.select_flag) SaveMesh(); HMI_ReturnScreen(); }
 
 void Goto_MeshViewer(bool redraw) {
-  meshredraw = redraw;
   if (leveling_is_valid()) { Goto_Popup(Draw_MeshViewer, onClick_MeshViewer); }
   else { HMI_ReturnScreen(); }
 }

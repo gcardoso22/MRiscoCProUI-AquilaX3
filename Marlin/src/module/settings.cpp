@@ -1982,7 +1982,7 @@ void MarlinSettings::postprocess() {
         _FIELD_TEST(runout_sensor_enabled);
         EEPROM_READ(runout_sensor_enabled);
         #if HAS_FILAMENT_SENSOR
-          runout.enabled = runout_sensor_enabled < 0 ? FIL_RUNOUT_ENABLED_DEFAULT : runout_sensor_enabled;
+          runout.enabled = (runout_sensor_enabled < 0) ? FIL_RUNOUT_ENABLED_DEFAULT : runout_sensor_enabled;
         #endif
 
         TERN_(HAS_FILAMENT_SENSOR, if (runout.enabled) runout.reset());
@@ -3305,9 +3305,9 @@ void MarlinSettings::reset() {
   //
   #if PROUI_EX && HAS_MESH
     ui.mesh_inset_min_x = MESH_INSET;
-    ui.mesh_inset_max_x = X_BED_SIZE - MESH_INSET;
+    ui.mesh_inset_max_x = (X_BED_SIZE - MESH_INSET);
     ui.mesh_inset_min_y = MESH_INSET;
-    ui.mesh_inset_max_y = Y_BED_SIZE - MESH_INSET;
+    ui.mesh_inset_max_y = (Y_BED_SIZE - MESH_INSET);
   #endif
 
   //
