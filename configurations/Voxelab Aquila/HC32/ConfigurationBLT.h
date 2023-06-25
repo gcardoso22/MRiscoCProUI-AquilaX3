@@ -1628,7 +1628,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 2    // Use a value of (1) with PROUI_EX, otherwise (2)
+#define MULTIPLE_PROBING 0    // Use a value of (0) with PROUI_EX, otherwise (2)
 //#define EXTRA_PROBING    1
 
 /**
@@ -2383,7 +2383,7 @@
 //#define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
-#define PREHEAT_2_LABEL       "ABS" //PETG 
+#define PREHEAT_2_LABEL       "ABS" //PETG
 #define PREHEAT_2_TEMP_HOTEND 240
 #define PREHEAT_2_TEMP_BED     75
 //#define PREHEAT_2_TEMP_CHAMBER 35
@@ -3395,10 +3395,10 @@
     #define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option (152 bytes of flash)
   #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR) // (2528 bytes of flash)
-    #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu 
+    #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu
   #endif
   #if ENABLED(POWER_LOSS_RECOVERY) // (3400 bytes of flash)
-    #define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu 
+    #define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu
   #endif
   #if ENABLED(BLTOUCH)
     #define HS_MENU_ITEM        // BLTOUCH_HS_MODE menu option (56 bytes of flash)
