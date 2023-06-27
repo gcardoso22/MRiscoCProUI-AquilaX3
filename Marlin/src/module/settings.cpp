@@ -176,6 +176,10 @@
   #include "../lcd/extui/dgus/DGUSDisplayDef.h"
 #endif
 
+#if ENABLED(HOTEND_IDLE_TIMEOUT)
+  #include "../feature/hotend_idle.h"
+#endif
+
 #pragma pack(push, 1) // No padding between variables
 
 #if HAS_ETHERNET
@@ -591,17 +595,17 @@ typedef struct SettingsDataStruct {
   // Bed corner screw position
   //
   #ifdef BED_SCREW_INSET
-    float screw_pos;
+    float ui_screw_pos;
   #endif
 
   //
   // MESH_INSET workaround
   //
   #if PROUI_EX && HAS_MESH
-    float mesh_inset_min_x;
-    float mesh_inset_max_x;
-    float mesh_inset_min_y;
-    float mesh_inset_max_y;
+    float ui_mesh_inset_min_x;
+    float ui_mesh_inset_max_x;
+    float ui_mesh_inset_min_y;
+    float ui_mesh_inset_max_y;
   #endif
 
   //
@@ -660,6 +664,13 @@ typedef struct SettingsDataStruct {
   #if ENABLED(INPUT_SHAPING_Y)
     float shaping_y_frequency,                          // M593 Y F
           shaping_y_zeta;                               // M593 Y D
+  #endif
+
+  //
+  // HOTEND_IDLE_TIMEOUT
+  //
+  #if ENABLED(HOTEND_IDLE_TIMEOUT)
+    hotend_idle_settings_t hotend_idle_config;          // M86 S T E B
   #endif
 
 } SettingsData;
@@ -1784,7 +1795,7 @@ void MarlinSettings::postprocess() {
 
     //
     // Input Shaping
-    ///
+    //
     #if HAS_ZV_SHAPING
       #if ENABLED(INPUT_SHAPING_X)
         EEPROM_WRITE(stepper.get_shaping_frequency(X_AXIS));
@@ -1794,6 +1805,13 @@ void MarlinSettings::postprocess() {
         EEPROM_WRITE(stepper.get_shaping_frequency(Y_AXIS));
         EEPROM_WRITE(stepper.get_shaping_damping_ratio(Y_AXIS));
       #endif
+    #endif
+
+    //
+    // HOTEND_IDLE_TIMEOUT
+    //
+    #if ENABLED(HOTEND_IDLE_TIMEOUT)
+      EEPROM_WRITE(hotend_idle.cfg);
     #endif
 
     //
@@ -2763,7 +2781,7 @@ void MarlinSettings::postprocess() {
       //BED_SCREW_INSET
       //
       #ifdef BED_SCREW_INSET
-        _FIELD_TEST(screw_pos);
+        _FIELD_TEST(ui_screw_pos);
         EEPROM_READ(ui.screw_pos);
       #endif
 
@@ -2771,13 +2789,13 @@ void MarlinSettings::postprocess() {
       // MESH_INSET workaround
       //
       #if PROUI_EX && HAS_MESH
-        _FIELD_TEST(mesh_inset_min_x);
+        _FIELD_TEST(ui_mesh_inset_min_x);
         EEPROM_READ(ui.mesh_inset_min_x);
-        _FIELD_TEST(mesh_inset_max_x);
+        _FIELD_TEST(ui_mesh_inset_max_x);
         EEPROM_READ(ui.mesh_inset_max_x);
-        _FIELD_TEST(mesh_inset_min_y);
+        _FIELD_TEST(ui_mesh_inset_min_y);
         EEPROM_READ(ui.mesh_inset_min_y);
-        _FIELD_TEST(mesh_inset_max_y);
+        _FIELD_TEST(ui_mesh_inset_max_y);
         EEPROM_READ(ui.mesh_inset_max_y); 
       #endif
 
@@ -2908,6 +2926,13 @@ void MarlinSettings::postprocess() {
         stepper.set_shaping_frequency(Y_AXIS, _data[0]);
         stepper.set_shaping_damping_ratio(Y_AXIS, _data[1]);
       }
+      #endif
+
+      //
+      // HOTEND_IDLE_TIMEOUT
+      //
+      #if ENABLED(HOTEND_IDLE_TIMEOUT)
+        EEPROM_READ(hotend_idle.cfg);
       #endif
 
       //
@@ -3305,9 +3330,9 @@ void MarlinSettings::reset() {
   //
   #if PROUI_EX && HAS_MESH
     ui.mesh_inset_min_x = MESH_INSET;
-    ui.mesh_inset_max_x = (X_BED_SIZE - MESH_INSET);
+    ui.mesh_inset_max_x = (DEF_X_BED_SIZE - MESH_INSET);
     ui.mesh_inset_min_y = MESH_INSET;
-    ui.mesh_inset_max_y = (Y_BED_SIZE - MESH_INSET);
+    ui.mesh_inset_max_y = (DEF_Y_BED_SIZE - MESH_INSET);
   #endif
 
   //
@@ -3764,6 +3789,11 @@ void MarlinSettings::reset() {
     #endif
   #endif
 
+  //
+  // Hotend Idle Timeout
+  //
+  TERN_(HOTEND_IDLE_TIMEOUT, hotend_idle.cfg.set_defaults());
+
   postprocess();
 
   #if ANY(EEPROM_CHITCHAT, DEBUG_LEVELING_FEATURE)
@@ -4028,6 +4058,11 @@ void MarlinSettings::reset() {
     // Input Shaping
     //
     TERN_(HAS_ZV_SHAPING, gcode.M593_report(forReplay));
+
+    //
+    // Hotend Idle Timeout
+    //
+    TERN_(HOTEND_IDLE_TIMEOUT, gcode.M86_report(forReplay));
 
     //
     // Linear Advance
