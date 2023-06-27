@@ -2282,7 +2282,8 @@ void Goto_ConfirmToPrint() {
   void WriteEeprom() {
     DWIN_DrawStatusLine(GET_TEXT_F(MSG_STORE_EEPROM));
     const bool success = settings.save();
-    safe_delay(200);
+    safe_delay(500);
+    bool need_lcd_update = true;
     DWIN_UpdateLCD();
     DONE_BUZZ(success);
   }
