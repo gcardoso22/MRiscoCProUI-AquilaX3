@@ -705,15 +705,15 @@
 /**
  * Model Predictive Control for hotend
  *
- * Use a physical model of the hotend to control temperature. When configured correctly
- * this gives better responsiveness and stability than PID and it also removes the need
- * for PID_EXTRUSION_SCALING and PID_FAN_SCALING. Use M306 T to autotune the model.
+ * Use a physical model of the hotend to control temperature. When configured correctly this gives
+ * better responsiveness and stability than PID and removes the need for PID_EXTRUSION_SCALING
+ * and PID_FAN_SCALING. Enable MPC_AUTOTUNE and use M306 T to autotune the model.
  * @section mpctemp
  */
 #if ENABLED(MPCTEMP)
-  #define MPC_AUTOTUNE                              // Include a method to do MPC auto-tuning (~6.3K bytes of flash)
-  #define MPC_EDIT_MENU                             // Add MPC editing to the "Advanced Settings" menu. (~1.3K bytes of flash)
-  #define MPC_AUTOTUNE_MENU                         // Add MPC auto-tuning to the "Advanced Settings" menu. (~350 bytes of flash)
+  #define MPC_AUTOTUNE                                // Include a method to do MPC auto-tuning (~6.3K bytes of flash)
+  #define MPC_EDIT_MENU                               // Add MPC editing to the "Advanced Settings" menu. (~1.3K bytes of flash)
+  #define MPC_AUTOTUNE_MENU                           // Add MPC auto-tuning to the "Advanced Settings" menu. (~350 bytes of flash)
 
   #define MPC_MAX 255                                 // (0..255) Current to nozzle while MPC is active.
   #define MPC_HEATER_POWER { 40.0f }                  // (W) Heat cartridge powers.
@@ -734,8 +734,12 @@
     //#define MPC_FAN_0_ACTIVE_HOTEND
   #endif
 
+  // Filament Heat Capacity (joules/kelvin/mm)
+  // Set at runtime with M306 H<value>
   #define FILAMENT_HEAT_CAPACITY_PERMM { 5.6e-3f }    // 0.0056 J/K/mm for 1.75mm PLA (0.0149 J/K/mm for 2.85mm PLA).
-  //#define FILAMENT_HEAT_CAPACITY_PERMM { 3.6e-3f }  // 0.0036 J/K/mm for 1.75mm PETG (0.0094 J/K/mm for 2.85mm PETG).
+                                                      // 0.0036 J/K/mm for 1.75mm PETG (0.0094 J/K/mm for 2.85mm PETG).
+                                                      // 0.00515 J/K/mm for 1.75mm ABS (0.0137 J/K/mm for 2.85mm ABS).
+                                                      // 0.00522 J/K/mm for 1.75mm Nylon (0.0138 J/K/mm for 2.85mm Nylon).
 
   // Advanced options
   #define MPC_SMOOTHING_FACTOR 0.5f                   // (0.0...1.0) Noisy temperature sensors may need a lower value for stabilization.
@@ -1628,7 +1632,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-//#define MULTIPLE_PROBING 2    // Use a value of (0) with ProUIex, otherwise (2)
+//#define MULTIPLE_PROBING 2    // Use a value of (0) with PROUI_EX, otherwise (2)
 //#define EXTRA_PROBING    1
 
 /**
@@ -3148,6 +3152,10 @@
  *  - Download https://github.com/InsanityAutomation/Marlin/raw/CrealityDwin_2.0/TM3D_Combined480272_Landscape_V7.7z
  *  - Copy the downloaded DWIN_SET folder to the SD card.
  *
+ * E3S1PRO (T5UID1)
+ *  - Download https://github.com/CrealityOfficial/Ender-3S1/archive/3S1_Plus_Screen.zip
+ *  - Copy the downloaded DWIN_SET folder to the SD card.
+ *
  * CREALITY_TOUCH
  *  - CR-6 OEM touch screen. A DWIN display with touch.
  *
@@ -3157,7 +3165,7 @@
  *  - Plug the microSD card into the back of the display.
  *  - Boot the display and wait for the update to complete.
  *
- * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY' ]
+ * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO' ]
  */
 //#define DGUS_LCD_UI ORIGIN
 #if DGUS_UI_IS(MKS)
@@ -3383,7 +3391,7 @@
     #define HAS_GCODE_PREVIEW 1
     #define HAS_TOOLBAR 1
   #endif
-  #define HAS_PLOT 1            // Graph Temp as grid plot - PID/MPC Tuning (1624 bytes of flash)
+  #define DISABLE_TUNING_GRAPH 0// Graph Temp as grid plot - PID/MPC Tuning (1624 bytes of flash)
   #define HAS_ESDIAG 1          // View End-stop switch continuity (560 bytes of flash)
   #define HAS_CGCODE 1          // Extra Gcode options (3320 bytes of flash)
   #define HAS_LOCKSCREEN 1      // Simple lockscreen as to not accidentally change something (568 bytes of flash)
@@ -3403,7 +3411,7 @@
   #if ENABLED(BLTOUCH)
     #define HS_MENU_ITEM        // BLTOUCH_HS_MODE menu option (56 bytes of flash)
   #endif
-  #if ENABLED(HAS_PLOT)
+  #if DISABLED(DISABLE_TUNING_GRAPH)
     #define PLOT_TUNE_ITEM      // Temperature Plot Graph item in Tune Menu (688 bytes of flash)
   #endif
   #if DISABLED(CLASSIC_JERK)
