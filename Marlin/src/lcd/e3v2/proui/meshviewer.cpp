@@ -114,7 +114,7 @@ void MeshViewerClass::DrawMesh(bed_mesh_t zval, const uint8_t csizex, const uint
   }
 }
 
-void MeshViewerClass::Draw(bool withsave /*=false*/, bool redraw /*=true*/) {
+void MeshViewerClass::Draw(bool withsave/*=false*/, bool redraw/*=true*/) {
   Title.ShowCaption(GET_TEXT_F(MSG_MESH_VIEWER));
   #if ENABLED(USE_GRID_MESHVIEWER)
   if(bedLevelTools.view_mesh) {
@@ -131,7 +131,7 @@ void MeshViewerClass::Draw(bool withsave /*=false*/, bool redraw /*=true*/) {
     else DWINUI::Draw_Box(1, HMI_data.Background_Color, {89,305,99,38});
   #endif
   if (withsave) {
-    DWIN_Draw_Box(1, HMI_data.Background_Color, 120, 300, 31, 42);
+    DWIN_Draw_Box(1, HMI_data.Background_Color, 120, 300, 31, 42); // draw black box to fill previous button select_box
     DWINUI::Draw_Button(BTN_Continue, 146, 305);
     DWINUI::Draw_Button(BTN_Save, 26, 305);
     Draw_Select_Highlight(HMI_flag.select_flag, 305);
@@ -145,14 +145,14 @@ void MeshViewerClass::Draw(bool withsave /*=false*/, bool redraw /*=true*/) {
     else {
     char str_1[6], str_2[6] = "";
     ui.status_printf(0, F("minZ: %s | maxZ: +%s"),
-      dtostrf(min, 1, 2, str_1),
-      dtostrf(max, 1, 2, str_2));
+      dtostrf(min, 1, 3, str_1),
+      dtostrf(max, 1, 3, str_2));
     }
   #else
     char str_1[6], str_2[6] = "";
     ui.status_printf(0, F("minZ: %s | maxZ: +%s"),
-      dtostrf(min, 1, 2, str_1),
-      dtostrf(max, 1, 2, str_2));
+      dtostrf(min, 1, 3, str_1),
+      dtostrf(max, 1, 3, str_2));
   #endif
 }
 

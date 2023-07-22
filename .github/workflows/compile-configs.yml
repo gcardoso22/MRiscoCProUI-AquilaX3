@@ -1,13 +1,15 @@
 name: Build Configs
 
+######################### Aquila #########################
+
 on:
   workflow_dispatch:
-  #release:
-   # types: [created]
+  release:
+    types: [released]
 
 jobs:
   Build-Default-A:            # Default-NP for Aquila
-    name: Build Default Files
+    name: Build Default Files A
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,6 +18,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -35,6 +41,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -43,7 +50,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = GD32 ]; then AVTMP="GD32"; else AVTMP="N32"; fi;
-        echo "filename=${AVTMP}_Default-NP-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_Default-NP-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila/Default-NP/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/Default-NP/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/Default-NP/Version.h Marlin/Version.h
@@ -68,7 +78,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -77,7 +87,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-Manual-Mesh-A:        # Manual Mesh - MM for Aquila
-    name: Build Manual-Mesh Files
+    name: Build Manual-Mesh Files A
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -86,6 +96,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -105,6 +119,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -113,7 +128,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = GD32 ]; then AVTMP="GD32"; else AVTMP="N32"; fi;
-        echo "filename=${AVTMP}_MM-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_MM-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila/MM/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/MM/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/MM/Version.h Marlin/Version.h
@@ -138,7 +156,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -147,15 +165,17 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-UBL-ProUI-A:            # UBL-Pro for Aquila
-    name: Build UBL Pro Files
+    name: Build UBL Pro Files A
     runs-on: ubuntu-latest
     strategy:
       matrix:
         chip: [GD32,N32]
-        temp: [false,false]
-        inshape: [false,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -175,42 +195,33 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
       id: build_configs
       run: |
-        if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
-        if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = GD32 ]; then AVTMP="GD32"; else AVTMP="N32"; fi;
-        echo "filename=${AVTMP}_UBL-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_UBL-ProUI.bin" >> $GITHUB_OUTPUT        
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila/UBL/ConfigurationPro.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/UBL/Configuration_advPro.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/UBL/Version.h Marlin/Version.h
         sed -i "s/default_envs =.*/default_envs = ${AQUILA_VER}F103RC_voxelab_maple/g" platformio.ini
-        if ($IS); then TEMP=; else TEMP='\/\/'; fi;
-        sed -i "s/[^ ]*#define INPUT_SHAPING_X/$TEMP#define INPUT_SHAPING_X/g" Marlin/Configuration_adv.h
-        sed -i "s/[^ ]*#define INPUT_SHAPING_Y/$TEMP#define INPUT_SHAPING_Y/g" Marlin/Configuration_adv.h
-        if ($TP); then PTEMP='\/\/'; else PTEMP=; fi;
-        sed -i "s/[^ ]*#define PIDTEMP/$PTEMP#define PIDTEMP/g" Marlin/Configuration.h
-        if ($TP); then MTEMP=; else MTEMP='\/\/'; fi;
-        sed -i "s/[^ ]*#define MPCTEMP/$MTEMP#define MPCTEMP/g" Marlin/Configuration.h
-        if ($IS) && ($TP); then ETEMP='\/\/'; else ETEMP=; fi;
-        sed -i "s/[^ ]*#define EXTENDED_CAPABILITIES_REPORT/$ETEMP#define EXTENDED_CAPABILITIES_REPORT/g" Marlin/Configuration_adv.h
         pio run
         mkdir temp
         mv .pio/build/${AQUILA_VER}F103RC_voxelab_maple/*.bin temp/build.bin
       env:
         AQUILA_VER: ${{ matrix.chip }}
-        TP: ${{ matrix.temp }}
-        IS: ${{ matrix.inshape }}
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.3.2
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -219,7 +230,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-UBL-NoPro-A:          # UBL NoPro for Aquila
-    name: Build UBL NoPro Files
+    name: Build UBL NoPro Files A
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -229,6 +240,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -248,6 +263,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -256,7 +272,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = GD32 ]; then AVTMP="GD32"; else AVTMP="N32"; fi;
-        echo "filename=${AVTMP}_UBL-${GRID}x${GRID}-NoPro${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_UBL-${GRID}x${GRID}-NoPro${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila/UBL/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/UBL/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/UBL/Version.h Marlin/Version.h
@@ -283,7 +302,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -292,7 +311,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-BLTouch-A:            # BLTouch Pro for Aquila
-    name: Build BLT Pro Files
+    name: Build BLT Pro Files A
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -300,6 +319,10 @@ jobs:
         temp: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -319,6 +342,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -326,7 +350,10 @@ jobs:
       run: |
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if [ "$AQUILA_VER" = GD32 ]; then AVTMP="GD32"; else AVTMP="N32"; fi;
-        echo "filename=${AVTMP}_BLT-ProUI${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_BLT-ProUI${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila/BLT/ConfigurationPro.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/BLT/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/BLT/Version.h Marlin/Version.h
@@ -348,7 +375,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -357,7 +384,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-BLTouch-NP-A:         # BLTouch NoPro for Aquila
-    name: Build BLT NoPro Files
+    name: Build BLT NoPro Files A
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -367,6 +394,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -386,6 +417,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -394,7 +426,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = GD32 ]; then AVTMP="GD32"; else AVTMP="N32"; fi;
-        echo "filename=${AVTMP}_BLT-${GRID}x${GRID}-NoPro${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_BLT-${GRID}x${GRID}-NoPro${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila/BLT/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila/BLT/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila/BLT/Version.h Marlin/Version.h
@@ -421,7 +456,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -430,7 +465,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-Default-A4:            # Default-NP for Aquila 427
-    name: Build Default Files
+    name: Build Default Files A4
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -439,6 +474,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -458,6 +497,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -466,7 +506,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = 427 ]; then AVTMP="427"; else AVTMP="422"; fi;
-        echo "filename=${AVTMP}_Default-NP-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_Default-NP-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila\ 427/Default-NP/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila\ 427/Default-NP/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila\ 427/Default-NP/Version.h Marlin/Version.h
@@ -493,7 +536,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -502,7 +545,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-Manual-Mesh-A4:        # Manual Mesh - MM for Aquila 427
-    name: Build Manual-Mesh Files
+    name: Build Manual-Mesh Files A4
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -511,6 +554,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -530,6 +577,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -538,7 +586,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = 427 ]; then AVTMP="427"; else AVTMP="422"; fi;
-        echo "filename=${AVTMP}_MM-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_MM-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila\ 427/MM/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila\ 427/MM/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila\ 427/MM/Version.h Marlin/Version.h
@@ -565,7 +616,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -574,7 +625,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-UBL-ProUI-A4:            # UBL-Pro for Aquila 427
-    name: Build UBL Pro Files
+    name: Build UBL Pro Files A4
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -583,6 +634,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -602,6 +657,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -610,7 +666,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = 427 ]; then AVTMP="427"; else AVTMP="422"; fi;
-        echo "filename=${AVTMP}_UBL-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_UBL-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila\ 427/UBL/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila\ 427/UBL/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila\ 427/UBL/Version.h Marlin/Version.h
@@ -637,7 +696,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -646,7 +705,7 @@ jobs:
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
   Build-BLTouch-A4:            # BLTouch Pro for Aquila 427
-    name: Build BLT Pro Files
+    name: Build BLT Pro Files A4
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -655,6 +714,10 @@ jobs:
         inshape: [true,false]
     steps:
     - uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Cache pip
       uses: actions/cache@v3
       with:
@@ -674,6 +737,7 @@ jobs:
     - name: Install PlatformIO
       run: |
         python3 -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install --upgrade wheel
         pip install --upgrade platformio
     - name: Run PlatformIO
@@ -682,7 +746,10 @@ jobs:
         if ($TP); then TPTMP=-MPC; else TPTMP=; fi;
         if ($IS); then ISTMP=-IS; else ISTMP=; fi;
         if [ "$AQUILA_VER" = 427 ]; then AVTMP="427"; else AVTMP="422"; fi;
-        echo "filename=${AVTMP}_BLT-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        echo "filename=Aquila_${AVTMP}_BLT-ProUI${ISTMP}${TPTMP}.bin" >> $GITHUB_OUTPUT
+        > Marlin/Configuration.h
+        > Marlin/Configuration_adv.h
+        > Marlin/Version.h
         cp configurations/Voxelab\ Aquila\ 427/BLT/Configuration.h Marlin/Configuration.h
         cp configurations/Voxelab\ Aquila\ 427/BLT/Configuration_adv.h Marlin/Configuration_adv.h
         cp configurations/Voxelab\ Aquila\ 427/BLT/Version.h Marlin/Version.h
@@ -709,7 +776,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1.0.2
+      uses: tanyagray/action-upload-release-asset@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -717,254 +784,3 @@ jobs:
         asset_path: temp/build.bin
         asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
-
-
-        ################################################## Ender-3
-  # Build-Default-E:
-  #   name: Build Default Files
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       board: [V422,V427]
-  #       inshape: [true,false]
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Cache pip
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.cache/pip
-  #       key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-  #       restore-keys: |
-  #         ${{ runner.os }}-pip-
-  #   - name: Cache PlatformIO
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.platformio
-  #       key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v3
-  #   - name: Install PlatformIO
-  #     run: |
-  #       python3 -m pip install --upgrade pip
-  #       pip install --upgrade wheel
-  #       pip install --upgrade platformio
-  #   - name: Run PlatformIO
-  #     id: build_configs
-  #     run: |
-  #       if ($IS); then ISTMP=-IS; else ISTMP=; fi;        
-  #       if [ "$BOARD" = V422 ]; then BOARDTMP=422 else BOARDTMP=427; fi;
-  #       echo "filename=Ender3V2-${BOARDTMP}_Default-NP-ProUI${ISTMP}.bin" >> $GITHUB_OUTPUT
-  #       cp configurations/Creality\ Ender/Ender3V2-NP/Configuration.h Marlin/Configuration.h
-  #       cp configurations/Creality\ Ender/Ender3V2-NP/Configuration_adv.h Marlin/Configuration_adv.h
-  #       cp configurations/Creality\ Ender/Ender3V2-NP/Version.h Marlin/Version.h
-  #       sed -i "s/#define MOTHERBOARD BOARD_CREALITY_.*/#define MOTHERBOARD BOARD_CREALITY_$BOARD/g" Marlin/Configuration.h
-  #       sed -i "s/default_envs =.*/default_envs = STM32F103RE_creality/g" platformio.ini
-  #       if ($IS); then TEMP=; else TEMP='\/\/'; fi;
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_X/$TEMP#define INPUT_SHAPING_X/g" Marlin/Configuration_adv.h
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_Y/$TEMP#define INPUT_SHAPING_Y/g" Marlin/Configuration_adv.h        
-  #       pio run
-  #       mkdir temp
-  #       mv .pio/build/STM32F103RE_creality/*.bin temp/build.bin
-  #     env:
-  #       BOARD: ${{ matrix.board }}
-  #       IS: ${{ matrix.inshape }}
-  #   - name: Get release
-  #     id: get_release
-  #     uses: bruceadams/get-release@v1.3.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ github.token }}
-  #   - name: Upload Release Asset
-  #     uses: actions/upload-release-asset@v1.0.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       upload_url: ${{ steps.get_release.outputs.upload_url }}
-  #       asset_path: temp/build.bin
-  #       asset_name: ${{ steps.build_configs.outputs.filename }}
-  #       asset_content_type: application/x-binary
-  # Build-Manual-Mesh-E:
-  #   name: Build Manual-Mesh Files
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       board: [V422,V427]
-  #       inshape: [true,false]
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Cache pip
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.cache/pip
-  #       key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-  #       restore-keys: |
-  #         ${{ runner.os }}-pip-
-  #   - name: Cache PlatformIO
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.platformio
-  #       key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v3
-  #   - name: Install PlatformIO
-  #     run: |
-  #       python3 -m pip install --upgrade pip
-  #       pip install --upgrade wheel
-  #       pip install --upgrade platformio
-  #   - name: Run PlatformIO
-  #     id: build_configs
-  #     run: |
-  #       if ($IS); then ISTMP=-IS; else ISTMP=; fi;        
-  #       if [ "$BOARD" = V422 ]; then BOARDTMP=422; else BOARDTMP=427; fi;
-  #       echo "filename=Ender3-${BOARDTMP}-MM-ProUI${ISTMP}.bin" >> $GITHUB_OUTPUT
-  #       cp configurations/Creality\ Ender/Ender3V2-MM/Configuration.h Marlin/Configuration.h
-  #       cp configurations/Creality\ Ender/Ender3V2-MM/Configuration_adv.h Marlin/Configuration_adv.h
-  #       cp configurations/Creality\ Ender/Ender3V2-MM/Version.h Marlin/Version.h
-  #       sed -i "s/default_envs =.*/default_envs = STM32F103RE_creality/g" platformio.ini
-  #       if ($IS); then TEMP=; else TEMP='\/\/'; fi;
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_X/$TEMP#define INPUT_SHAPING_X/g" Marlin/Configuration_adv.h
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_Y/$TEMP#define INPUT_SHAPING_Y/g" Marlin/Configuration_adv.h        
-  #       pio run
-  #       mkdir temp
-  #       mv .pio/build/STM32F103RE_creality/*.bin temp/build.bin
-  #     env:
-  #       BOARD: ${{ matrix.board }}
-  #       IS: ${{ matrix.inshape }}
-  #   - name: Get release
-  #     id: get_release
-  #     uses: bruceadams/get-release@v1.3.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ github.token }}
-  #   - name: Upload Release Asset
-  #     uses: actions/upload-release-asset@v1.0.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       upload_url: ${{ steps.get_release.outputs.upload_url }}
-  #       asset_path: temp/build.bin
-  #       asset_name: ${{ steps.build_configs.outputs.filename }}
-  #       asset_content_type: application/x-binary
-  # Build-UBL-BLTouch-E:
-  #   name: Build BL-Touch UBL Files
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       board: [V422,V427]
-  #       inshape: [true,false]
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Cache pip
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.cache/pip
-  #       key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-  #       restore-keys: |
-  #         ${{ runner.os }}-pip-
-  #   - name: Cache PlatformIO
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.platformio
-  #       key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v3
-  #   - name: Install PlatformIO
-  #     run: |
-  #       python3 -m pip install --upgrade pip
-  #       pip install --upgrade wheel
-  #       pip install --upgrade platformio
-  #   - name: Run PlatformIO
-  #     id: build_configs
-  #     run: |
-  #       if ($IS); then ISTMP=-IS; else ISTMP=; fi;
-  #       if [ "$BOARD" = V422 ]; then BOARDTMP=422; else BOARDTMP=427; fi;
-  #       echo "filename=Ender3-${BOARDTMP}_UBL-ProUI${ISTMP}.bin" >> $GITHUB_OUTPUT
-  #       cp configurations/Creality\ Ender/Ender3V2-UBL/Configuration\ Pro.h Marlin/Configuration.h
-  #       cp configurations/Creality\ Ender/Ender3V2-UBL/Configuration_adv\ Pro.h Marlin/Configuration_adv.h
-  #       cp configurations/Creality\ Ender/Ender3V2-UBL/Version.h Marlin/Version.h
-  #       sed -i "s/default_envs =.*/default_envs = STM32F103RE_creality/g" platformio.ini
-  #       if ($IS); then TEMP=; else TEMP='\/\/'; fi;
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_X/$TEMP#define INPUT_SHAPING_X/g" Marlin/Configuration_adv.h
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_Y/$TEMP#define INPUT_SHAPING_Y/g" Marlin/Configuration_adv.h
-  #       pio run
-  #       mkdir temp
-  #       mv .pio/build/STM32F103RE_creality/*.bin temp/build.bin
-  #     env:
-  #       BOARD: ${{ matrix.board }}
-  #       IS: ${{ matrix.inshape }}
-  #   - name: Get release
-  #     id: get_release
-  #     uses: bruceadams/get-release@v1.3.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ github.token }}
-  #   - name: Upload Release Asset
-  #     uses: actions/upload-release-asset@v1.0.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       upload_url: ${{ steps.get_release.outputs.upload_url }}
-  #       asset_path: temp/build.bin
-  #       asset_name: ${{ steps.build_configs.outputs.filename }}
-  #       asset_content_type: application/x-binary
-  # Build-UBL-BLTouch-E-NP:
-  #   name: Build BL-Touch UBL Files
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       board: [V422,V427]
-  #       grid: [3,4,5,6,7]
-  #       inshape: [true,false]
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Cache pip
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.cache/pip
-  #       key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-  #       restore-keys: |
-  #         ${{ runner.os }}-pip-
-  #   - name: Cache PlatformIO
-  #     uses: actions/cache@v3
-  #     with:
-  #       path: ~/.platformio
-  #       key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v3
-  #   - name: Install PlatformIO
-  #     run: |
-  #       python3 -m pip install --upgrade pip
-  #       pip install --upgrade wheel
-  #       pip install --upgrade platformio
-  #   - name: Run PlatformIO
-  #     id: build_configs
-  #     run: |
-  #       if ($IS); then ISTMP=-IS; else ISTMP=; fi;
-  #       if [ "$BOARD" = V422 ]; then BOARDTMP=422; else BOARDTMP=427; fi;
-  #       echo "filename=Ender3-${BOARDTMP}_UBL-${GRID}x${GRID}-NoPro${ISTMP}.bin" >> $GITHUB_OUTPUT
-  #       cp configurations/Creality\ Ender/Ender3V2-UBL/Configuration\ Pro.h Marlin/Configuration.h
-  #       cp configurations/Creality\ Ender/Ender3V2-UBL/Configuration_adv\ Pro.h Marlin/Configuration_adv.h
-  #       cp configurations/Creality\ Ender/Ender3V2-UBL/Version.h Marlin/Version.h
-  #       sed -i "s/default_envs =.*/default_envs = STM32F103RE_creality/g" platformio.ini
-  #       sed -i "s/#define GRID_MAX_POINTS_X.*/#define GRID_MAX_POINTS_X $GRID/g" Marlin/Configuration.h
-  #       if ($IS); then TEMP=; else TEMP='\/\/'; fi;
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_X/$TEMP#define INPUT_SHAPING_X/g" Marlin/Configuration_adv.h
-  #       sed -i "s/[^ ]*#define INPUT_SHAPING_Y/$TEMP#define INPUT_SHAPING_Y/g" Marlin/Configuration_adv.h
-  #       pio run
-  #       mkdir temp
-  #       mv .pio/build/STM32F103RE_creality/*.bin temp/build.bin
-  #     env:
-  #       BOARD: ${{ matrix.board }}
-  #       GRID: ${{ matrix.grid }}
-  #       IS: ${{ matrix.inshape }}
-  #   - name: Get release
-  #     id: get_release
-  #     uses: bruceadams/get-release@v1.3.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ github.token }}
-  #   - name: Upload Release Asset
-  #     uses: actions/upload-release-asset@v1.0.2
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       upload_url: ${{ steps.get_release.outputs.upload_url }}
-  #       asset_path: temp/build.bin
-  #       asset_name: ${{ steps.build_configs.outputs.filename }}
-  #       asset_content_type: application/x-binary
