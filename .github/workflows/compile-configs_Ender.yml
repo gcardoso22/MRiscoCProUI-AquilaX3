@@ -2,10 +2,10 @@ name: Build Configs
 
 ######################### Ender-3 #########################
 
-on:
-  workflow_dispatch:
-  release:
-    types: [prereleased]
+# on:
+#   workflow_dispatch:
+#   release:
+#     types: [prereleased]
 
 jobs:
   Build-Default-E:            # Default-NP for Ender-3
