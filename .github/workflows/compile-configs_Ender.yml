@@ -2,8 +2,8 @@ name: Build Configs
 
 ######################### Ender-3 #########################
 
-# on:
-#   workflow_dispatch:
+on:
+  workflow_dispatch:
 #   release:
 #     types: [prereleased]
 
