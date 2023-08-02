@@ -2059,12 +2059,6 @@
   #endif
 
   /**
-   * Add Z offset (M424 Z) that applies to all moves at the planner level.
-   * This Z offset will be automatically set to the middle value with G29.
-   */
-  //#define GLOBAL_MESH_Z_OFFSET
-
-  /**
    * For Cartesian machines, instead of dividing moves on mesh boundaries,
    * split up moves into short segments like a Delta. This follows the
    * contours of the bed more closely than edge-to-edge straight moves.
@@ -3168,7 +3162,7 @@
  *  - Plug the microSD card into the back of the display.
  *  - Boot the display and wait for the update to complete.
  *
- * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO' ]
+ * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO', 'CREALITY_TOUCH' ]
  */
 //#define DGUS_LCD_UI ORIGIN
 #if DGUS_UI_IS(MKS)
@@ -3369,6 +3363,8 @@
   #define TFT_THEME BLACK_MARLIN
 
   //#define TFT_SHARED_IO   // I/O is shared between TFT display and other devices. Disable async data transfer.
+
+  #define COMPACT_MARLIN_BOOT_LOGO  // Use compressed data to save Flash space.
 #endif
 
 #if ENABLED(TFT_LVGL_UI)
@@ -3415,13 +3411,10 @@
   #define HAS_CUSTOM_COLORS 1   // Able to change display colors (2040 bytes of flash)
   #define ALT_COLOR_MENU 0      // Color palette options >> 0 = Voxelab Default | 1 = Alternate Aquila | 2 = Ender3V2 Default
   #if ENABLED(AUTO_BED_LEVELING_UBL)
-    #define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option (152 bytes of flash)
+    //#define ACTIVATE_MESH_ITEM// Active Mesh Leveling menu option (152 bytes of flash)
   #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR) // (2528 bytes of flash)
     #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu
-  #endif
-  #if ENABLED(POWER_LOSS_RECOVERY) // (3400 bytes of flash)
-    #define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu
   #endif
   #if ENABLED(BLTOUCH)
     #define HS_MENU_ITEM        // BLTOUCH_HS_MODE menu option (56 bytes of flash)
@@ -3429,12 +3422,9 @@
   #if DISABLED(DISABLE_TUNING_GRAPH)
     #define PLOT_TUNE_ITEM      // Temperature Plot Graph item in Tune Menu (688 bytes of flash)
   #endif
-  #if DISABLED(CLASSIC_JERK)
-    //#define JD_TUNE_ITEM      // Enable only if Juntion Deviation is enabled
-  #endif
-  #if ENABLED(LIN_ADVANCE)
-    #define ADVK_TUNE_ITEM      // Linear Advance item in Tune Menu
-  #endif
+  //#define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu (POWER_LOSS_RECOVERY 3400 bytes of flash)
+  //#define JD_TUNE_ITEM        // Juntion Deviation item in Tune Menu (only if JD is enabled)
+  #define ADVK_TUNE_ITEM        // Linear Advance item in Tune Menu (only if JD is enabled)
   #define SHOW_REAL_POS
   #define CCLOUD_PRINT_SUPPORT  // Menu item: enable/disable Creality Cloud Print Support (192 bytes of flash)
   #define TRAMWIZ_MENU_ITEM     // Menu item: enable Tramming Wizard (2304 bytes of flash)

@@ -2594,7 +2594,7 @@ void ApplyMove() {
 void SetSpeed() { SetPIntOnClick(MIN_PRINT_SPEED, MAX_PRINT_SPEED); }
 
 #if HAS_HOTEND
-  void ApplyHotendTemp() { thermalManager.setTargetHotend(MenuData.Value, 0); }
+  void ApplyHotendTemp() { thermalManager.setTargetHotend(MenuData.Value, H_E0); }
   void SetHotendTemp() { SetIntOnClick(MIN_ETEMP, MAX_ETEMP, thermalManager.degTargetHotend(0), ApplyHotendTemp); }
 #endif
 
@@ -2608,19 +2608,19 @@ void SetSpeed() { SetPIntOnClick(MIN_PRINT_SPEED, MAX_PRINT_SPEED); }
   void SetFanSpeed() { SetIntOnClick(0, 255, thermalManager.fan_speed[0], ApplyFanSpeed); }
 #endif
 
+#if ENABLED(NOZZLE_PARK_FEATURE)
+  void ParkHead() {
+    LCD_MESSAGE(MSG_FILAMENT_PARK_ENABLED);
+    queue.inject(F("G28O\nG27"));
+  }
+#endif
+
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
   void ChangeFilament() {
     HMI_SaveProcessID(NothingToDo);
     queue.inject(F("M600 B2"));
   }
-
-  #if ENABLED(NOZZLE_PARK_FEATURE)
-    void ParkHead() {
-      LCD_MESSAGE(MSG_FILAMENT_PARK_ENABLED);
-      queue.inject(F("G28O\nG27"));
-    }
-  #endif
 
   #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
     void UnloadFilament() {
@@ -2774,6 +2774,7 @@ void SetFlow() { SetPIntOnClick(MIN_PRINT_FLOW, MAX_PRINT_FLOW, []{ planner.refr
       #endif
 
       if (ABS(MeshViewer.max - MeshViewer.min) < BED_TRAMMING_PROBE_TOLERANCE) {
+        EXIT_TRAMWIZ:
         DWINUI::Draw_CenteredString(140, F("Corners leveled"));
         DWINUI::Draw_CenteredString(160, F("Tolerance achieved!"));
       }
@@ -2789,6 +2790,7 @@ void SetFlow() { SetPIntOnClick(MIN_PRINT_FLOW, MAX_PRINT_FLOW, []{ planner.refr
             max = d;
             p = x + 2 * y;
           }
+          else { goto EXIT_TRAMWIZ; } // fail-safe if Corners are = 0.00
         }
         switch (p) {
           case 0b00 : plabel = GET_TEXT_F(MSG_TRAM_FL); break;
@@ -3083,9 +3085,7 @@ void Draw_Prepare_Menu() {
       MENU_ITEM(ICON_SetZOffset, MSG_PROBE_WIZARD, onDrawSubMenu, Draw_ZOffsetWiz_Menu);
     #endif
     MENU_ITEM(ICON_Tram, MSG_BED_TRAMMING, onDrawSubMenu, Draw_Tramming_Menu);
-    #if ENABLED(ADVANCED_PAUSE_FEATURE)
-      MENU_ITEM(ICON_FilMan, MSG_FILAMENT_MAN, onDrawSubMenu, Draw_FilamentMan_Menu);
-    #endif
+    MENU_ITEM(ICON_FilMan, MSG_FILAMENT_MAN, onDrawSubMenu, Draw_FilamentMan_Menu);
     #if ENABLED(PROUI_TUNING_GRAPH) && ENABLED(PLOT_TUNE_ITEM)
       MENU_ITEM_F(ICON_PIDNozzle, "Hotend Temp Graph", onDrawMenuItem, drawHPlot);
       MENU_ITEM_F(ICON_PIDBed, "Bed Temp Graph", onDrawMenuItem, drawBPlot);
@@ -3251,6 +3251,7 @@ void Draw_Move_Menu() {
       #endif
     }
     UpdateMenu(ProbeSetMenu);
+    LCD_MESSAGE_F("..HS Mode is High Speed for Probe ");
   }
 
 #endif
@@ -3366,7 +3367,7 @@ void Draw_Tune_Menu() {
     if (laser_device.is_laser_device()) return LCD_MESSAGE_F("Not available in laser mode");
   #endif
   checkkey = Menu;
-  if (SET_MENU(TuneMenu, MSG_TUNE, 20)) {
+  if (SET_MENU(TuneMenu, MSG_TUNE, 21)) {
     BACK_ITEM(Goto_PrintProcess);
     #if HAS_LCD_BRIGHTNESS
       MENU_ITEM(ICON_Box, MSG_BRIGHTNESS_OFF, onDrawMenuItem, TurnOffBacklight);
@@ -3374,10 +3375,10 @@ void Draw_Tune_Menu() {
     EDIT_ITEM(ICON_Speed, MSG_SPEED, onDrawPIntMenu, SetSpeed, &feedrate_percentage);
     EDIT_ITEM(ICON_Flow, MSG_FLOW, onDrawPIntMenu, SetFlow, &planner.flow_percentage[0]);
     #if HAS_HOTEND
-      HotendTargetItem = EDIT_ITEM(ICON_HotendTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawPIntMenu, SetHotendTemp, &thermalManager.temp_hotend[0].target);
+      HotendTargetItem = EDIT_ITEM(ICON_SetEndTemp, MSG_UBL_SET_TEMP_HOTEND, onDrawPIntMenu, SetHotendTemp, &thermalManager.temp_hotend[0].target);
     #endif
     #if HAS_HEATED_BED
-      BedTargetItem = EDIT_ITEM(ICON_BedTemp, MSG_UBL_SET_TEMP_BED, onDrawPIntMenu, SetBedTemp, &thermalManager.temp_bed.target);
+      BedTargetItem = EDIT_ITEM(ICON_SetBedTemp, MSG_UBL_SET_TEMP_BED, onDrawPIntMenu, SetBedTemp, &thermalManager.temp_bed.target);
     #endif
     #if HAS_FAN
       FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawPInt8Menu, SetFanSpeed, &thermalManager.fan_speed[0]);
@@ -3400,6 +3401,9 @@ void Draw_Tune_Menu() {
     #endif
     #if ENABLED(PLR_TUNE_ITEM) && ENABLED(POWER_LOSS_RECOVERY)
       EDIT_ITEM(ICON_Pwrlossr, MSG_OUTAGE_RECOVERY, onDrawChkbMenu, SetPwrLossr, &recovery.enabled);
+    #endif
+    #if ENABLED(SHOW_SPEED_IND)
+      EDIT_ITEM_F(ICON_MaxSpeed, "Speed Indicator", onDrawChkbMenu, SetSpdInd, &HMI_data.SpdInd);
     #endif
     #if ENABLED(FWRETRACT)
       MENU_ITEM(ICON_FWRetract, MSG_FWRETRACT, onDrawSubMenu, Draw_FWRetract_Menu);
@@ -3528,28 +3532,26 @@ void Draw_Motion_Menu() {
   UpdateMenu(MotionMenu);
 }
 
-#if ENABLED(ADVANCED_PAUSE_FEATURE)
-
-  void Draw_FilamentMan_Menu() {
-    checkkey = Menu;
-    if (SET_MENU(FilamentMenu, MSG_FILAMENT_MAN, 8)) {
-      BACK_ITEM(Draw_Prepare_Menu);
-      MENU_ITEM(ICON_FilSet, MSG_FILAMENT_SET, onDrawSubMenu, Draw_FilSet_Menu);
-      #if ENABLED(FWRETRACT)
-        MENU_ITEM(ICON_FWRetract, MSG_FWRETRACT, onDrawSubMenu, Draw_FWRetract_Menu);
-      #endif
-      EDIT_ITEM(ICON_Speed, MSG_SPEED, onDrawPIntMenu, SetSpeed, &feedrate_percentage);
-      EDIT_ITEM(ICON_Flow, MSG_FLOW, onDrawPIntMenu, SetFlow, &planner.flow_percentage[0]);
+void Draw_FilamentMan_Menu() {
+  checkkey = Menu;
+  if (SET_MENU(FilamentMenu, MSG_FILAMENT_MAN, 8)) {
+    BACK_ITEM(Draw_Prepare_Menu);
+    MENU_ITEM(ICON_FilSet, MSG_FILAMENT_SET, onDrawSubMenu, Draw_FilSet_Menu);
+    #if ENABLED(FWRETRACT)
+      MENU_ITEM(ICON_FWRetract, MSG_FWRETRACT, onDrawSubMenu, Draw_FWRetract_Menu);
+    #endif
+    EDIT_ITEM(ICON_Speed, MSG_SPEED, onDrawPIntMenu, SetSpeed, &feedrate_percentage);
+    EDIT_ITEM(ICON_Flow, MSG_FLOW, onDrawPIntMenu, SetFlow, &planner.flow_percentage[0]);
+    #if ENABLED(ADVANCED_PAUSE_FEATURE)
       MENU_ITEM(ICON_FilMan, MSG_FILAMENTCHANGE, onDrawMenuItem, ChangeFilament);
-      #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
-        MENU_ITEM(ICON_FilUnload, MSG_FILAMENTUNLOAD, onDrawMenuItem, UnloadFilament);
-        MENU_ITEM(ICON_FilLoad, MSG_FILAMENTLOAD, onDrawMenuItem, LoadFilament);
-      #endif
-    }
-    UpdateMenu(FilamentMenu);
+    #endif
+    #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+      MENU_ITEM(ICON_FilUnload, MSG_FILAMENTUNLOAD, onDrawMenuItem, UnloadFilament);
+      MENU_ITEM(ICON_FilLoad, MSG_FILAMENTLOAD, onDrawMenuItem, LoadFilament);
+    #endif
   }
-
-#endif // ADVANCED_PAUSE_FEATURE
+  UpdateMenu(FilamentMenu);
+}
 
 #if HAS_PREHEAT
 

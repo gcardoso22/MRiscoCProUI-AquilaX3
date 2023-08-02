@@ -1709,7 +1709,7 @@
    * an option on the LCD screen to continue the print from the last-known
    * point in the file.
    */
-  //#define POWER_LOSS_RECOVERY         // (3400 bytes of flash)
+  #define POWER_LOSS_RECOVERY         // (3400 bytes of flash)
   #if ENABLED(POWER_LOSS_RECOVERY)
     #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
     //#define BACKUP_POWER_SUPPLY       // Backup power / UPS to move the steppers on power loss
@@ -2249,15 +2249,12 @@
 
   //#define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28
 
-  #ifdef BLTOUCH
+  #if ENABLED(BLTOUCH)
     #define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
-    //#define BABYSTEP_GLOBAL_Z             // Combine M424 Z and Babystepping
 
-    #if ANY(BABYSTEP_ZPROBE_OFFSET, BABYSTEP_GLOBAL_Z)
-      #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
-        //#define BABYSTEP_HOTEND_Z_OFFSET  // For multiple hotends, babystep relative Z offsets
-      #endif
-    //#define BABYSTEP_GFX_OVERLAY          // Enable graphical overlay on Z-offset editor
+    #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
+      //#define BABYSTEP_HOTEND_Z_OFFSET  // For multiple hotends, babystep relative Z offsets
+      //#define BABYSTEP_GFX_OVERLAY          // Enable graphical overlay on Z-offset editor
     #endif
   #endif
 #endif
@@ -2845,7 +2842,7 @@
   #define FILAMENT_UNLOAD_PURGE_LENGTH         8  // (mm) An unretract is done, then this length is purged.
   #define FILAMENT_UNLOAD_PURGE_FEEDRATE      25  // (mm/s) feedrate to purge before unload
 
-  #define PAUSE_PARK_NOZZLE_TIMEOUT           90  // (seconds) Time limit before the nozzle is turned off for safety.
+  #define PAUSE_PARK_NOZZLE_TIMEOUT          180  // (seconds) Time limit before the nozzle is turned off for safety.
   #define FILAMENT_CHANGE_ALERT_BEEPS          5  // Number of alert beeps to play when a response is needed.
   #define PAUSE_PARK_NO_STEPPER_TIMEOUT           // Enable for XYZ steppers to stay powered on during filament change.
   //#define FILAMENT_CHANGE_RESUME_ON_INSERT      // Automatically continue / load filament when runout sensor is triggered again.
@@ -3845,7 +3842,7 @@
 // @section reporting
 
 // Extra options for the M114 "Current Position" report
-#define M114_DETAIL         // Use 'M114` for details to check planner calculations (600 bytes of flash)
+#define M114_DETAIL           // Use 'M114` for details to check planner calculations (600 bytes of flash)
 //#define M114_REALTIME       // Real current position based on forward kinematics (80 bytes of flash)
 //#define M114_LEGACY         // M114 used to synchronize on every call. Enable if needed.
 

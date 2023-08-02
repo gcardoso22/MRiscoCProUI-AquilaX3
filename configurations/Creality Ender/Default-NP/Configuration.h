@@ -1,4 +1,4 @@
-/** Aquila Default-No Probe
+/** Ender-3 Default-No Probe
  * Marlin 3D Printer Firmware
  * Copyright (c) 2022 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
@@ -1865,8 +1865,8 @@
   #define NUM_RUNOUT_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
 
   #define FIL_RUNOUT_STATE     HIGH       // Pin state indicating that filament is NOT present.
-  #define FIL_RUNOUT_PULLUP               // Use internal pullup for filament runout pins.
-  //#define FIL_RUNOUT_PULLDOWN           // Use internal pulldown for filament runout pins.
+  //#define FIL_RUNOUT_PULLUP             // Use internal pullup for filament runout pins.
+  #define FIL_RUNOUT_PULLDOWN             // Use internal pulldown for filament runout pins.
   //#define WATCH_ALL_RUNOUT_SENSORS      // Execute runout script on any triggering sensor, not only for the active extruder.
                                           // This is automatically enabled for MIXING_EXTRUDERs.
 
@@ -2054,12 +2054,6 @@
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
     #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height.
   #endif
-
-  /**
-   * Add Z offset (M424 Z) that applies to all moves at the planner level.
-   * This Z offset will be automatically set to the middle value with G29.
-   */
-  //#define GLOBAL_MESH_Z_OFFSET
 
   /**
    * For Cartesian machines, instead of dividing moves on mesh boundaries,
@@ -3165,7 +3159,7 @@
  *  - Plug the microSD card into the back of the display.
  *  - Boot the display and wait for the update to complete.
  *
- * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO' ]
+ * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO', 'CREALITY_TOUCH' ]
  */
 //#define DGUS_LCD_UI ORIGIN
 #if DGUS_UI_IS(MKS)
@@ -3356,7 +3350,18 @@
    */
   #define TFT_FONT  NOTOSANS
 
+  /**
+   * TFT Theme for Color_UI. Choose one of the following or add a new one to 'Marlin/src/lcd/tft/themes' directory
+   *
+   * BLUE_MARLIN  - Default theme with 'midnight blue' background
+   * BLACK_MARLIN - Theme with 'black' background
+   * ANET_BLACK   - Theme used for Anet ET4/5
+   */
+  #define TFT_THEME BLACK_MARLIN
+
   //#define TFT_SHARED_IO   // I/O is shared between TFT display and other devices. Disable async data transfer.
+
+  #define COMPACT_MARLIN_BOOT_LOGO  // Use compressed data to save Flash space.
 #endif
 
 #if ENABLED(TFT_LVGL_UI)
@@ -3408,21 +3413,15 @@
   #if ENABLED(FILAMENT_RUNOUT_SENSOR) // (2528 bytes of flash)
     #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu 
   #endif
-  #if ENABLED(POWER_LOSS_RECOVERY) // (3400 bytes of flash)
-    #define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu 
-  #endif
   #if ENABLED(BLTOUCH)
     //#define HS_MENU_ITEM      // BLTOUCH_HS_MODE menu option (56 bytes of flash)
   #endif
   #if DISABLED(DISABLE_TUNING_GRAPH)
     #define PLOT_TUNE_ITEM      // Temperature Plot Graph item in Tune Menu (688 bytes of flash)
   #endif
-  #if DISABLED(CLASSIC_JERK)
-    //#define JD_TUNE_ITEM      // Enable only if Juntion Deviation is enabled
-  #endif
-  #if ENABLED(LIN_ADVANCE)
-    #define ADVK_TUNE_ITEM      // Linear Advance item in Tune Menu
-  #endif
+  #define PLR_TUNE_ITEM         // Power-loss Recovery option in Tune Menu (POWER_LOSS_RECOVERY 3400 bytes of flash)
+  //#define JD_TUNE_ITEM        // Juntion Deviation item in Tune Menu (only if JD is enabled)
+  #define ADVK_TUNE_ITEM        // Linear Advance item in Tune Menu (only if JD is enabled)
   #define SHOW_REAL_POS
   #define CCLOUD_PRINT_SUPPORT  // Menu item: enable/disable Creality Cloud Print Support (192 bytes of flash)
   #define TRAMWIZ_MENU_ITEM     // Menu item: enable Tramming Wizard (2304 bytes of flash)
