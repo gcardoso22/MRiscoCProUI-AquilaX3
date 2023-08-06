@@ -21,7 +21,8 @@
 #include "../../../inc/MarlinConfig.h"
 
 #if ALL(HAS_GRAPHICAL_LCD, FORCE_SOFT_SPI)
-#warning "'u8g_com_stm32duino_swspi' has not been tested to work as expected. Proceed at your own risk"
+#warning "'u8g_com_stm32duino_swspi' has not been adapted to HC32F46x. Proceed at your own risk"
+
 
 #include "../HAL.h"
 #include <U8glib.h>
@@ -34,8 +35,7 @@ static uint8_t SPI_speed = SPI_SPEED;
 
 static inline uint8_t swSpiTransfer_mode_0(uint8_t b, const uint8_t spi_speed, const pin_t miso_pin = -1)
 {
-  LOOP_L_N(i, 8)
-  {
+  for (uint8_t i = 0; i < 8; ++i) {
     if (spi_speed == 0)
     {
       WRITE(DOGLCD_MOSI, !!(b & 0x80));
@@ -48,67 +48,60 @@ static inline uint8_t swSpiTransfer_mode_0(uint8_t b, const uint8_t spi_speed, c
     else
     {
       const uint8_t state = (b & 0x80) ? HIGH : LOW;
-      LOOP_L_N(j, spi_speed)
-      WRITE(DOGLCD_MOSI, state);
+      for (uint8_t j = 0; j < spi_speed; ++j)
+        WRITE(DOGLCD_MOSI, state);
 
-      LOOP_L_N(j, spi_speed + (miso_pin >= 0 ? 0 : 1))
-      WRITE(DOGLCD_SCK, HIGH);
+      for (uint8_t j = 0; j < spi_speed + (miso_pin >= 0 ? 0 : 1); ++j)
+        WRITE(DOGLCD_SCK, HIGH);
 
       b <<= 1;
       if (miso_pin >= 0 && READ(miso_pin))
         b |= 1;
 
-      LOOP_L_N(j, spi_speed)
-      WRITE(DOGLCD_SCK, LOW);
+      for (uint8_t j = 0; j < spi_speed; ++j)
+        WRITE(DOGLCD_SCK, LOW);
     }
   }
   return b;
 }
 
-static inline uint8_t swSpiTransfer_mode_3(uint8_t b, const uint8_t spi_speed, const pin_t miso_pin = -1)
-{
-  LOOP_L_N(i, 8)
-  {
+static inline uint8_t swSpiTransfer_mode_3(uint8_t b, const uint8_t spi_speed, const pin_t miso_pin=-1) {
+  for (uint8_t i = 0; i < 8; ++i) {
     const uint8_t state = (b & 0x80) ? HIGH : LOW;
-    if (spi_speed == 0)
-    {
+    if (spi_speed == 0) {
       WRITE(DOGLCD_SCK, LOW);
       WRITE(DOGLCD_MOSI, state);
       WRITE(DOGLCD_MOSI, state); // need some setup time
       WRITE(DOGLCD_SCK, HIGH);
     }
-    else
-    {
-      LOOP_L_N(j, spi_speed + (miso_pin >= 0 ? 0 : 1))
-      WRITE(DOGLCD_SCK, LOW);
+    else {
+      for (uint8_t j = 0; j < spi_speed + (miso_pin >= 0 ? 0 : 1); ++j)
+        WRITE(DOGLCD_SCK, LOW);
 
-      LOOP_L_N(j, spi_speed)
-      WRITE(DOGLCD_MOSI, state);
+      for (uint8_t j = 0; j < spi_speed; ++j)
+        WRITE(DOGLCD_MOSI, state);
 
-      LOOP_L_N(j, spi_speed)
-      WRITE(DOGLCD_SCK, HIGH);
+      for (uint8_t j = 0; j < spi_speed; ++j)
+        WRITE(DOGLCD_SCK, HIGH);
     }
     b <<= 1;
-    if (miso_pin >= 0 && READ(miso_pin))
-      b |= 1;
+    if (miso_pin >= 0 && READ(miso_pin)) b |= 1;
   }
   return b;
 }
 
-static void u8g_sw_spi_HAL_STM32F1_shift_out(uint8_t val)
-{
-#if ENABLED(FYSETC_MINI_12864)
-  swSpiTransfer_mode_3(val, SPI_speed);
-#else
-  swSpiTransfer_mode_0(val, SPI_speed);
-#endif
+static void u8g_sw_spi_HAL_STM32F1_shift_out(uint8_t val) {
+  #if ENABLED(FYSETC_MINI_12864)
+    swSpiTransfer_mode_3(val, SPI_speed);
+  #else
+    swSpiTransfer_mode_0(val, SPI_speed);
+  #endif
 }
 
-static uint8_t swSpiInit(const uint8_t spi_speed)
-{
-#if PIN_EXISTS(LCD_RESET)
-  SET_OUTPUT(LCD_RESET_PIN);
-#endif
+static uint8_t swSpiInit(const uint8_t spi_speed) {
+  #if PIN_EXISTS(LCD_RESET)
+    SET_OUTPUT(LCD_RESET_PIN);
+  #endif
   SET_OUTPUT(DOGLCD_A0);
   OUT_WRITE(DOGLCD_SCK, LOW);
   OUT_WRITE(DOGLCD_MOSI, LOW);
