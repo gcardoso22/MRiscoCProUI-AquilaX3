@@ -973,7 +973,6 @@ void hmiSDCardUpdate() {
 void dwinDrawDashboard() {
 
   dwinDrawRectangle(1, hmiData.colorBackground, 0, STATUS_Y + 21, DWIN_WIDTH, DWIN_HEIGHT - 1);
-
   dwinDrawRectangle(1, hmiData.colorSplitLine, 0, 449, DWIN_WIDTH, 451);
 
   DWINUI::drawIcon(ICON_MaxSpeedX,  10, 456);
@@ -1014,7 +1013,6 @@ void dwinDrawDashboard() {
     DWINUI::drawIcon(planner.leveling_active ? ICON_SetZOffset : ICON_Zoffset, 187, 416);
     DWINUI::drawSignedFloat(DWIN_FONT_STAT, hmiData.colorIndicator,  hmiData.colorBackground, 2, 2, 204, 417, BABY_Z_VAR);
   #endif
-
 }
 
 void drawInfoMenu() {
@@ -2688,12 +2686,12 @@ void drawPrepareMenu() {
       #else
         MENU_ITEM_F(ICON_MoveZ0, "Home Z and disable", onDrawMenuItem, homeZandDisable);
       #endif
-      MENU_ITEM(ICON_Axis, MSG_LEVBED_FL, onDrawMenuItem, []{ tram(LF); });
-      MENU_ITEM(ICON_Axis, MSG_LEVBED_FR, onDrawMenuItem, []{ tram(RF); });
-      MENU_ITEM(ICON_Axis, MSG_LEVBED_BR, onDrawMenuItem, []{ tram(RB); });
-      MENU_ITEM(ICON_Axis, MSG_LEVBED_BL, onDrawMenuItem, []{ tram(LB); });
+      MENU_ITEM(ICON_Axis, MSG_TRAM_FL, onDrawMenuItem, []{ tram(LF); });
+      MENU_ITEM(ICON_Axis, MSG_TRAM_FR, onDrawMenuItem, []{ tram(RF); });
+      MENU_ITEM(ICON_Axis, MSG_TRAM_BR, onDrawMenuItem, []{ tram(RB); });
+      MENU_ITEM(ICON_Axis, MSG_TRAM_BL, onDrawMenuItem, []{ tram(LB); });
       #if ENABLED(BED_TRAMMING_INCLUDE_CENTER)
-        MENU_ITEM(ICON_Axis, MSG_LEVBED_C , onDrawMenuItem, []{ tram(TRAM_C); } );
+        MENU_ITEM(ICON_Axis, MSG_TRAM_C , onDrawMenuItem, []{ tram(TRAM_C); } );
       #endif
     }
     updateMenu(trammingMenu);

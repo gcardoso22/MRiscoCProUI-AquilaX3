@@ -209,7 +209,6 @@ void dwinFrameAreaMove(uint8_t mode, uint8_t dir, uint16_t dis,
 //  *string: The string
 //  rlimit: To limit the drawn string length
 void dwinDrawString(bool bShow, uint8_t size, uint16_t color, uint16_t bColor, uint16_t x, uint16_t y, const char * const string, uint16_t rlimit/*=0xFFFF*/) {
-
   constexpr uint8_t widthAdjust = 0;
   size_t i = 0;
   dwinByte(i, 0x11);
