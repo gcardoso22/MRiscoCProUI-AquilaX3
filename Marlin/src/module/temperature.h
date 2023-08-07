@@ -523,7 +523,11 @@ struct HeaterWatch {
 #endif
 
 // Temperature sensor read value ranges
-typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_range_t;
+#if PROUI_EX
+  typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp, tablemax; } temp_range_t;
+#else
+  typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_range_t;
+#endif
 
 #define THERMISTOR_ABS_ZERO_C           -273.15f  // bbbbrrrrr cold !
 #define THERMISTOR_RESISTANCE_NOMINAL_C 25.0f     // mmmmm comfortable
@@ -593,7 +597,12 @@ class Temperature {
 
     #if HAS_HOTEND
       static hotend_info_t temp_hotend[HOTENDS];
-      static constexpr celsius_t hotend_maxtemp[HOTENDS] = ARRAY_BY_HOTENDS(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP, HEATER_3_MAXTEMP, HEATER_4_MAXTEMP, HEATER_5_MAXTEMP, HEATER_6_MAXTEMP, HEATER_7_MAXTEMP);
+      #if PROUI_EX
+        static celsius_t hotend_maxtemp[HOTENDS];
+        static temp_range_t temp_range[HOTENDS];
+      #else
+        static constexpr celsius_t hotend_maxtemp[HOTENDS] = ARRAY_BY_HOTENDS(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP, HEATER_3_MAXTEMP, HEATER_4_MAXTEMP, HEATER_5_MAXTEMP, HEATER_6_MAXTEMP, HEATER_7_MAXTEMP);
+      #endif
       static celsius_t hotend_max_target(const uint8_t e) { return hotend_maxtemp[e] - (HOTEND_OVERSHOOT); }
     #endif
 
@@ -726,7 +735,7 @@ class Temperature {
       static hotend_watch_t watch_hotend[HOTENDS];
     #endif
 
-    #if HAS_HOTEND
+    #if HAS_HOTEND && DISABLED(PROUI_EX)
       static temp_range_t temp_range[HOTENDS];
     #endif
 

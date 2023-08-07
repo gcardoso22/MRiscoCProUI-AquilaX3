@@ -698,6 +698,8 @@
   #include "gd32f1/pins_TRIGORILLA_V006.h"          // GD32F1                               env:trigorilla_v006
 #elif MB(KEDI_CONTROLLER_V1_2)
   #include "stm32f1/pins_KEDI_CONTROLLER_V1_2.h"    // STM32F1                              env:STM32F103RC_btt env:STM32F103RC_btt_USB env:STM32F103RC_btt_maple env:STM32F103RC_btt_USB_maple
+#elif MB(VOXELAB_AQUILA)
+  #include "stm32f1/pins_CREALITY_V4.h"             // STM32F1                              env:GD32F103RE_voxelab_maple env:GD32F103RC_voxelab_maple
 
 //
 // ARM Cortex-M4F
@@ -789,7 +791,7 @@
 #elif MB(ARTILLERY_RUBY)
   #include "stm32f4/pins_ARTILLERY_RUBY.h"          // STM32F4                              env:Artillery_Ruby
 #elif MB(CREALITY_V24S1_301F4)
-  #include "stm32f4/pins_CREALITY_V24S1_301F4.h"    // STM32F4                              env:STM32F401RC_creality env:STM32F401RC_creality_jlink env:STM32F401RC_creality_stlink
+  #include "stm32f4/pins_CREALITY_V24S1_301F4.h"    // STM32F4                              env:STM32F401RC_creality env:STM32F401RC_creality_jlink env:STM32F401RC_creality_stlink env:STM32F401RE_creality
 #elif MB(OPULO_LUMEN_REV4)
   #include "stm32f4/pins_OPULO_LUMEN_REV4.h"        // STM32F4                              env:Opulo_Lumen_REV4
 #elif MB(FYSETC_SPIDER_KING407)
@@ -804,6 +806,8 @@
   #include "stm32f4/pins_BLACKPILL_CUSTOM.h"        // STM32F4                              env:STM32F401CD_blackpill_stlink
 #elif MB(I3DBEEZ9_V1)
   #include "stm32f4/pins_I3DBEEZ9.h"                // STM32F4                              env:I3DBEEZ9_V1
+#elif MB(CREALITY_CR4NTxxC10)
+  #include "stm32f4/pins_CREALITY_CR4NTxxC10.h"     // STM32F4                              env:STM32F401RC_creality env:STM32F401RE_creality
 
 //
 // ARM Cortex-M7

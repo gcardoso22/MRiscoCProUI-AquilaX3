@@ -1,13 +1,12 @@
 /**
- * Marlin 3D Printer Firmware
- * Copyright (c) 2021 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
- *
- * Based on Sprinter and grbl.
- * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
+ * DWIN Enhanced implementation for PRO UI
+ * Author: Miguel A. Risco-Castillo (MRISCOC)
+ * Version: 4.1.1
+ * Date: 2023/07/12
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -15,27 +14,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-/**
- * DWIN Enhanced implementation for PRO UI
- * Author: Miguel A. Risco-Castillo (MRISCOC)
- * Version: 3.11.1
- * Date: 2022/02/28
- */
-
 #include "../../../inc/MarlinConfigPre.h"
 
 #if ENABLED(DWIN_LCD_PROUI)
 
+#include "../../../MarlinCore.h" // for wait_for_user
 #include "dwin.h"
 #include "dwinui.h"
 #include "dwin_popup.h"
-
-#include "../../../MarlinCore.h" // for wait_for_user
 
 popupDrawFunc_t popupDraw = nullptr;
 popupClickFunc_t popupClick = nullptr;
@@ -61,7 +51,7 @@ void dwinPopupContinue(const uint8_t icon, FSTR_P const fmsg1, FSTR_P const fmsg
 }
 
 void dwinPopupConfirmCancel(const uint8_t icon, FSTR_P const fmsg2) {
-  dwinDrawPopup(ICON_BLTouch, F("Please confirm"), fmsg2);
+  dwinDrawPopup(icon, F("Please confirm"), fmsg2);
   DWINUI::drawButton(BTN_Confirm, 26, 280);
   DWINUI::drawButton(BTN_Cancel, 146, 280);
   drawSelectHighlight(hmiFlag.select_flag);

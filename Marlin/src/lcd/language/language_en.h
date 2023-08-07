@@ -75,6 +75,8 @@ namespace LanguageNarrow_en {
   LSTR MSG_LCD_SOFT_ENDSTOPS              = _UxGT("Soft Endstops");
   LSTR MSG_MAIN_MENU                      = _UxGT("Main Menu");
   LSTR MSG_ADVANCED_SETTINGS              = _UxGT("Advanced Settings");
+  LSTR MSG_TOOLBAR_SETUP                  = _UxGT("Toolbar Setup");
+  LSTR MSG_OPTION_DISABLED                = _UxGT("Option Disabled");
   LSTR MSG_CONFIGURATION                  = _UxGT("Configuration");
   LSTR MSG_RUN_AUTO_FILES                 = _UxGT("Run Auto Files");
   LSTR MSG_DISABLE_STEPPERS               = _UxGT("Disable Steppers");
@@ -334,6 +336,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_NOZZLE_N                       = _UxGT("Nozzle ~");
   LSTR MSG_NOZZLE_PARKED                  = _UxGT("Nozzle Parked");
   LSTR MSG_NOZZLE_STANDBY                 = _UxGT("Nozzle Standby");
+  LSTR MSG_NOZZLE_CLEAN                   = _UxGT("Clean and press continue");
   LSTR MSG_BED                            = _UxGT("Bed");
   LSTR MSG_CHAMBER                        = _UxGT("Enclosure");
   LSTR MSG_COOLER                         = _UxGT("Laser Coolant");
@@ -457,7 +460,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_CONTRAST                       = _UxGT("LCD Contrast");
   LSTR MSG_BRIGHTNESS                     = _UxGT("LCD Brightness");
   LSTR MSG_SCREEN_TIMEOUT                 = _UxGT("LCD Timeout (m)");
-  LSTR MSG_BRIGHTNESS_OFF                 = _UxGT("Backlight Off");
+  LSTR MSG_BRIGHTNESS_OFF                 = _UxGT("Turn Off LCD");
   LSTR MSG_STORE_EEPROM                   = _UxGT("Store Settings");
   LSTR MSG_LOAD_EEPROM                    = _UxGT("Load Settings");
   LSTR MSG_RESTORE_DEFAULTS               = _UxGT("Restore Defaults");
@@ -468,7 +471,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_ERR_EEPROM_CORRUPT             = _UxGT("Err: EEPROM Corrupt");
   LSTR MSG_SETTINGS_STORED                = _UxGT("Settings Stored");
   LSTR MSG_HAS_PREVIEW                    = _UxGT("Has preview");
-  LSTR MSG_RESET_PRINTER                  = _UxGT("Reset Printer");
+  LSTR MSG_RESET_PRINTER                  = _UxGT("Reboot Printer");
   LSTR MSG_REFRESH                        = LCD_STR_REFRESH _UxGT("Refresh");
   LSTR MSG_INFO_SCREEN                    = _UxGT("Info Screen");
   LSTR MSG_INFO_MACHINENAME               = _UxGT("Machine Name");
@@ -486,6 +489,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_BUTTON_INIT                    = _UxGT("Init");
   LSTR MSG_BUTTON_STOP                    = _UxGT("Stop");
   LSTR MSG_BUTTON_PRINT                   = _UxGT("Print");
+  LSTR MSG_BUTTON_MEDIA                   = _UxGT(MEDIA_TYPE_EN);
   LSTR MSG_BUTTON_RESET                   = _UxGT("Reset");
   LSTR MSG_BUTTON_IGNORE                  = _UxGT("Ignore");
   LSTR MSG_BUTTON_CANCEL                  = _UxGT("Cancel");
@@ -521,6 +525,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_USERWAIT                       = _UxGT("Click to Resume...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Print Paused");
   LSTR MSG_PRINTING                       = _UxGT("Printing...");
+  LSTR MSG_ENGRAVING                      = _UxGT("Engraving...");
   LSTR MSG_STOPPING                       = _UxGT("Stopping...");
   LSTR MSG_REMAINING_TIME                 = _UxGT("Remaining");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Print Aborted");
@@ -534,7 +539,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_CONTROL_RETRACT_SWAP           = _UxGT("Swap Re.mm");
   LSTR MSG_CONTROL_RETRACTF               = _UxGT("Retract V");
   LSTR MSG_CONTROL_RETRACT_ZHOP           = _UxGT("Hop mm");
-  LSTR MSG_CONTROL_RETRACT_RECOVER        = _UxGT("Unretr. mm");
+  LSTR MSG_CONTROL_RETRACT_RECOVER        = _UxGT("Unretr. Extra");
   LSTR MSG_CONTROL_RETRACT_RECOVER_SWAP   = _UxGT("S Unretr. mm");
   LSTR MSG_CONTROL_RETRACT_RECOVERF       = _UxGT("Unretract V");
   LSTR MSG_CONTROL_RETRACT_RECOVER_SWAPF  = _UxGT("S UnRet V");
@@ -548,7 +553,18 @@ namespace LanguageNarrow_en {
   LSTR MSG_SINGLENOZZLE_WIPE_RETRACT      = _UxGT("Wipe Retract");
   LSTR MSG_SINGLENOZZLE_RETRACT_SPEED     = _UxGT("Retract Speed");
   LSTR MSG_FILAMENT_PARK_ENABLED          = _UxGT("Park Head");
+  LSTR MSG_PARK_XPOSITION                 = _UxGT("Park X Position");
+  LSTR MSG_PARK_YPOSITION                 = _UxGT("Park Y Position");
+  LSTR MSG_PARK_ZRAISE                    = _UxGT("Park Z Raise");
   LSTR MSG_PARK_FAILED                    = _UxGT("Head cannot be parked");
+  LSTR MSG_PHY_SET                        = _UxGT("Physical settings");
+  LSTR MSG_PHY_XBEDSIZE                   = _UxGT("X bed size");
+  LSTR MSG_PHY_YBEDSIZE                   = _UxGT("Y bed size");
+  LSTR MSG_PHY_XMINPOS                    = _UxGT("X min position");
+  LSTR MSG_PHY_YMINPOS                    = _UxGT("Y min position");
+  LSTR MSG_PHY_XMAXPOS                    = _UxGT("X max position");
+  LSTR MSG_PHY_YMAXPOS                    = _UxGT("Y max position");
+  LSTR MSG_PHY_ZMAXPOS                    = _UxGT("Z max position");
   LSTR MSG_SINGLENOZZLE_UNRETRACT_SPEED   = _UxGT("Recover Speed");
   LSTR MSG_SINGLENOZZLE_FAN_SPEED         = _UxGT("Fan Speed");
   LSTR MSG_SINGLENOZZLE_FAN_TIME          = _UxGT("Fan Time");
@@ -602,6 +618,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_ZPROBE_YOFFSET                 = _UxGT("Probe Y Offset");
   LSTR MSG_ZPROBE_ZOFFSET                 = _UxGT("Probe Z Offset");
   LSTR MSG_ZPROBE_MARGIN                  = _UxGT("Probe Margin");
+  LSTR MSG_ZPROBE_MULTIPLE                = _UxGT("Multiple Probing");
   LSTR MSG_Z_FEED_RATE                    = _UxGT("Z Feed Rate");
   LSTR MSG_ENABLE_HS_MODE                 = _UxGT("Enable HS mode");
   LSTR MSG_MOVE_NOZZLE_TO_BED             = _UxGT("Move Nozzle to Bed");
@@ -653,6 +670,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_UBL_LEVELING                   = _UxGT("Unified Bed Leveling");
   LSTR MSG_MESH_LEVELING                  = _UxGT("Mesh Leveling");
   LSTR MSG_MESH_DONE                      = _UxGT("Mesh probing done");
+  LSTR MSG_MESH_POINTS                    = _UxGT("Mesh Points");
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Printer Stats");
   LSTR MSG_RESET_STATS                    = _UxGT("Reset Print Stats?");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Board Info");

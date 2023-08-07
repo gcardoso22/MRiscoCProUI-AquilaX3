@@ -700,6 +700,10 @@ private:
     static void M78();
   #endif
 
+  #if ENABLED(CCLOUD_PRINT_SUPPORT)
+    static void M79();
+  #endif
+
   #if ENABLED(PSU_CONTROL)
     static void M80();
   #endif

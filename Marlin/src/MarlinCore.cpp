@@ -79,8 +79,6 @@
     #include "lcd/e3v2/creality/dwin.h"
   #elif ENABLED(DWIN_LCD_PROUI)
     #include "lcd/e3v2/proui/dwin.h"
-  #elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
-    #include "lcd/e3v2/jyersui/dwin.h"
   #endif
 #endif
 
@@ -1132,6 +1130,7 @@ void setup() {
 
   // Check startup - does nothing if bootloader sets MCUSR to 0
   const byte mcu = hal.get_reset_source();
+  TERN_(PROUI_EX, if (mcu & RST_EXTERNAL) hal.reboot());
   hal.clear_reset_source();
 
   #if ENABLED(MARLIN_DEV_MODE)
@@ -1265,15 +1264,19 @@ void setup() {
   if (mcu & RST_WATCHDOG)  SERIAL_ECHOLNPGM(STR_WATCHDOG_RESET);
   if (mcu & RST_SOFTWARE)  SERIAL_ECHOLNPGM(STR_SOFTWARE_RESET);
 
-  // Identify myself as Marlin x.x.x
-  SERIAL_ECHOLNPGM("Marlin " SHORT_BUILD_VERSION);
-  #if defined(STRING_DISTRIBUTION_DATE) && defined(STRING_CONFIG_H_AUTHOR)
-    SERIAL_ECHO_MSG(
-      " Last Updated: " STRING_DISTRIBUTION_DATE
-      " | Author: " STRING_CONFIG_H_AUTHOR
-    );
+  #if PROUI_EX
+    proUIEx.C115();
+  #else
+    // Identify myself as Marlin x.x.x
+    SERIAL_ECHOLNPGM("Marlin " SHORT_BUILD_VERSION);
+    #if defined(STRING_DISTRIBUTION_DATE) && defined(STRING_CONFIG_H_AUTHOR)
+      SERIAL_ECHO_MSG(
+        " Last Updated: " STRING_DISTRIBUTION_DATE
+        " | Author: " STRING_CONFIG_H_AUTHOR
+      );
+    #endif
+    SERIAL_ECHO_MSG(" Compiled: " __DATE__);
   #endif
-  SERIAL_ECHO_MSG(" Compiled: " __DATE__);
   SERIAL_ECHO_MSG(STR_FREE_MEMORY, hal.freeMemory(), STR_PLANNER_BUFFER_BYTES, sizeof(block_t) * (BLOCK_BUFFER_SIZE));
 
   // Some HAL need precise delay adjustment

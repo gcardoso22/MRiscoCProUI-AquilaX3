@@ -1,13 +1,12 @@
 /**
- * Marlin 3D Printer Firmware
- * Copyright (c) 2022 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
- *
- * Based on Sprinter and grbl.
- * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
+ * Menu functions for ProUI
+ * Author: Miguel A. Risco-Castillo
+ * Version: 2.1.1
+ * Date: 2023/07/12
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -15,16 +14,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- */
-
-/**
- * Menu functions for ProUI
- * Author: Miguel A. Risco-Castillo
- * Version: 1.10.1
- * Date: 2022/05/01
  */
 
 #include "../../../inc/MarlinConfigPre.h"
@@ -35,8 +27,8 @@
 #include "dwin.h"
 #include "menus.h"
 
-int8_t MenuItemTotal = 0;
-int8_t MenuItemCount = 0;
+int8_t menuItemTotal = 0;
+int8_t menuItemCount = 0;
 CustomMenuItem** menuItems = nullptr;
 Menu *currentMenu = nullptr;
 Menu *previousMenu = nullptr;
@@ -157,7 +149,7 @@ void onDrawChkbMenu(MenuItem* menuitem, int8_t line) {
   onDrawChkbMenu(menuitem, line, val);
 }
 
-void DrawItemEdit(const bool selected) {
+void drawItemEdit(const bool selected) {
   const uint16_t bcolor = selected ? hmiData.colorSelected : hmiData.colorBackground;
   const uint8_t iNum = 4 - ((menuData.dp > 0) ? (menuData.dp - 1) : 0);
   switch (checkkey) {
@@ -202,7 +194,7 @@ void setOnClick(uint8_t process, const int32_t lo, const int32_t hi, uint8_t dp,
 //  apply: update function when the encoder is pressed
 void setValueOnClick(uint8_t process, const int32_t lo, const int32_t hi, const int32_t val, void (*apply)()/*=nullptr*/, void (*liveUpdate)()/*=nullptr*/) {
   setOnClick(process, lo, hi, 0, val, apply, liveUpdate);
-  DrawItemEdit(true);
+  drawItemEdit(true);
 }
 
 // Generic onclick event for float values
@@ -215,7 +207,7 @@ void setValueOnClick(uint8_t process, const int32_t lo, const int32_t hi, const 
 void setValueOnClick(uint8_t process, const float lo, const float hi, uint8_t dp, const float val, void (*apply)()/*=nullptr*/, void (*liveUpdate)()/*=nullptr*/) {
   const int32_t value =  round(val * POW(10, dp));
   setOnClick(process, lo * POW(10, dp), hi * POW(10, dp), dp, value, apply, liveUpdate);
-  DrawItemEdit(true);
+  drawItemEdit(true);
 }
 
 // Generic onclick event for integer values
@@ -287,14 +279,14 @@ int8_t hmiGet(bool draw) {
   if (encoder_diffState != ENCODER_DIFF_NO) {
     if (applyEncoder(encoder_diffState, menuData.value)) {
       encoderRate.enabled = false;
-      if (draw) DrawItemEdit(false);
+      if (draw) drawItemEdit(false);
       checkkey = ID_Menu;
       return 2;
     }
     LIMIT(menuData.value, lo, hi);
   }
   const bool change = cval != menuData.value;
-  if (change) DrawItemEdit(true);
+  if (change) drawItemEdit(true);
   return int8_t(change);
 }
 
@@ -349,7 +341,7 @@ void Menu::draw() {
   menuTitle.draw();
   DWINUI::setColors(hmiData.colorText, hmiData.colorBackground, hmiData.colorStatusBg);
   dwinDrawRectangle(1, DWINUI::backColor, 0, TITLE_HEIGHT, DWIN_WIDTH - 1, STATUS_Y - 1);
-  for (int8_t i = 0; i < MenuItemCount; i++)
+  for (int8_t i = 0; i < menuItemCount; i++)
     menuItems[i]->draw(i - topline);
   drawMenuCursor(line());
   dwinUpdateLCD();
@@ -358,7 +350,7 @@ void Menu::draw() {
 void Menu::onScroll(bool dir) {
   int8_t sel = selected;
   if (dir) sel++; else sel--;
-  LIMIT(sel, 0, MenuItemCount - 1);
+  LIMIT(sel, 0, menuItemCount - 1);
   if (sel != selected) {
     eraseMenuCursor(line());
     dwinUpdateLCD();
@@ -391,7 +383,7 @@ CustomMenuItem** Menu::items() {
 }
 
 int8_t Menu::count() {
-  return MenuItemCount;
+  return menuItemCount;
 };
 
 /* MenuItem Class ===========================================================*/
@@ -444,16 +436,16 @@ MenuItemPtr::MenuItemPtr(uint8_t cicon, const char * const text, OnDrawItem ondr
 
 void menuItemsClear() {
   if (menuItems == nullptr) return;
-  for (int8_t i = 0; i < MenuItemCount; i++) delete menuItems[i];
+  for (int8_t i = 0; i < menuItemCount; i++) delete menuItems[i];
   delete[] menuItems;
   menuItems = nullptr;
-  MenuItemCount = 0;
-  MenuItemTotal = 0;
+  menuItemCount = 0;
+  menuItemTotal = 0;
 }
 
 void menuItemsPrepare(int8_t totalitems) {
   menuItemsClear();
-  MenuItemTotal = _MIN(totalitems, MENU_MAX_ITEMS);
+  menuItemTotal = _MIN(totalitems, MENU_MAX_ITEMS);
   menuItems = new CustomMenuItem*[totalitems];
 }
 
@@ -463,13 +455,13 @@ bool isMenu(Menu* _menu) {
 
 template<typename T>
 T* menuItemAdd(T* menuitem) {
-  menuItems[MenuItemCount] = menuitem;
-  menuitem->pos = MenuItemCount++;
+  menuItems[menuItemCount] = menuitem;
+  menuitem->pos = menuItemCount++;
   return menuitem;
 }
 
 CustomMenuItem* menuItemAdd(OnDrawItem ondraw/*=nullptr*/, OnClickItem onclick/*=nullptr*/) {
-  if (MenuItemCount < MenuItemTotal) {
+  if (menuItemCount < menuItemTotal) {
     CustomMenuItem* menuitem = new CustomMenuItem(ondraw, onclick);
     return menuItemAdd(menuitem);
   }
@@ -477,7 +469,7 @@ CustomMenuItem* menuItemAdd(OnDrawItem ondraw/*=nullptr*/, OnClickItem onclick/*
 }
 
 MenuItem* menuItemAdd(uint8_t cicon, const char * const text/*=nullptr*/, OnDrawItem ondraw/*=nullptr*/, OnClickItem onclick/*=nullptr*/) {
-  if (MenuItemCount < MenuItemTotal) {
+  if (menuItemCount < menuItemTotal) {
     MenuItem* menuitem = new MenuItem(cicon, text, ondraw, onclick);
     return menuItemAdd(menuitem);
   }
@@ -485,7 +477,7 @@ MenuItem* menuItemAdd(uint8_t cicon, const char * const text/*=nullptr*/, OnDraw
 }
 
 MenuItem* menuItemAdd(uint8_t cicon, uint8_t id, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, OnDrawItem ondraw/*=nullptr*/, OnClickItem onclick/*=nullptr*/) {
-  if (MenuItemCount < MenuItemTotal) {
+  if (menuItemCount < menuItemTotal) {
     MenuItem* menuitem = new MenuItem(cicon, id, x1, y1, x2, y2, ondraw, onclick);
     return menuItemAdd(menuitem);
   }
@@ -493,7 +485,7 @@ MenuItem* menuItemAdd(uint8_t cicon, uint8_t id, uint16_t x1, uint16_t y1, uint1
 }
 
 MenuItem* editItemAdd(uint8_t cicon, const char * const text, OnDrawItem ondraw, OnClickItem onclick, void* val) {
-  if (MenuItemCount < MenuItemTotal) {
+  if (menuItemCount < menuItemTotal) {
     MenuItem* menuitem = new MenuItemPtr(cicon, text, ondraw, onclick, val);
     return menuItemAdd(menuitem);
   }
@@ -549,12 +541,12 @@ void updateMenu(Menu* &menu) {
   menu->draw();
 }
 
-void ReDrawMenu(bool force/*=false*/) {
+void redrawMenu(bool force/*=false*/) {
   if (currentMenu && (force || checkkey == ID_Menu)) currentMenu->draw();
-  if (force) DrawItemEdit(true);
+  if (force) drawItemEdit(true);
 }
 
-void ReDrawItem() {
+void redrawItem() {
   static_cast<MenuItem*>(currentMenu->selectedItem())->redraw(false);
 }
 

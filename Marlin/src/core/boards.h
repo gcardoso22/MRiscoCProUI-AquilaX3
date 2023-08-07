@@ -401,6 +401,11 @@
 #define BOARD_KEDI_CONTROLLER_V1_2    5069  // EDUTRONICS Kedi Controller V1.2 (STM32F103RC)
 
 //
+// Voxelab
+//
+#define BOARD_VOXELAB_AQUILA          5090  // Voxelab Aquila (GD32F103Rx)
+
+//
 // ARM Cortex-M4F
 //
 
@@ -459,7 +464,7 @@
 #define BOARD_CREALITY_F401RE         5245  // Creality CR4NS200141C13 (STM32F401RE) as found in the Ender-5 S1
 #define BOARD_BLACKPILL_CUSTOM        5246  // Custom board based on STM32F401CDU6.
 #define BOARD_I3DBEEZ9_V1             5247  // I3DBEEZ9 V1 (STM32F407ZG)
-
+#define BOARD_CREALITY_CR4NTxxC10     5301  // Creality STM32F401RE
 //
 // ARM Cortex-M7
 //

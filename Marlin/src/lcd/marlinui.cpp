@@ -49,8 +49,6 @@ MarlinUI ui;
   #include "e3v2/creality/dwin.h"
 #elif ENABLED(DWIN_LCD_PROUI)
   #include "e3v2/proui/dwin.h"
-#elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
-  #include "e3v2/jyersui/dwin.h"
 #endif
 
 #if ENABLED(LCD_PROGRESS_BAR) && !IS_TFTGLCD_PANEL
@@ -1457,13 +1455,16 @@ void MarlinUI::host_notify(const char * const cstr) {
     FSTR_P msg;
     if (printingIsPaused())
       msg = GET_TEXT_F(MSG_PRINT_PAUSED);
-    #if HAS_MEDIA
+    #if HAS_MEDIA && DISABLED(DWIN_LCD_PROUI)
       else if (IS_SD_PRINTING())
         return set_status_no_expire(card.longest_filename());
     #endif
     else if (print_job_timer.isRunning())
-      msg = GET_TEXT_F(MSG_PRINTING);
-
+      #if ENABLED(CV_LASER_MODULE)
+        msg = laser_device.is_laser_device() ? GET_TEXT_F(MSG_ENGRAVING) : GET_TEXT_F(MSG_PRINTING);
+      #else
+        msg = GET_TEXT_F(MSG_PRINTING);
+      #endif
     #if SERVICE_INTERVAL_1 > 0
       else if (print_job_timer.needsService(1)) msg = FPSTR(service1);
     #endif
@@ -1653,6 +1654,9 @@ void MarlinUI::host_notify(const char * const cstr) {
   #endif
 
   void MarlinUI::abort_print() {
+    #if ENABLED(CV_LASER_MODULE)
+      if (laser_device.is_laser_device()) laser_device.quick_stop();
+    #endif
     #if HAS_MEDIA
       wait_for_heatup = wait_for_user = false;
       card.abortFilePrintSoon();
@@ -1696,8 +1700,14 @@ void MarlinUI::host_notify(const char * const cstr) {
     LCD_MESSAGE(MSG_PRINT_PAUSED);
 
     #if ENABLED(PARK_HEAD_ON_PAUSE)
-      pause_show_message(PAUSE_MESSAGE_PARKING, PAUSE_MODE_PAUSE_PRINT); // Show message immediately to let user know about pause in progress
-      queue.inject(F("M25 P\nM24"));
+      #if ENABLED(CV_LASER_MODULE)
+        if (laser_device.is_laser_device()) queue.inject(F("M25"));
+        else
+      #endif
+      {
+        pause_show_message(PAUSE_MESSAGE_PARKING, PAUSE_MODE_PAUSE_PRINT); // Show message immediately to let user know about pause in progress
+        queue.inject(F("M25 P\nM24"));
+      }
     #elif HAS_MEDIA
       queue.inject(F("M25"));
     #elif defined(ACTION_ON_PAUSE)

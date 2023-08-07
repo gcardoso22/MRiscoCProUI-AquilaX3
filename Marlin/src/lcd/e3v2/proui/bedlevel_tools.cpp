@@ -1,30 +1,8 @@
 /**
- * Marlin 3D Printer Firmware
- * Copyright (c) 2022 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
- *
- * Based on Sprinter and grbl.
- * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- */
-
-/**
  * Bed Level Tools for Pro UI
  * Extended by: Miguel A. Risco-Castillo (MRISCOC)
- * Version: 3.2.0
- * Date: 2023/05/03
+ * Version: 4.1.0
+ * Date: 2023/07/12
  *
  * Based on the original work of: Henri-J-Norden
  * https://github.com/Jyers/Marlin/pull/126
@@ -172,7 +150,7 @@ void BedLevelTools::moveToZ() {
 void BedLevelTools::probeXY() {
   gcode.process_subcommands_now(
     MString<MAX_CMD_SIZE>(
-      F("G28O\nG0Z"), uint16_t(Z_CLEARANCE_DEPLOY_PROBE),
+      F("G0Z"), uint16_t(Z_CLEARANCE_DEPLOY_PROBE),
       F("\nG30X"), p_float_t(bedlevel.get_mesh_x(mesh_x), 2),
       F("Y"), p_float_t(bedlevel.get_mesh_y(mesh_y), 2)
     )
@@ -181,7 +159,9 @@ void BedLevelTools::probeXY() {
 
 void BedLevelTools::meshReset() {
   ZERO(bedlevel.z_values);
-  TERN_(AUTO_BED_LEVELING_BILINEAR, bedlevel.refresh_bed_level());
+  #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
+    bedlevel.refresh_bed_level();
+  #endif
 }
 
 // Accessors
@@ -214,7 +194,11 @@ bool BedLevelTools::meshValidate() {
 
 #if ENABLED(USE_GRID_MESHVIEWER)
 
-  constexpr uint8_t meshfont = TERN(TJC_DISPLAY, font8x16, font6x12);
+  #if ENABLED(TJC_DISPLAY)
+    #define meshfont font8x16
+  #else
+    #define meshfont font6x12
+  #endif
 
   void BedLevelTools::drawBedMesh(int16_t selected/*=-1*/, uint8_t gridline_width/*=1*/, uint16_t padding_x/*=8*/, uint16_t padding_y_top/*=(40 + 53 - 7)*/) {
     drawing_mesh = true;
@@ -239,7 +223,7 @@ bool BedLevelTools::meshValidate() {
       const auto end_x_px   = start_x_px + cell_width_px - 1 - gridline_width;
       const auto start_y_px = padding_y_top + ((GRID_MAX_POINTS_Y) - y - 1) * cell_height_px;
       const auto end_y_px   = start_y_px + cell_height_px - 1 - gridline_width;
-      dwinDrawRectangle(1,                                                                                 // RGB565 colors: http://www.barth-dev.de/online/rgb565-color-picker/
+      dwinDrawRectangle(1,                                                                                        // RGB565 colors: http://www.barth-dev.de/online/rgb565-color-picker/
         isnan(bedlevel.z_values[x][y]) ? COLOR_GREY : (                                                           // gray if undefined
           (bedlevel.z_values[x][y] < 0 ?
             (uint16_t)round(0x1F * -bedlevel.z_values[x][y] / (!viewer_asymmetric_range ? range : v_min)) << 11 : // red if mesh point value is negative
@@ -247,12 +231,11 @@ bool BedLevelTools::meshValidate() {
               _MIN(0x1F, (((uint8_t)abs(bedlevel.z_values[x][y]) / 10) * 4))),                                    // + blue stepping for every mm
         start_x_px, start_y_px, end_x_px, end_y_px
       );
-
       safe_delay(10);
       LCD_SERIAL.flushTX();
 
       // Draw value text on
-      char buf[8];
+      char buf[8]; char str_1[16];
       const uint8_t fs = DWINUI::fontWidth(meshfont);
       if (viewer_print_value) {
         int8_t offset_x, offset_y = cell_height_px / 2 - fs;

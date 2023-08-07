@@ -1651,7 +1651,7 @@ void _update_axis_value(const AxisEnum axis, const uint16_t x, const uint16_t y,
   }
 }
 
-void _draw_xyz_position(const bool force) {
+void _drawXYZPosition(const bool force) {
   //SERIAL_ECHOPGM("Draw XYZ:");
   static bool _blink = false;
   const bool blink = !!(millis() & 0x400UL);
@@ -1766,7 +1766,7 @@ void updateVariable() {
     }
   }
 
-  _draw_xyz_position(false);
+  _drawXYZPosition(false);
 }
 
 /**
@@ -1777,7 +1777,7 @@ void updateVariable() {
  * cache files here.
  */
 
-void make_name_without_ext(char *dst, char *src, size_t maxlen=MENU_CHAR_LIMIT) {
+void makeNameWithoutExt(char *dst, char *src, size_t maxlen=MENU_CHAR_LIMIT) {
   char * const name = card.longest_filename();
   size_t pos        = strlen(name); // index of ending nul
 
@@ -1825,7 +1825,7 @@ void MarlinUI::refresh() { /* Nothing to see here */ }
     if (WITHIN(filenum, 0, fileCnt - 1)) {
       card.selectFileByIndexSorted(filenum);
       char * const name = card.longest_filename();
-      make_name_without_ext(shift_name, name, 100);
+      makeNameWithoutExt(shift_name, name, 100);
     }
   }
 
@@ -1855,14 +1855,14 @@ void drawSDItem(const uint16_t item, int16_t row=-1) {
     // Init the current selected name
     // This is used during scroll drawing
     if (item == select_file.now - 1) {
-      make_name_without_ext(shift_name, name, 100);
+      makeNameWithoutExt(shift_name, name, 100);
       initSDItemShift();
     }
   #endif
 
   // Draw the file/folder with name aligned left
   char str[strlen(name) + 1];
-  make_name_without_ext(str, name);
+  makeNameWithoutExt(str, name);
   drawMenuLine(row, card.flag.filenameIsDir ? ICON_Folder : ICON_File, str);
 }
 
@@ -1931,7 +1931,7 @@ void hmiSDCardUpdate() {
   if (hmiFlag.home_flag) return;
   if (DWIN_lcd_sd_status != card.isMounted()) {
     DWIN_lcd_sd_status = card.isMounted();
-    //SERIAL_ECHOLNPGM("HMI_SDCardUpdate: ", DWIN_lcd_sd_status);
+    //SERIAL_ECHOLNPGM("hmiSDCardUpdate: ", DWIN_lcd_sd_status);
     if (DWIN_lcd_sd_status) {
       if (checkkey == ID_SelectFile)
         redrawSDList();
@@ -2006,7 +2006,7 @@ void drawStatusArea(const bool with_update) {
   dwinIconShow(ICON, ICON_MaxSpeedX,  10, 456);
   dwinIconShow(ICON, ICON_MaxSpeedY,  95, 456);
   dwinIconShow(ICON, ICON_MaxSpeedZ, 180, 456);
-  _draw_xyz_position(true);
+  _drawXYZPosition(true);
 
   if (with_update) {
     dwinUpdateLCD();

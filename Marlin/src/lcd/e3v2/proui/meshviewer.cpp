@@ -1,13 +1,12 @@
 /**
- * Marlin 3D Printer Firmware
- * Copyright (c) 2021 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
- *
- * Based on Sprinter and grbl.
- * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
+ * Mesh Viewer for PRO UI
+ * Author: Miguel A. Risco-Castillo (MRISCOC)
+ * version: 5.1.1
+ * Date: 2023/07/12
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -15,16 +14,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- */
-
-/**
- * Mesh Viewer for PRO UI
- * Author: Miguel A. Risco-Castillo (MRISCOC)
- * version: 4.2.1
- * Date: 2023/05/05
  */
 
 #include "../../../inc/MarlinConfigPre.h"
@@ -50,11 +42,15 @@ uint8_t rmax;                               // Maximum radius
 #define zmin -20                            // rmin at z=-0.20
 #define zmax  20                            // rmax at z= 0.20
 #define width DWIN_WIDTH - 2 * margin
-#define r(z) ((z - zmin) * (rmax - rmin) / (zmax - zmin) + rmin)
-#define px(xp) (margin + (xp) * (width) / (sizex - 1))
-#define py(yp) (30 + DWIN_WIDTH - margin - (yp) * (width) / (sizey - 1))
+#define r(z) ((z-zmin)*(rmax-rmin)/(zmax-zmin)+rmin)
+#define px(xp) (margin + (xp)*(width)/(sizex - 1))
+#define py(yp) (30 + DWIN_WIDTH - margin - (yp)*(width)/(sizey - 1))
 
-constexpr uint8_t meshfont = TERN(TJC_DISPLAY, font8x16, font6x12);
+#if ENABLED(TJC_DISPLAY)
+  #define meshfont font8x16
+#else
+  #define meshfont font6x12
+#endif
 
 MeshViewer meshViewer;
 
@@ -63,7 +59,7 @@ float MeshViewer::max, MeshViewer::min;
 void MeshViewer::drawMeshGrid(const uint8_t csizex, const uint8_t csizey) {
   sizex = csizex;
   sizey = csizey;
-  rmax = _MIN(margin - 2, 0.5 * (width) / (sizex - 1));
+  rmax = _MIN(margin - 2, 0.5*(width)/(sizex - 1));
   min = 100;
   max = -100;
   DWINUI::clearMainArea();
@@ -73,40 +69,44 @@ void MeshViewer::drawMeshGrid(const uint8_t csizex, const uint8_t csizey) {
 }
 
 void MeshViewer::drawMeshPoint(const uint8_t x, const uint8_t y, const float z) {
+  if (isnan(z)) return;
+  #if LCD_BACKLIGHT_TIMEOUT_MINS
+    ui.refresh_backlight_timeout();
+  #endif
   const uint8_t fs = DWINUI::fontWidth(meshfont);
-  const int16_t v = isnan(z) ? 0 : round(z * 100);
-  NOLESS(max, z);
-  NOMORE(min, z);
-  const uint16_t color = DWINUI::RainbowInt(v, zmin, zmax);
+  int16_t v = round(z * 100);
+  NOLESS(max, z); NOMORE(min, z);
+  const uint16_t color = DWINUI::rainbowInt(v, zmin, zmax);
   DWINUI::drawFillCircle(color, px(x), py(y), r(_MAX(_MIN(v,zmax),zmin)));
-  TERN_(TJC_DISPLAY, delay(100));
   if (sizex < (ENABLED(TJC_DISPLAY) ? 8 : 9)) {
-    if (v == 0) DWINUI::drawFloat(meshfont, 1, 2, px(x) - 2*fs, py(y) - fs, 0);
+    if (v == 0) dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2*fs - 1, py(y) - fs, "0.00");
     else DWINUI::drawSignedFloat(meshfont, 1, 2, px(x) - 3*fs, py(y) - fs, z);
   }
   else {
     char str_1[9];
-    str_1[0] = '\0';
+    str_1[0] = 0;
     switch (v) {
-      case -999 ... -100:
+      case -999 ... -100:  // -9.99 .. -1.00 mm
         DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3*fs, py(y) - fs, z);
         break;
-      case -99 ... -1:
+      case -99 ... -1:  // -0.99 .. -0.01 mm
         sprintf_P(str_1, PSTR("-.%02i"), -v);
         break;
       case 0:
         dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 4, py(y) - fs, "0");
         break;
-      case 1 ... 99:
+      case 1 ... 99:  // 0.01 .. 0.99 mm
         sprintf_P(str_1, PSTR(".%02i"), v);
         break;
-      case 100 ... 999:
+      case 100 ... 999:  // 1.00 .. 9.99 mm
         DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3 * fs, py(y) - fs, z);
         break;
     }
     if (str_1[0])
       dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2 * fs, py(y) - fs, str_1);
   }
+  SERIAL_FLUSH();
+  TERN_(TJC_DISPLAY, delay(100));
 }
 
 void MeshViewer::drawMesh(const bed_mesh_t zval, const uint8_t csizex, const uint8_t csizey) {
@@ -124,8 +124,8 @@ void MeshViewer::draw(const bool withsave/*=false*/, const bool redraw/*=true*/)
     bedLevelTools.viewer_print_value = true;
     bedLevelTools.drawBedMesh(-1, 1, 8, 10 + TITLE_HEIGHT);
   #else
-    if (redraw) drawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y);
-    else DWINUI::drawBox(1, hmiData.colorBackground, { 89, 305, 99, 38 });
+    if (redraw) drawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y); // Draw complete mesh viewer
+    else DWINUI::drawBox(1, hmiData.colorBackground, { 89, 305, 99, 38 }); // Erase "Continue" button
   #endif
   if (withsave) {
     DWINUI::drawButton(BTN_Save, 26, 305);
@@ -139,7 +139,10 @@ void MeshViewer::draw(const bool withsave/*=false*/, const bool redraw/*=true*/)
     bedLevelTools.setMeshViewerStatus();
   #else
     char str_1[6], str_2[6] = "";
-    ui.status_printf(0, F("Mesh minZ: %s, maxZ: %s"), dtostrf(min, 1, 2, str_1), dtostrf(max, 1, 2, str_2));
+    ui.status_printf(0, F("Mesh minZ: %s, maxZ: %s"),
+      dtostrf(min, 1, 2, str_1),
+      dtostrf(max, 1, 2, str_2)
+    );
   #endif
 }
 

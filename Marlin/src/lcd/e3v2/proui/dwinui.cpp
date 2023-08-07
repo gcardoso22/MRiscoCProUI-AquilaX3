@@ -1,13 +1,12 @@
 /**
- * Marlin 3D Printer Firmware
- * Copyright (c) 2021 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
- *
- * Based on Sprinter and grbl.
- * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
+ * DWIN Enhanced graphics implementation for PRO UI
+ * Author: Miguel A. Risco-Castillo (MRISCOC)
+ * Version: 4.1.1
+ * Date: 2023/07/12
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -15,16 +14,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- */
-
-/**
- * DWIN Enhanced implementation for PRO UI
- * Author: Miguel A. Risco-Castillo (MRISCOC)
- * Version: 3.21.1
- * Date: 2023/03/21
  */
 
 #include "../../../inc/MarlinConfig.h"
@@ -40,7 +32,6 @@ uint16_t DWINUI::textColor = defColorText;
 uint16_t DWINUI::backColor = defColorBackground;
 uint16_t DWINUI::buttonColor = defColorButton;
 uint8_t  DWINUI::fontID = font8x16;
-FSTR_P const DWINUI::author = F(STRING_CONFIG_H_AUTHOR);
 
 void (*DWINUI::onTitleDraw)(Title* t) = nullptr;
 
@@ -79,7 +70,7 @@ uint8_t DWINUI::fontWidth(fontid_t fid) {
 uint8_t DWINUI::fontHeight(fontid_t fid) {
   switch (fid) {
     #if DISABLED(TJC_DISPLAY)
-    case font6x12 : return 12;
+      case font6x12 : return 12;
       case font20x40: return 40;
       case font24x48: return 48;
       case font28x56: return 56;
@@ -209,7 +200,7 @@ void DWINUI::drawFloat(uint8_t bShow, bool signedMode, fontid_t fid, uint16_t co
 //  libID: Icon library ID
 //  picID: Icon ID
 //  x/y: Upper-left point
-void DWINUI::ICON_Show(bool BG, uint8_t icon, uint16_t x, uint16_t y) {
+void DWINUI::iconShow(bool BG, uint8_t icon, uint16_t x, uint16_t y) {
   const uint8_t libID = ICON TERN_(HAS_CUSTOMICONS, + (icon / 100));
   const uint8_t picID = icon TERN_(HAS_CUSTOMICONS, % 100);
   dwinIconShow(BG, false, !BG, libID, picID, x, y);
@@ -268,9 +259,9 @@ void DWINUI::drawFillCircle(uint16_t bcolor, uint16_t x,uint16_t y,uint8_t r) {
   uint16_t b = 1;
   while (b <= r) {
     uint16_t a = SQRT(sq(r) - sq(b));
-    dwinDrawLine(bcolor, x - a, y + b, x + a, y + b);
-    dwinDrawLine(bcolor, x - a, y - b, x + a, y - b);
-    b += TERN(TJC_DISPLAY, 2, 1);
+    dwinDrawLine(bcolor, x-a,y+b,x+a,y+b);
+    dwinDrawLine(bcolor, x-a,y-b,x+a,y-b);
+    b+=TERN(TJC_DISPLAY,2,1);
   }
 }
 
@@ -280,9 +271,9 @@ void DWINUI::drawFillCircle(uint16_t bcolor, uint16_t x,uint16_t y,uint8_t r) {
 //  maxv : Maximum value
 //  color1 : Start color
 //  color2 : End color
-uint16_t DWINUI::ColorInt(int16_t val, int16_t minv, int16_t maxv, uint16_t color1, uint16_t color2) {
+uint16_t DWINUI::colorInt(int16_t val, int16_t minv, int16_t maxv, uint16_t color1, uint16_t color2) {
   uint8_t B, G, R;
-  const float n = float(val - minv) / (maxv - minv);
+  const float n = (float)(val - minv) / (maxv - minv);
   R = (1 - n) * GetRColor(color1) + n * GetRColor(color2);
   G = (1 - n) * GetGColor(color1) + n * GetGColor(color2);
   B = (1 - n) * GetBColor(color1) + n * GetBColor(color2);
@@ -293,12 +284,13 @@ uint16_t DWINUI::ColorInt(int16_t val, int16_t minv, int16_t maxv, uint16_t colo
 //  val : Interpolator minv..maxv
 //  minv : Minimum value
 //  maxv : Maximum value
-uint16_t DWINUI::RainbowInt(int16_t val, int16_t minv, int16_t maxv) {
+uint16_t DWINUI::rainbowInt(const int16_t val, const int16_t minv, const int16_t maxv) {
   uint8_t B, G, R;
   const uint8_t maxB = 28, maxR = 28, maxG = 38;
-  const int16_t limv = _MAX(abs(minv), abs(maxv));
-  float n = minv >= 0 ? float(val - minv) / (maxv - minv) : (float)val / limv;
-  LIMIT(n, -1, 1);
+  int16_t v = val;
+  LIMIT(v, minv, maxv);
+  const float m = 2.0 / float(maxv - minv);
+  const float n = m * (v - minv) - 1;
   if (n < 0) {
     R = 0;
     G = (1 + n) * maxG;

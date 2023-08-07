@@ -39,6 +39,10 @@
   #include "../lcd/extui/ui_api.h"
 #endif
 
+#if PROUI_EX
+  #include "../lcd/e3v2/proui/proui.h"
+#endif
+
 //#define FILAMENT_RUNOUT_SENSOR_DEBUG
 #ifndef FILAMENT_RUNOUT_THRESHOLD
   #define FILAMENT_RUNOUT_THRESHOLD 5
@@ -159,7 +163,7 @@ class TFilamentMonitor : public FilamentMonitorBase {
         if (ran_out) {
           #if ENABLED(FILAMENT_RUNOUT_SENSOR_DEBUG)
             SERIAL_ECHOPGM("Runout Sensors: ");
-            for (uint8_t i = 0; i < 8; ++i) SERIAL_ECHO('0' + char(runout_flags[i]));
+            for (uint8_t i = 0; i < 8; ++i) SERIAL_ECHO(i < NUM_RUNOUT_SENSORS ? runout_flags[i] : 0);  // ProUI
             SERIAL_ECHOLNPGM(" -> ", extruder, " RUN OUT");
           #endif
 
@@ -191,7 +195,11 @@ class FilamentSensorBase {
   public:
     static void setup() {
       #define _INIT_RUNOUT_PIN(P,S,U,D) do{ if (ENABLED(U)) SET_INPUT_PULLUP(P); else if (ENABLED(D)) SET_INPUT_PULLDOWN(P); else SET_INPUT(P); }while(0);
-      #define  INIT_RUNOUT_PIN(N) _INIT_RUNOUT_PIN(FIL_RUNOUT##N##_PIN, FIL_RUNOUT##N##_STATE, FIL_RUNOUT##N##_PULLUP, FIL_RUNOUT##N##_PULLDOWN);
+      #if PROUI_EX
+        #define INIT_RUNOUT_PIN(N) proUIEx.setRunoutState(FIL_RUNOUT##N##_PIN);
+      #else
+        #define  INIT_RUNOUT_PIN(N) _INIT_RUNOUT_PIN(FIL_RUNOUT##N##_PIN, FIL_RUNOUT##N##_STATE, FIL_RUNOUT##N##_PULLUP, FIL_RUNOUT##N##_PULLDOWN);
+      #endif
       REPEAT_1(NUM_RUNOUT_SENSORS, INIT_RUNOUT_PIN)
       #undef INIT_RUNOUT_PIN
 
@@ -212,12 +220,21 @@ class FilamentSensorBase {
 
     // Return a bitmask of runout flag states (1 bits always indicates runout)
     static uint8_t poll_runout_states() {
-      #define _INVERT_BIT(N) | (FIL_RUNOUT##N##_STATE ? 0 : _BV(N - 1))
+      #if ENABLED(PROUI_EX)
+        #define _INVERT_BIT(N) | (PRO_data.Runout_active_state ? 0 : _BV(N - 1))
+      #else
+        #define _INVERT_BIT(N) | (FIL_RUNOUT##N##_STATE ? 0 : _BV(N - 1))
+      #endif
       return poll_runout_pins() ^ uint8_t(0 REPEAT_1(NUM_RUNOUT_SENSORS, _INVERT_BIT));
       #undef _INVERT_BIT
     }
 
-    #if ENABLED(FILAMENT_SWITCH_AND_MOTION)
+    #if ENABLED(PROUI_EX)
+      static uint8_t motion_detected;
+      static void poll_motion_sensor();
+      static void block_completed(const block_t * const b);
+      static void run();
+    #elif ENABLED(FILAMENT_SWITCH_AND_MOTION)
       // Return a bitmask of motion pin states
       static uint8_t poll_motion_pins() {
         #define _OR_MOTION(N) | (READ(FIL_MOTION##N##_PIN) ? _BV((N) - 1) : 0)
@@ -280,7 +297,7 @@ class FilamentSensorBase {
 
 #endif // HAS_FILAMENT_MOTION
 
-#if HAS_FILAMENT_SWITCH
+#if HAS_FILAMENT_SWITCH && DISABLED(PROUI_EX)
 
   /**
    * This is a simple endstop switch in the path of the filament.
@@ -318,7 +335,17 @@ class FilamentSensorBase {
       }
   };
 
- #endif // HAS_FILAMENT_SWITCH
+#endif // HAS_FILAMENT_SWITCH
+
+#if ENABLED(PROUI_EX)
+  /**
+   * This is a selectable sensor between endstop switch in the path of the
+   * filament, and a magnetic encoder disc with a Hall effect
+   * sensor (or a slotted disc and optical sensor).
+   */
+  class FilamentSensor : public FilamentSensorBase{};
+
+#else
 
   /**
    * This is a simple endstop switch in the path of the filament.
@@ -341,6 +368,7 @@ class FilamentSensorBase {
       }
   };
 
+#endif
 
 /********************************* RESPONSE TYPE *********************************/
 
