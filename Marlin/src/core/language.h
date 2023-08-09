@@ -160,10 +160,10 @@
 #define STR_ON                              "ON"
 #define STR_OFF                             "OFF"
 #define STR_ENDSTOP_HIT                     "TRIGGERED"
-#define STR_ENDSTOP_OPEN                    "open"
+#define STR_ENDSTOP_OPEN                    "Open"
 #define STR_DUPLICATION_MODE                "Duplication mode: "
-#define STR_SOFT_MIN                        "  Min: "
-#define STR_SOFT_MAX                        "  Max: "
+#define STR_SOFT_MIN                        " Min: "
+#define STR_SOFT_MAX                        " Max: "
 
 #define STR_SAVED_POS                       "Position saved"
 #define STR_RESTORING_POS                   "Restoring position"
@@ -231,6 +231,7 @@
 #define STR_PID_DEBUG_INPUT                 ": Input "
 #define STR_PID_DEBUG_OUTPUT                " Output "
 #define STR_INVALID_EXTRUDER_NUM            " - Invalid extruder number !"
+#define STR_MPC_AUTOTUNE                    "MPC Autotune"
 #define STR_MPC_AUTOTUNE_START              "MPC Autotune start for " STR_E
 #define STR_MPC_AUTOTUNE_INTERRUPTED        "MPC Autotune interrupted!"
 #define STR_MPC_AUTOTUNE_FINISHED           "MPC Autotune finished! Put the constants below into Configuration.h"

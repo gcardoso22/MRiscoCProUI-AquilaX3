@@ -25,6 +25,7 @@
 
 #include "dwin_defines.h"
 #include "dwinui.h"
+#include "dwin.h"
 
 xy_int_t DWINUI::cursor = { 0 };
 uint16_t DWINUI::penColor = COLOR_WHITE;
@@ -32,6 +33,7 @@ uint16_t DWINUI::textColor = defColorText;
 uint16_t DWINUI::backColor = defColorBackground;
 uint16_t DWINUI::buttonColor = defColorButton;
 uint8_t  DWINUI::fontID = font8x16;
+FSTR_P const DWINUI::Author = F(STRING_CONFIG_H_AUTHOR);
 
 void (*DWINUI::onTitleDraw)(Title* t) = nullptr;
 
@@ -208,12 +210,31 @@ void DWINUI::iconShow(bool BG, uint8_t icon, uint16_t x, uint16_t y) {
 
 // ------------------------- Buttons ------------------------------//
 
+void DWINUI::drawSelectBox(uint16_t xpos, uint16_t ypos) {
+  const uint16_t c1 = hmiData.colorCursor;
+  dwinDrawRectangle(0, c1, xpos - 1, ypos - 1, xpos + 100, ypos + 38);
+  dwinDrawRectangle(0, c1, xpos - 2, ypos - 2, xpos + 101, ypos + 39);
+}
+
 void DWINUI::drawButton(uint16_t color, uint16_t bcolor, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const char * const caption) {
   dwinDrawRectangle(1, bcolor, x1, y1, x2, y2);
   drawCenteredString(0, fontID, color, bcolor, x1, x2, (y2 + y1 - fontHeight())/2, caption);
 }
 
 void DWINUI::drawButton(uint8_t id, uint16_t x, uint16_t y) {
+  switch (id) {
+    case BTN_Cancel  : drawButton(GET_TEXT_F(MSG_BUTTON_CANCEL), x, y); break;
+    case BTN_Confirm : drawButton(GET_TEXT_F(MSG_BUTTON_CONFIRM), x, y); break;
+    case BTN_Continue: drawButton(GET_TEXT_F(MSG_BUTTON_CONTINUE), x, y); break;
+    case BTN_Print   : drawButton(GET_TEXT_F(MSG_BUTTON_PRINT), x, y); break;
+    case BTN_Save    : drawButton(GET_TEXT_F(MSG_BUTTON_SAVE), x, y); break;
+    case BTN_Purge   : drawButton(GET_TEXT_F(MSG_BUTTON_PURGE), x, y); break;
+    default: break;
+  }
+}
+
+void DWINUI::drawButton(uint8_t id, uint16_t x, uint16_t y, bool sel) {
+  if (sel) drawSelectBox(x, y);
   switch (id) {
     case BTN_Cancel  : drawButton(GET_TEXT_F(MSG_BUTTON_CANCEL), x, y); break;
     case BTN_Confirm : drawButton(GET_TEXT_F(MSG_BUTTON_CONFIRM), x, y); break;

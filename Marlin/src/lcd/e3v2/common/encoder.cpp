@@ -50,7 +50,7 @@ EncoderRate encoderRate;
 
 // TODO: Replace with ui.quick_feedback
 void Encoder_tick() {
-  TERN_(HAS_BEEPER, if (ui.sound_on) buzzer.click(10));
+  TERN_(HAS_BEEPER, if (ui.tick_on) buzzer.click(10);)
 }
 
 // Encoder initialization
@@ -127,11 +127,14 @@ EncoderState encoderReceiveAnalyze() {
     else temp_diffState = TERN(REVERSE_ENCODER_DIRECTION, ENCODER_DIFF_CW, ENCODER_DIFF_CCW);
 
     #if ENABLED(ENCODER_RATE_MULTIPLIER)
-
+      #if ENABLED(ENC_MENU_ITEM)
+        int a = ui.enc_rateA;
+        int b = ui.enc_rateB;
+      #endif
       millis_t ms = millis();
       int32_t encoderMultiplier = 1;
 
-      // if must encoder rati multiplier
+      // if must encoder rate multiplier
       if (encoderRate.enabled) {
         const float abs_diff = ABS(temp_diff),
                     encoderMovementSteps = abs_diff / (ENCODER_PULSES_PER_STEP);
@@ -139,8 +142,8 @@ EncoderState encoderReceiveAnalyze() {
           // Note that the rate is always calculated between two passes through the
           // loop and that the abs of the temp_diff value is tracked.
           const float encoderStepRate = encoderMovementSteps / float(ms - encoderRate.lastEncoderTime) * 1000;
-               if (encoderStepRate >= ENCODER_100X_STEPS_PER_SEC) encoderMultiplier = 100;
-          else if (encoderStepRate >= ENCODER_10X_STEPS_PER_SEC)  encoderMultiplier = 10;
+               if (encoderStepRate >= ENCODER_100X_STEPS_PER_SEC) encoderMultiplier = TERN(ENC_MENU_ITEM, a, 135);
+          else if (encoderStepRate >= ENCODER_10X_STEPS_PER_SEC)  encoderMultiplier = TERN(ENC_MENU_ITEM, b, 25);
           #if ENCODER_5X_STEPS_PER_SEC
             else if (encoderStepRate >= ENCODER_5X_STEPS_PER_SEC) encoderMultiplier = 5;
           #endif
@@ -176,9 +179,9 @@ EncoderState encoderReceiveAnalyze() {
 
   // LED light operation
   void LED_Action() {
-    LED_Control(RGB_SCALE_WARM_WHITE,0x0F);
+    LED_Control(RGB_SCALE_WARM_WHITE, 0x0F);
     delay(30);
-    LED_Control(RGB_SCALE_WARM_WHITE,0x00);
+    LED_Control(RGB_SCALE_WARM_WHITE, 0x00);
   }
 
   // LED initialization

@@ -260,7 +260,7 @@ G29_TYPE GcodeSuite::G29() {
     G29_RETURN(false, false);
   }
 
-  #if ALL(DWIN_LCD_PROUI, ZHOME_BEFORE_LEVELING)
+  #if ENABLED(DWIN_LCD_PROUI)
     process_subcommands_now(F("G28Z"));
   #else
     // Send 'N' to force homing before G29 (internal only)
@@ -513,7 +513,7 @@ G29_TYPE GcodeSuite::G29() {
       }
       // Pre-populate local Z values from the stored mesh
       TERN_(IS_KINEMATIC, COPY(abl.z_values, bedlevel.z_values));
-    #endif
+    #endif // AUTO_BED_LEVELING_BILINEAR
 
   } // !g29_in_progress
 

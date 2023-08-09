@@ -25,5 +25,5 @@ RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/l
 RUN pip install -U https://github.com/platformio/platformio-core/archive/develop.zip
 RUN platformio update
 # To get the test platforms
-RUN pip install PyYaml
+RUN pip install --upgrade PyYaml pio wheel
 #ENV PATH /code/buildroot/bin/:/code/buildroot/tests/:${PATH}

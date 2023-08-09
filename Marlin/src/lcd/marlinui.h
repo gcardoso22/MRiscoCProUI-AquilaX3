@@ -89,7 +89,6 @@ typedef bool (*statusResetFunc_t)();
 #if HAS_WIRED_LCD
   #define LCD_WITH_BLINK 1
   #define LCD_UPDATE_INTERVAL TERN(HAS_TOUCH_BUTTONS, 50, 100)
-
 #endif
 
 #if HAS_MARLINUI_U8GLIB
@@ -198,6 +197,22 @@ public:
   MarlinUI() {
     TERN_(HAS_MARLINUI_MENU, currentScreen = status_screen);
   }
+  
+  #ifdef BED_SCREW_INSET
+    static float screw_pos; // bed corner screw inset
+  #endif
+
+  #if PROUI_EX && HAS_MESH // workaround for mesh inset not saving on restart
+    static float mesh_inset_min_x;
+    static float mesh_inset_max_x;
+    static float mesh_inset_min_y;
+    static float mesh_inset_max_y;
+  #endif 
+
+  #if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+    static int enc_rateA;
+    static int enc_rateB;
+  #endif
 
   static void init();
 
@@ -226,6 +241,7 @@ public:
 
   #if ENABLED(SOUND_MENU_ITEM)
     static bool sound_on; // Initialized by settings.load()
+    static bool tick_on;  // added to disable encoder tick/beep while keeping sound on
   #else
     static constexpr bool sound_on = true;
   #endif
@@ -274,7 +290,7 @@ public:
   #endif
 
   #if LCD_BACKLIGHT_TIMEOUT_MINS
-    static constexpr uint8_t backlight_timeout_min = 0;
+    static constexpr uint8_t backlight_timeout_min = 1;
     static constexpr uint8_t backlight_timeout_max = 99;
     static uint8_t backlight_timeout_minutes;
     static millis_t backlight_off_ms;

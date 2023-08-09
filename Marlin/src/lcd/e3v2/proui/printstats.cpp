@@ -64,7 +64,7 @@ void gotoPrintStats() {
 }
 
 // Print Stats Reset popup
-void popupResetStats() { dwinPopupConfirmCancel(ICON_Info_0, GET_TEXT_F(MSG_RESET_STATS)); }
+void popupResetStats() { dwinPopupConfirmCancel(ICON_Pause_1, GET_TEXT_F(MSG_RESET_STATS)); }
 void onClickResetStats() {
   if (hmiFlag.select_flag) printStats.reset();
   hmiReturnScreen();

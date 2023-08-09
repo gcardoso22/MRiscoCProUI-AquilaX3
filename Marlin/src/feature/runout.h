@@ -367,7 +367,6 @@ class FilamentSensorBase {
         TERN_(HAS_FILAMENT_SWITCH, switch_sensor.run());
       }
   };
-
 #endif
 
 /********************************* RESPONSE TYPE *********************************/

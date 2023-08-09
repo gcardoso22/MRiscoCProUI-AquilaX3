@@ -11,7 +11,9 @@ import os
 
 libpath = "Marlin/lib/proui/"
 libfile = libpath+'libproui.a'
-
+from SCons.Script import Import
+from SCons.Script import DefaultEnvironment
+env = DefaultEnvironment()
 Import("env")
 
 def _GetMarlinEnv(marlinEnv, feature):
@@ -43,8 +45,9 @@ if "MARLIN_FEATURES" in env:
          arch = 'stm32g0/'
          print ('STM32G0 Architecture detected')
       elif (gd32f10):
-         arch = 'gd32f10/'
-         print ('GD32F1 Architecture detected')
+         #arch = 'gd32f10/'
+         print ('GD32F1 Architecture detected\n(Maple Environment depreciated - Exiting)')
+         exit()
       else:
          print("Error: can't detect the correct architecture")
          exit()
@@ -59,5 +62,5 @@ if "MARLIN_FEATURES" in env:
          print("Unified Mesh Bed Leveling detected")
          shutil.copy(libpath+arch+'libproui_ubl.a', libfile)
       else:
-         print("Error: can't detect a supported leveling system")
-         exit()
+         print("Default-No Probe detected")
+         shutil.copy(libpath+arch+'libproui_mbl.a', libfile)

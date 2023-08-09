@@ -759,7 +759,7 @@ bool Probe::probe_down_to_z(const_float_t z, const_feedRate_t fr_mm_s) {
 
       // Do a first probe at the fast speed
       const bool probe_fail = probe_down_to_z(z_probe_low_point, fr_mm_s),              // No probe trigger?
-                early_fail = (scheck && current_position.z > zoffs + error_tolerance); // Probe triggered too high?
+                 early_fail = (scheck && current_position.z > zoffs + error_tolerance); // Probe triggered too high?
       #if ENABLED(DEBUG_LEVELING_FEATURE)
         if (DEBUGGING(LEVELING) && (probe_fail || early_fail)) {
           DEBUG_ECHOPGM(" Probe fail! - ");
@@ -832,7 +832,7 @@ bool Probe::probe_down_to_z(const_float_t z, const_feedRate_t fr_mm_s) {
 
         #if EXTRA_PROBING > 0
           // Insert Z measurement into probes[]. Keep it sorted ascending.
-          for (uint8_t i = 0; i <= p; ++i) {                                             // Iterate the saved Zs to insert the new Z
+          for (uint8_t i = 0; i <= p; ++i) {                            // Iterate the saved Zs to insert the new Z
             if (i == p || probes[i] > z) {                              // Last index or new Z is smaller than this Z
               for (int8_t m = p; --m >= i;) probes[m + 1] = probes[m];  // Shift items down after the insertion point
               probes[i] = z;                                            // Insert the new Z measurement
@@ -895,7 +895,7 @@ bool Probe::probe_down_to_z(const_float_t z, const_feedRate_t fr_mm_s) {
 
     return DIFF_TERN(HAS_HOTEND_OFFSET, measured_z, hotend_offset[active_extruder].z);
   }
-#endif
+#endif // DISABLED(PROUI_EX)
 
 #if DO_TOOLCHANGE_FOR_PROBING
 

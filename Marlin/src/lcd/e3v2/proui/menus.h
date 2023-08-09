@@ -68,9 +68,9 @@ public:
   int8_t pos = 0;
   OnDrawItem onDraw = nullptr;
   void (*onClick)() = nullptr;
-  CustomMenuItem() {};
+  CustomMenuItem() {}
   CustomMenuItem(OnDrawItem ondraw=nullptr, OnClickItem onclick=nullptr);
-  virtual ~CustomMenuItem(){};
+  virtual ~CustomMenuItem(){}
   virtual void draw(int8_t line);
   void redraw(bool erase=false);
 };
@@ -167,7 +167,6 @@ void initMenu();
 
 // Create a new menu
 bool setMenu(Menu* &menu, FSTR_P fTitle, int8_t totalitems);
-bool setMenu(Menu* &menu, frame_rect_t cn, FSTR_P fTitle, int8_t totalitems);
 
 // Reset top line and selected item
 void resetMenu(Menu* &menu);

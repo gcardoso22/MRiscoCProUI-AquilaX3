@@ -61,8 +61,9 @@ if pioutil.is_pio_build():
         def rename_target(source, target, env):
             from pathlib import Path
             from datetime import datetime
-            newname = datetime.now().strftime(new_name.replace('{date}', '%Y%m%d').replace('{time}', '%H%M%S'))
-            print("Renamed to: ", newname)
-            Path(target[0].path).replace(Path(target[0].dir.path, newname))
+            BIN_NAME = Path(target[0].path).replace(Path(target[0].dir.path, datetime.now().strftime(new_name.replace('{date}', '%Y%m%d').replace('{time}', '%H%M%S'))))
+            ELF_NAME = Path(source[0].path).replace(Path(source[0].dir.path, datetime.now().strftime(new_name.replace('{date}', '%Y%m%d').replace('{time}', '%H%M%S').replace('.bin', '.elf'))))
+            print("FIRMWARE ELF: %s" % ELF_NAME)
+            print("FIRMWARE BIN: %s" % BIN_NAME)
 
         marlin.add_post_action(rename_target)

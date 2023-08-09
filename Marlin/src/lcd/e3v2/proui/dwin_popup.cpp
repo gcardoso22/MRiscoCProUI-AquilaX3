@@ -36,8 +36,8 @@ uint16_t HighlightYPos = 280;
 void drawSelectHighlight(const bool sel, const uint16_t ypos) {
   HighlightYPos = ypos;
   hmiFlag.select_flag = sel;
-  const uint16_t c1 = sel ? hmiData.colorHighlight : hmiData.colorPopupBg,
-                 c2 = sel ? hmiData.colorPopupBg : hmiData.colorHighlight;
+  const uint16_t c1 = sel ? hmiData.colorCursor : hmiData.colorPopupBg,
+                 c2 = sel ? hmiData.colorPopupBg : hmiData.colorCursor;
   dwinDrawRectangle(0, c1, 25, ypos - 1, 126, ypos + 38);
   dwinDrawRectangle(0, c1, 24, ypos - 2, 127, ypos + 39);
   dwinDrawRectangle(0, c2, 145, ypos - 1, 246, ypos + 38);

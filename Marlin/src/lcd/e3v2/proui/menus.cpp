@@ -275,7 +275,7 @@ int8_t hmiGet(bool draw) {
   const int32_t lo = menuData.minValue;
   const int32_t hi = menuData.maxValue;
   const int32_t cval = menuData.value;
-  EncoderState encoder_diffState = TERN(SMOOTH_ENCODER_MENUITEMS, get_encoder_state(), encoderReceiveAnalyze());
+  EncoderState encoder_diffState = encoderReceiveAnalyze();
   if (encoder_diffState != ENCODER_DIFF_NO) {
     if (applyEncoder(encoder_diffState, menuData.value)) {
       encoderRate.enabled = false;
@@ -339,7 +339,7 @@ Menu::Menu() {
 
 void Menu::draw() {
   menuTitle.draw();
-  DWINUI::setColors(hmiData.colorText, hmiData.colorBackground, hmiData.colorStatusBg);
+  DWINUI::setColors(hmiData.colorText, hmiData.colorBackground, hmiData.colorTitleBg);
   dwinDrawRectangle(1, DWINUI::backColor, 0, TITLE_HEIGHT, DWIN_WIDTH - 1, STATUS_Y - 1);
   for (int8_t i = 0; i < menuItemCount; i++)
     menuItems[i]->draw(i - topline);
@@ -502,19 +502,6 @@ bool setMenu(Menu* &menu, FSTR_P fTitle, int8_t totalitems) {
   const bool NotCurrent = (currentMenu != menu);
   if (NotCurrent) {
     menu->menuTitle.setCaption(fTitle);
-    menuItemsPrepare(totalitems);
-  }
-  return NotCurrent;
-}
-
-bool setMenu(Menu* &menu, frame_rect_t cn, FSTR_P fTitle, int8_t totalitems) {
-  if (!menu) menu = new Menu();
-  const bool NotCurrent = (currentMenu != menu);
-  if (NotCurrent) {
-    if (cn.w != 0)
-      menu->menuTitle.setFrame(cn.x, cn.y, cn.w, cn.h);
-    else
-      menu->menuTitle.setCaption(fTitle);
     menuItemsPrepare(totalitems);
   }
   return NotCurrent;

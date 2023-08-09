@@ -270,7 +270,7 @@ typedef struct SettingsDataStruct {
   //
   float mbl_z_offset;                                   // bedlevel.z_offset
   uint8_t mesh_num_x, mesh_num_y;                       // GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y
-  uint16_t mesh_check; 
+  uint16_t mesh_check;                                  // Hash to check against X/Y
   #if PROUI_EX
     float mbl_z_values[TERN(MESH_BED_LEVELING, GRID_LIMIT, 3)]   // bedlevel.z_values
                       [TERN(MESH_BED_LEVELING, GRID_LIMIT, 3)];
@@ -567,7 +567,9 @@ typedef struct SettingsDataStruct {
     touch_calibration_t touch_calibration_data;
   #endif
 
+  //
   // Ethernet settings
+  //
   #if HAS_ETHERNET
     bool ethernet_hardware_enabled;                     // M552 S
     uint32_t ethernet_ip,                               // M552 P
@@ -581,6 +583,39 @@ typedef struct SettingsDataStruct {
   //
   #if ENABLED(SOUND_MENU_ITEM)
     bool sound_on;
+    bool tick_on; //encoder beep
+  #endif
+
+  //
+  // 2nd Mesh Viewer
+  //
+  #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+    bool view_mesh;
+  #endif
+
+  //
+  // Bed corner screw position
+  //
+  #if BED_SCREW_INSET
+    float ui_screw_pos;
+  #endif
+
+  //
+  // MESH_INSET workaround
+  //
+  #if PROUI_EX && HAS_MESH
+    float ui_mesh_inset_min_x;
+    float ui_mesh_inset_max_x;
+    float ui_mesh_inset_min_y;
+    float ui_mesh_inset_max_y;
+  #endif
+
+  //
+  // Encoder Rate
+  //
+  #if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+    int enc_rateA;
+    int enc_rateB;
   #endif
 
   //
@@ -600,6 +635,9 @@ typedef struct SettingsDataStruct {
     celsius_t mks_min_extrusion_temp;                   // Min E Temp (shadow M302 value)
   #endif
 
+  //
+  // If LCD has Language > 1
+  //
   #if HAS_MULTI_LANGUAGE
     uint8_t ui_language;                                // M414 S
   #endif
@@ -1650,6 +1688,31 @@ void MarlinSettings::postprocess() {
     #endif
 
     //
+    // BED_SCREW_INSET
+    //
+    #if BED_SCREW_INSET
+      EEPROM_WRITE(ui.screw_pos);
+    #endif
+
+    //
+    // MESH_INSET workaround
+    //
+    #if PROUI_EX && HAS_MESH
+      EEPROM_WRITE(ui.mesh_inset_min_x);
+      EEPROM_WRITE(ui.mesh_inset_max_x);
+      EEPROM_WRITE(ui.mesh_inset_min_y);
+      EEPROM_WRITE(ui.mesh_inset_max_y);
+    #endif
+
+    //
+    // Encoder Rate
+    //
+    #if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+      EEPROM_WRITE(ui.enc_rateA);
+      EEPROM_WRITE(ui.enc_rateB);
+    #endif
+
+    //
     // Case Light Brightness
     //
     #if CASELIGHT_USES_BRIGHTNESS
@@ -1695,8 +1758,12 @@ void MarlinSettings::postprocess() {
     //
     #if ENABLED(SOUND_MENU_ITEM)
       EEPROM_WRITE(ui.sound_on);
+      EEPROM_WRITE(ui.tick_on);
     #endif
 
+    #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+      EEPROM_WRITE(bedLevelTools.view_mesh);
+    #endif
     //
     // Fan tachometer check
     //
@@ -2720,6 +2787,38 @@ void MarlinSettings::postprocess() {
       #endif
 
       //
+      //BED_SCREW_INSET
+      //
+      #if BED_SCREW_INSET
+        _FIELD_TEST(ui_screw_pos);
+        EEPROM_READ(ui.screw_pos);
+      #endif
+
+      //
+      // MESH_INSET workaround
+      //
+      #if PROUI_EX && HAS_MESH
+        _FIELD_TEST(ui_mesh_inset_min_x);
+        EEPROM_READ(ui.mesh_inset_min_x);
+        _FIELD_TEST(ui_mesh_inset_max_x);
+        EEPROM_READ(ui.mesh_inset_max_x);
+        _FIELD_TEST(ui_mesh_inset_min_y);
+        EEPROM_READ(ui.mesh_inset_min_y);
+        _FIELD_TEST(ui_mesh_inset_max_y);
+        EEPROM_READ(ui.mesh_inset_max_y); 
+      #endif
+
+      //
+      // Encoder Rate
+      //
+      #if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+        _FIELD_TEST(enc_rateA);
+        EEPROM_READ(ui.enc_rateA);
+        _FIELD_TEST(enc_rateB);
+        EEPROM_READ(ui.enc_rateB);
+      #endif
+
+      //
       // Case Light Brightness
       //
       #if CASELIGHT_USES_BRIGHTNESS
@@ -2763,8 +2862,14 @@ void MarlinSettings::postprocess() {
       #if ENABLED(SOUND_MENU_ITEM)
         _FIELD_TEST(sound_on);
         EEPROM_READ(ui.sound_on);
+        _FIELD_TEST(tick_on);
+        EEPROM_READ(ui.tick_on);
       #endif
 
+      #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+        _FIELD_TEST(view_mesh);
+        EEPROM_READ(bedLevelTools.view_mesh);
+      #endif
       //
       // Fan tachometer check
       //
@@ -3073,7 +3178,6 @@ void MarlinSettings::postprocess() {
         #if ENABLED(DWIN_LCD_PROUI)
           if (bedLevelTools.meshValidate()) {
             ui.status_printf(0, GET_TEXT_F(MSG_MESH_LOADED), slot);
-            DONE_BUZZ(true);
           }
           else {
             status = true;
@@ -3224,6 +3328,31 @@ void MarlinSettings::reset() {
     #endif
   #endif
 
+  //
+  //BED_SCREW_INSET
+  //
+  #if BED_SCREW_INSET
+    ui.screw_pos = BED_SCREW_INSET; 
+  #endif
+
+  //
+  // MESH_INSET workaround
+  //
+  #if PROUI_EX && HAS_MESH
+    ui.mesh_inset_min_x = MESH_INSET;
+    ui.mesh_inset_max_x = (DEF_X_BED_SIZE - MESH_INSET);
+    ui.mesh_inset_min_y = MESH_INSET;
+    ui.mesh_inset_max_y = (DEF_Y_BED_SIZE - MESH_INSET);
+  #endif
+
+  //
+  // Encoder Rate
+  //
+  #if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+    ui.enc_rateA = 135;
+    ui.enc_rateB = 25;
+  #endif
+
   TERN_(DWIN_CREALITY_LCD_JYERSUI, jyersDWIN.resetSettings());
 
   //
@@ -3241,6 +3370,11 @@ void MarlinSettings::reset() {
   //
   #if ENABLED(SOUND_MENU_ITEM)
     ui.sound_on = ENABLED(SOUND_ON_DEFAULT);
+    ui.tick_on = ENABLED(TICK_ON_DEFAULT); //added encoder beep bool
+  #endif
+
+  #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+    bedLevelTools.view_mesh = false; //added mesh viewer option
   #endif
 
   //
@@ -3771,11 +3905,11 @@ void MarlinSettings::reset() {
 
         if (leveling_is_valid()) {
           #if PROUI_EX
-          for (uint8_t py = 0; py < GRID_LIMIT; ++py) {
-            for (uint8_t px = 0; px < GRID_LIMIT; ++px) {
+            for (uint8_t py = 0; py < GRID_LIMIT; ++py) {
+              for (uint8_t px = 0; px < GRID_LIMIT; ++px) {
           #else
-          for (uint8_t py = 0; py < GRID_MAX_POINTS_Y; ++py) {
-            for (uint8_t px = 0; px < GRID_MAX_POINTS_X; ++px) {
+            for (uint8_t py = 0; py < GRID_MAX_POINTS_Y; ++py) {
+              for (uint8_t px = 0; px < GRID_MAX_POINTS_X; ++px) {
           #endif
               CONFIG_ECHO_START();
               SERIAL_ECHOLN(F("  G29 S3 I"), px, F(" J"), py, FPSTR(SP_Z_STR), p_float_t(LINEAR_UNIT(bedlevel.z_values[px][py]), 5));
@@ -3801,11 +3935,11 @@ void MarlinSettings::reset() {
 
         if (leveling_is_valid()) {
           #if PROUI_EX
-          for (uint8_t py = 0; py < GRID_LIMIT; ++py) {
-            for (uint8_t px = 0; px < GRID_LIMIT; ++px) {
+            for (uint8_t py = 0; py < GRID_LIMIT; ++py) {
+              for (uint8_t px = 0; px < GRID_LIMIT; ++px) {
           #else
-          for (uint8_t py = 0; py < GRID_MAX_POINTS_Y; ++py) {
-            for (uint8_t px = 0; px < GRID_MAX_POINTS_X; ++px) {
+            for (uint8_t py = 0; py < GRID_MAX_POINTS_Y; ++py) {
+              for (uint8_t px = 0; px < GRID_MAX_POINTS_X; ++px) {
           #endif
               CONFIG_ECHO_START();
               SERIAL_ECHOLN(F("  G29 W I"), px, F(" J"), py, FPSTR(SP_Z_STR), p_float_t(LINEAR_UNIT(bedlevel.z_values[px][py]), 5));

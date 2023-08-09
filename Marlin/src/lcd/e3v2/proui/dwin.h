@@ -42,9 +42,9 @@
 namespace GET_LANG(LCD_LANGUAGE) {
   #define _MSG_PREHEAT(N) \
     LSTR MSG_PREHEAT_##N                  = _UxGT("Preheat ") PREHEAT_## N ##_LABEL; \
-    LSTR MSG_PREHEAT_## N ##_SETTINGS     = _UxGT("Preheat ") PREHEAT_## N ##_LABEL _UxGT(" Conf");
-  #if PREHEAT_COUNT > 1
-    REPEAT_S(2, INCREMENT(PREHEAT_COUNT), _MSG_PREHEAT)
+    LSTR MSG_PREHEAT_## N ##_SETTINGS     = _UxGT("Preheat ") PREHEAT_## N ##_LABEL _UxGT(" Settings");
+  #if PREHEAT_COUNT > 3
+    REPEAT_S(4, INCREMENT(PREHEAT_COUNT), _MSG_PREHEAT)
   #endif
 }
 
@@ -118,7 +118,9 @@ typedef struct {
   int16_t pidCycles;
   int16_t extMinT;
   int16_t bedLevT;
-  bool baud115K;
+  bool baud250K;
+  bool calcAvg;
+  bool spdInd;
   bool fullManualTramming;
   bool mediaSort;
   bool mediaAutoMount;
@@ -177,6 +179,20 @@ void rebootPrinter();
 void disableMotors();
 void autoLev();
 void autoHome();
+// added
+void AutoLevStart();
+void SetMeshPoints();
+void SetMeshInset();
+void MaxMeshArea();
+void CenterMeshArea();
+void SetMeshFadeHeight();
+void SetEncRateA();
+void SetEncRateB();
+void SetHSMode();
+void PopUp_StartAutoLev();
+void onClick_StartAutoLev();
+void SetRetractSpeed();
+//
 #if HAS_PREHEAT
   #define _DOPREHEAT(N) void DoPreheat##N();
   REPEAT_1(PREHEAT_COUNT, _DOPREHEAT)
@@ -194,6 +210,16 @@ void doCoolDown();
 #endif
 void applyExtMinT();
 void parkHead();
+// added
+TERN(HAS_BED_PROBE, float, void) tram(uint8_t point, bool stow_probe = true);
+#if HAS_BED_PROBE && ENABLED(TRAMWIZ_MENU_ITEM)
+  void Trammingwizard();
+  void TramwizStart();
+  void onClick_StartTramwiz();
+  void PopUp_StartTramwiz();
+  void drawTrammingMenu();
+#endif
+//
 #if ALL(LED_CONTROL_MENU, HAS_COLOR_LEDS)
   void applyLEDColor();
 #endif
@@ -265,7 +291,7 @@ inline void dwinGcode(const int16_t codenum) { TERN_(HAS_CGCODE, customGcode(cod
   void dwinUnLockScreen();
   void hmiLockScreen();
 #endif
-#if HAS_MESH
+#if HAS_MESH && USE_GRID_MESHVIEWER
   void dwinMeshViewer();
 #endif
 #if HAS_ESDIAG
@@ -279,9 +305,9 @@ void drawAdvancedSettingsMenu();
 void drawPrepareMenu();
 void drawMoveMenu();
 
-#if ENABLED(LCD_BED_TRAMMING)
-void drawTrammingMenu();
-#endif
+//#if ENABLED(LCD_BED_TRAMMING)
+//void drawTrammingMenu();
+//#endif
 
 #if HAS_HOME_OFFSET
   void drawHomeOffsetMenu();
@@ -305,9 +331,10 @@ void drawMotionMenu();
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   void drawFilamentManMenu();
 #endif
-#if ENABLED(MESH_BED_LEVELING)
-  void drawManualMeshMenu();
-#endif
+//#if ENABLED(MESH_BED_LEVELING)
+//  void drawManualMeshMenu();
+//#endif
+void drawPIDMenu();
 void drawTemperatureMenu();
 void drawMaxSpeedMenu();
 void drawMaxAccelMenu();
@@ -350,6 +377,7 @@ void drawStepsMenu();
   #include "../../../module/temperature.h"
   void dwinM303(const bool seenC, const int c, const bool seenS, const heater_id_t hid, const celsius_t temp);
   void dwinPidTuning(tempcontrol_t result);
+  void Draw_PID_Menu();
 #endif
 #if ENABLED(PIDTEMP)
   #if ENABLED(PID_AUTOTUNE_MENU)

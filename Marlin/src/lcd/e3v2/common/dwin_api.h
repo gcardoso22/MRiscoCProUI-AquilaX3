@@ -169,6 +169,11 @@ inline void dwinDrawBox(uint8_t mode, uint16_t color, uint16_t xStart, uint16_t 
 void dwinFrameAreaMove(uint8_t mode, uint8_t dir, uint16_t dis,
                          uint16_t color, uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd);
 
+//Color: color
+//x: upper left point
+//y: bottom right point
+void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y);
+
 
 /*---------------------------------------- Text related functions ----------------------------------------*/
 

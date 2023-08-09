@@ -26,7 +26,6 @@
  */
 
 #define BOARD_INFO_NAME      "Creality v4.2.2"
-#define DEFAULT_MACHINE_NAME "Creality3D"
 
 #define EMIT_CREALITY_422_WARNING
 

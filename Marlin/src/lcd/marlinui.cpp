@@ -49,6 +49,8 @@ MarlinUI ui;
   #include "e3v2/creality/dwin.h"
 #elif ENABLED(DWIN_LCD_PROUI)
   #include "e3v2/proui/dwin.h"
+#elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
+  #include "e3v2/jyersui/dwin.h"
 #endif
 
 #if ENABLED(LCD_PROGRESS_BAR) && !IS_TFTGLCD_PANEL
@@ -64,6 +66,22 @@ MarlinUI ui;
 #endif
 
 constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
+
+#ifdef BED_SCREW_INSET
+  float MarlinUI::screw_pos = BED_SCREW_INSET;
+#endif
+
+#if PROUI_EX && HAS_MESH
+  float MarlinUI::mesh_inset_min_x = MESH_INSET;
+  float MarlinUI::mesh_inset_max_x = X_BED_SIZE - MESH_INSET;
+  float MarlinUI::mesh_inset_min_y = MESH_INSET;
+  float MarlinUI::mesh_inset_max_y = Y_BED_SIZE - MESH_INSET;
+#endif
+
+#if ENABLED(ENCODER_RATE_MULTIPLIER) && ENABLED(ENC_MENU_ITEM)
+  int MarlinUI::enc_rateA; // = 135
+  int MarlinUI::enc_rateB; // = 25
+#endif
 
 #if HAS_STATUS_MESSAGE
   #if ENABLED(STATUS_MESSAGE_SCROLLING) && ANY(HAS_WIRED_LCD, DWIN_LCD_PROUI)
@@ -122,6 +140,7 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
 
 #if ENABLED(SOUND_MENU_ITEM)
   bool MarlinUI::sound_on = ENABLED(SOUND_ON_DEFAULT);
+  bool MarlinUI::tick_on = ENABLED(TICK_ON_DEFAULT);
 #endif
 
 #if ENABLED(PCA9632_BUZZER)
@@ -188,7 +207,7 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
   millis_t MarlinUI::backlight_off_ms = 0;
 
   void MarlinUI::refresh_backlight_timeout() {
-    backlight_off_ms = backlight_timeout_minutes ? millis() + backlight_timeout_minutes * 60UL * 1000UL : 0;
+    backlight_off_ms = backlight_timeout_minutes ? millis() + MIN_TO_MS(backlight_timeout_minutes) : 0;
     #ifdef NEOPIXEL_BKGD_INDEX_FIRST
       neo.reset_background_color();
       neo.show();
@@ -490,6 +509,10 @@ void MarlinUI::init() {
 
   #endif // HAS_MARLINUI_MENU
 
+  ////////////////////////////////////////////
+  ///////////// Keypad Handling //////////////
+  ////////////////////////////////////////////
+
   #if IS_RRW_KEYPAD && HAS_ENCODER_ACTION
 
     volatile uint8_t MarlinUI::keypad_buttons;
@@ -769,6 +792,10 @@ void MarlinUI::init() {
       #endif
     #endif
   }
+
+  ////////////////////////////////////////////
+  /////////////// Manual Move ////////////////
+  ////////////////////////////////////////////
 
   #if HAS_MARLINUI_MENU
 
@@ -1057,6 +1084,7 @@ void MarlinUI::init() {
                     SERIAL_ECHO_START();
                     SERIAL_ECHOPGM("Enc Step Rate: ", encoderStepRate);
                     SERIAL_ECHOPGM("  Multiplier: ", encoderMultiplier);
+                    SERIAL_ECHOPGM("  ENCODER_5X_STEPS_PER_SEC: ", ENCODER_5X_STEPS_PER_SEC);
                     SERIAL_ECHOPGM("  ENCODER_10X_STEPS_PER_SEC: ", ENCODER_10X_STEPS_PER_SEC);
                     SERIAL_ECHOPGM("  ENCODER_100X_STEPS_PER_SEC: ", ENCODER_100X_STEPS_PER_SEC);
                     SERIAL_EOL();
@@ -1195,9 +1223,10 @@ void MarlinUI::init() {
           #ifdef NEOPIXEL_BKGD_INDEX_FIRST
             neo.set_background_off();
             neo.show();
-          #elif PIN_EXIST(LCD_BACKLIGHT)
+          //#elif PIN_EXIST(LCD_BACKLIGHT) && ENABLED(CR10_STOCKDISPLAY)
             WRITE(LCD_BACKLIGHT_PIN, LOW); // Backlight off
           #endif
+          // TODO: Backlight off (add function to turn off backlight for LCD-12864)
           backlight_off_ms = 0;
         }
       #elif HAS_DISPLAY_SLEEP
@@ -1477,8 +1506,8 @@ void MarlinUI::host_notify(const char * const cstr) {
 
     else if (!no_welcome) msg = GET_TEXT_F(WELCOME_MSG);
 
-    else if (ENABLED(DWIN_LCD_PROUI))
-        msg = F("");
+    else if (ENABLED(DWIN_LCD_PROUI)) msg = F("");
+
     else
       return;
 

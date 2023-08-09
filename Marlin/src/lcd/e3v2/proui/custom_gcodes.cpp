@@ -61,7 +61,7 @@ void cError() {
   }
 #endif
 
-#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(TRAMWIZ_MENU_ITEM)
   // Bed tramming
   void C35() {
     if (parser.seenval('T')) {
@@ -119,8 +119,8 @@ void customGcode(const int16_t codenum) {
     #if HAS_CUSTOM_COLORS
       case 11: C11(); break;            // Set color for UI element E
     #endif
-    #if ENABLED(LCD_BED_TRAMMING)
-      case 35: C35(); break; // Launch bed tramming wizard
+    #if ENABLED(TRAMWIZ_MENU_ITEM)
+      case 35: C35(); break;            // Launch bed tramming wizard
     #endif
     case 108: C108(); break;            // Cancel a Wait for User without an Emergecy Parser
     #if ENABLED(HAS_GCODE_PREVIEW)

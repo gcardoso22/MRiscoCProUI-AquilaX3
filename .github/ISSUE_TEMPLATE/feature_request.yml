@@ -1,0 +1,45 @@
+name: ✨ Feature Request
+description: Request a new Firmware feature or Share an idea
+title: "[FR] "
+labels: 'Feature Request'
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Do you want to ask a question? Are you looking for support? Please use one of the [support links](https://github.com/classicrocker883/MriscocProUI/issues/new/choose).
+
+  - type: markdown
+    attributes:
+      value: >
+        **Thank you for requesting a new Firmware feature!**
+
+        ## Before Requesting a Feature
+
+        - Read and understand Marlin's [Code of Conduct](https://github.com/MarlinFirmware/Marlin/blob/master/.github/code_of_conduct.md). You are expected to comply with it, including treating everyone with respect.
+
+        - Check the latest [branch](https://github.com/classicrocker883/MriscocProUI) to see if the feature already exists.
+
+        - Before you proceed, please consider all aspects necessary to make it into a firmware feature, or what may be involved building and testing it before it becomes fully ulilized in the next updated release.  
+        Also think if it may be better suited for a slicer or host feature.
+
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem? Please describe.
+      description: A clear description of the problem (e.g., "I need X but Marlin can't do it [...]" | "Such and such would do [...]".)
+
+  - type: textarea
+    attributes:
+      label: Are you looking for hardware support?
+      description: Tell us the printer, board, or peripheral that needs support.
+
+  - type: textarea
+    attributes:
+      label: Describe the feature you want
+      description: A clear description of the feature, how it should work, and what solution it may bring.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional context - Possible alternatives
+      description: Add any other context, documentation, pictures, video or information about the feature here.

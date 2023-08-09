@@ -23,7 +23,7 @@
 
 // #define DEBUG_DWIN 1
 
-#if MB(CREALITY_V24S1_301, CREALITY_V24S1_301F4)
+#if defined(__STM32F1__) || defined(STM32F1)//#if MB(CREALITY_V24S1_301, CREALITY_V24S1_301F4)
   #define DASH_REDRAW 1
 #endif
 
@@ -91,11 +91,13 @@
   #include <stddef.h>
   #include "../../../core/types.h"
 
-  #define TBMaxOpt 5                    // Amount of shortcuts on screen
-  #if HAS_BED_PROBE
-    #define DEF_TBOPT {1, 2, 3, 4, 5}   // Default shorcuts for ALB/UBL
-  #else
-    #define DEF_TBOPT {1, 2, 5, 6, 7};  // Default shortcuts for MM
+  #if HAS_TOOLBAR
+    #define TBMaxOpt 5                    // Amount of shortcuts on screen
+    #if HAS_BED_PROBE
+      #define DEF_TBOPT {1, 7, 6, 2, 4}   // Default shorcuts for ALB/UBL
+    #else
+      #define DEF_TBOPT {1, 5, 4, 2, 3};  // Default shortcuts for MM
+    #endif
   #endif
 
   #include "proui.h"
@@ -134,14 +136,29 @@
     #define GRID_MAX_POINTS_X PRO_data.grid_max_points
     #define GRID_MAX_POINTS_Y PRO_data.grid_max_points
     #define GRID_MAX_POINTS (PRO_data.grid_max_points * PRO_data.grid_max_points)
-    #define MESH_MIN_X PRO_data.mesh_min_x
-    #define MESH_MAX_X PRO_data.mesh_max_x
-    #define MESH_MIN_Y PRO_data.mesh_min_y
-    #define MESH_MAX_Y PRO_data.mesh_max_y
+    #define MESH_MIN_X (float)PRO_data.mesh_min_x
+    #define MESH_MAX_X (float)PRO_data.mesh_max_x
+    #define MESH_MIN_Y (float)PRO_data.mesh_min_y
+    #define MESH_MAX_Y (float)PRO_data.mesh_max_y
   #endif
   #if HAS_BED_PROBE
     #define Z_PROBE_FEEDRATE_SLOW PRO_data.zprobefeedslow
   #endif
   #define INVERT_E0_DIR PRO_data.Invert_E0
-
+#else
+  #include <stddef.h>
+  #include "../../../core/types.h"
+  #ifndef MESH_MIN_X
+    #define MESH_MIN_X MESH_INSET
+  #endif
+  #ifndef MESH_MIN_Y
+    #define MESH_MIN_Y MESH_INSET
+  #endif
+  #ifndef MESH_MAX_X
+    #define MESH_MAX_X  X_BED_SIZE - (MESH_INSET)
+  #endif
+  #ifndef MESH_MAX_Y
+    #define MESH_MAX_Y  Y_BED_SIZE - (MESH_INSET)
+  #endif
+  //#include "proui.h"
 #endif  // PROUI_EX

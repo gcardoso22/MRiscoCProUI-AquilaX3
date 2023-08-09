@@ -31,11 +31,36 @@
   #error "Creality v4 only supports 1 hotend / E stepper."
 #endif
 
-#ifndef BOARD_INFO_NAME
-  #define BOARD_INFO_NAME      "Creality V4"
-#endif
-#ifndef DEFAULT_MACHINE_NAME
-  #define DEFAULT_MACHINE_NAME "Ender-3 V2"
+#if MB(CREALITY_V427) || MB(CREALITY_V422) || MB(CREALITY_V4)
+  #ifndef BOARD_INFO_NAME
+    #define BOARD_INFO_NAME      "Creality V4"
+  #endif
+  #ifndef DEFAULT_MACHINE_NAME
+    #define DEFAULT_MACHINE_NAME "Ender-3 V2"
+  #endif
+  #ifndef CUSTOM_MACHINE_NAME
+    #define CUSTOM_MACHINE_NAME DEFAULT_MACHINE_NAME
+  #endif
+  #ifndef BOOT_MACHINE_NAME
+    #define BOOT_MACHINE_NAME DEFAULT_MACHINE_NAME
+  #endif
+#elif MB(VOXELAB_AQUILA)
+/**
+ * FFP0173_Aquila_Main_Board_V1.0.1 (GD32F103RE / N32F103RC)
+ * 
+ * Uses CREALITY v4 (STM32F103RE / STM32F103RC) board pin assignments
+ */
+  #define BOARD_INFO_NAME      "Aquila v1.0.1"
+  #ifndef DEFAULT_MACHINE_NAME
+    #define DEFAULT_MACHINE_NAME "Aquila"
+  #endif
+  #ifndef CUSTOM_MACHINE_NAME
+    #define CUSTOM_MACHINE_NAME DEFAULT_MACHINE_NAME
+  #endif
+  #ifndef BOOT_MACHINE_NAME
+    #define BOOT_MACHINE_NAME DEFAULT_MACHINE_NAME
+  #endif
+  #define NO_MAPLE_WARNING     // Disable warning when compiling with Maple env
 #endif
 
 #define BOARD_NO_NATIVE_USB

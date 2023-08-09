@@ -31,8 +31,8 @@
 class BedLevelTools {
 public:
   #if ENABLED(USE_GRID_MESHVIEWER)
-    static bool viewer_asymmetric_range;
     static bool viewer_print_value;
+    static bool view_mesh;
   #endif
   static bool goto_mesh_value;
   static uint8_t mesh_x, mesh_y;

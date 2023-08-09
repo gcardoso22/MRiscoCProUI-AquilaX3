@@ -42,9 +42,9 @@ uint8_t rmax;                               // Maximum radius
 #define zmin -20                            // rmin at z=-0.20
 #define zmax  20                            // rmax at z= 0.20
 #define width DWIN_WIDTH - 2 * margin
-#define r(z) ((z-zmin)*(rmax-rmin)/(zmax-zmin)+rmin)
-#define px(xp) (margin + (xp)*(width)/(sizex - 1))
-#define py(yp) (30 + DWIN_WIDTH - margin - (yp)*(width)/(sizey - 1))
+#define r(z) ((z - zmin) * (rmax - rmin) / (zmax - zmin) + rmin)
+#define px(xp) (margin + (xp) * (width) / (sizex - 1))
+#define py(yp) (30 + DWIN_WIDTH - margin - (yp) * (width) / (sizey - 1))
 
 #if ENABLED(TJC_DISPLAY)
   #define meshfont font8x16
@@ -63,9 +63,9 @@ void MeshViewer::drawMeshGrid(const uint8_t csizex, const uint8_t csizey) {
   min = 100;
   max = -100;
   DWINUI::clearMainArea();
-  dwinDrawRectangle(0, hmiData.colorSplitLine, px(0), py(0), px(sizex - 1), py(sizey - 1));
-  for (uint8_t x = 1; x < sizex - 1; ++x) dwinDrawVLine(hmiData.colorSplitLine, px(x), py(sizey - 1), width);
-  for (uint8_t y = 1; y < sizey - 1; ++y) dwinDrawHLine(hmiData.colorSplitLine, px(0), py(y), width);
+  dwinDrawRectangle(0, hmiData.colorPopupTxt, px(0), py(0), px(sizex - 1), py(sizey - 1));
+  for (uint8_t x = 1; x < sizex - 1; ++x) dwinDrawVLine(hmiData.colorPopupBg, px(x), py(sizey - 1), width);
+  for (uint8_t y = 1; y < sizey - 1; ++y) dwinDrawHLine(hmiData.colorPopupBg, px(0), py(y), width);
 }
 
 void MeshViewer::drawMeshPoint(const uint8_t x, const uint8_t y, const float z) {
@@ -77,33 +77,36 @@ void MeshViewer::drawMeshPoint(const uint8_t x, const uint8_t y, const float z) 
   int16_t v = round(z * 100);
   NOLESS(max, z); NOMORE(min, z);
   const uint16_t color = DWINUI::rainbowInt(v, zmin, zmax);
-  DWINUI::drawFillCircle(color, px(x), py(y), r(_MAX(_MIN(v,zmax),zmin)));
+  DWINUI::drawFillCircle(color, px(x), py(y), r(_MAX(_MIN(v, zmax), zmin)));
   if (sizex < (ENABLED(TJC_DISPLAY) ? 8 : 9)) {
-    if (v == 0) dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2*fs - 1, py(y) - fs, "0.00");
-    else DWINUI::drawSignedFloat(meshfont, 1, 2, px(x) - 3*fs, py(y) - fs, z);
+    if (v == 0) dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2 * fs - 1, py(y) - fs, "0.00");
+    else DWINUI::drawSignedFloat(meshfont, 1, 2, px(x) - 3 * fs, py(y) - fs, z);
   }
   else {
     char str_1[9];
     str_1[0] = 0;
+    MString<12> msg;
     switch (v) {
       case -999 ... -100:  // -9.99 .. -1.00 mm
-        DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3*fs, py(y) - fs, z);
+        DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3 * fs, py(y) - fs, z);
         break;
       case -99 ... -1:  // -0.99 .. -0.01 mm
-        sprintf_P(str_1, PSTR("-.%02i"), -v);
+        msg.setf_P(PSTR("%02f"), p_float_t(z, 2));
+        //sprintf_P(str_1, PSTR("-.%02i"), -v);
         break;
       case 0:
         dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 4, py(y) - fs, "0");
         break;
       case 1 ... 99:  // 0.01 .. 0.99 mm
-        sprintf_P(str_1, PSTR(".%02i"), v);
+        msg.setf_P(PSTR("%02f"), p_float_t(z, 2));
+        //sprintf_P(str_1, PSTR(".%02i"), v);
         break;
       case 100 ... 999:  // 1.00 .. 9.99 mm
         DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3 * fs, py(y) - fs, z);
         break;
     }
     if (str_1[0])
-      dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2 * fs, py(y) - fs, str_1);
+      dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2 * fs, py(y) - fs, msg);
   }
   SERIAL_FLUSH();
   TERN_(TJC_DISPLAY, delay(100));
@@ -120,14 +123,21 @@ void MeshViewer::drawMesh(const bed_mesh_t zval, const uint8_t csizex, const uin
 void MeshViewer::draw(const bool withsave/*=false*/, const bool redraw/*=true*/) {
   title.showCaption(GET_TEXT_F(MSG_MESH_VIEWER));
   #if ENABLED(USE_GRID_MESHVIEWER)
+  if(bedLevelTools.view_mesh) {
     DWINUI::clearMainArea();
     bedLevelTools.viewer_print_value = true;
     bedLevelTools.drawBedMesh(-1, 1, 8, 10 + TITLE_HEIGHT);
+  }
+  else {
+    if (redraw) drawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y); // Draw complete mesh viewer
+    else DWINUI::drawBox(1, hmiData.colorBackground, { 89, 305, 99, 38 }); // Erase "Continue" button
+  }
   #else
     if (redraw) drawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y); // Draw complete mesh viewer
     else DWINUI::drawBox(1, hmiData.colorBackground, { 89, 305, 99, 38 }); // Erase "Continue" button
   #endif
   if (withsave) {
+    dwinDrawBox(1, hmiData.colorBackground, 120, 300, 31, 42); // draw black box to fill previous button select_box
     DWINUI::drawButton(BTN_Save, 26, 305);
     DWINUI::drawButton(BTN_Continue, 146, 305);
     drawSelectHighlight(hmiFlag.select_flag, 305);
@@ -136,12 +146,21 @@ void MeshViewer::draw(const bool withsave/*=false*/, const bool redraw/*=true*/)
     DWINUI::drawButton(BTN_Continue, 86, 305);
 
   #if ENABLED(USE_GRID_MESHVIEWER)
-    bedLevelTools.setMeshViewerStatus();
+    if(bedLevelTools.view_mesh) {
+      bedLevelTools.setMeshViewerStatus();
+    }
+    else {
+    char str_1[6], str_2[6] = "";
+    ui.status_printf(0, F("minZ: %s | maxZ: +%s"),
+      dtostrf(min, 1, 3, str_1),
+      dtostrf(max, 1, 3, str_2)
+    );
+   }
   #else
     char str_1[6], str_2[6] = "";
-    ui.status_printf(0, F("Mesh minZ: %s, maxZ: %s"),
-      dtostrf(min, 1, 2, str_1),
-      dtostrf(max, 1, 2, str_2)
+    ui.status_printf(0, F("minZ: %s | maxZ: +%s"),
+      dtostrf(min, 1, 3, str_1),
+      dtostrf(max, 1, 3, str_2)
     );
   #endif
 }

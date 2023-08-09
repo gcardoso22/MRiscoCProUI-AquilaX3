@@ -1748,7 +1748,7 @@ void dwinSetDataDefaults() {
   #if ALL(HAS_HEATED_BED, PREHEAT_BEFORE_LEVELING)
     hmiData.bedLevT = LEVELING_BED_TEMP;
   #endif
-  TERN_(BAUD_RATE_GCODE, hmiData.baud115K = (BAUDRATE == 115200));
+  TERN_(BAUD_RATE_GCODE, hmiData.baud250K = (BAUDRATE == 115200));
   #if ALL(LCD_BED_TRAMMING, HAS_BED_PROBE)
     hmiData.fullManualTramming = DISABLED(BED_TRAMMING_USE_PROBE);
   #endif
@@ -1834,7 +1834,7 @@ void dwinCopySettingsFrom(const char * const buff) {
   DWINUI::setColors(hmiData.colorText, hmiData.colorBackground, hmiData.colorStatusBg);
   TERN_(PREVENT_COLD_EXTRUSION, applyExtMinT());
   feedrate_percentage = 100;
-  TERN_(BAUD_RATE_GCODE, if (hmiData.baud115K) setBaud115K(); else setBaud250K());
+  TERN_(BAUD_RATE_GCODE, if (hmiData.baud250K) setBaud115K(); else setBaud250K());
   TERN_(MEDIASORT_MENU_ITEM, card.setSortOn(hmiData.mediaSort));
   #if ALL(LED_CONTROL_MENU, HAS_COLOR_LEDS)
     leds.set_color(
@@ -2237,8 +2237,8 @@ void applyMove() {
 
 #if ENABLED(BAUD_RATE_GCODE)
   void setBaudRate() {
-    toggleCheckboxLine(hmiData.baud115K);
-    if (hmiData.baud115K) setBaud115K(); else setBaud250K();
+    toggleCheckboxLine(hmiData.baud250K);
+    if (hmiData.baud250K) setBaud115K(); else setBaud250K();
   }
   void setBaud115K() { queue.inject(F("M575B115")); }
   void setBaud250K() { queue.inject(F("M575B250")); }
@@ -2776,7 +2776,7 @@ void drawAdvancedSettingsMenu() {
       MENU_ITEM(ICON_Host, MSG_HOST_SHUTDOWN, onDrawMenuItem, hostShutDown);
     #endif
     #if ENABLED(SOUND_MENU_ITEM)
-      EDIT_ITEM(ICON_Sound, MSG_SOUND_ENABLE, onDrawChkbMenu, setEnableSound, &ui.sound_on);
+      EDIT_ITEM(ICON_Sound, MSG_SOUND, onDrawChkbMenu, setEnableSound, &ui.sound_on);
     #endif
     #if ENABLED(POWER_LOSS_RECOVERY)
       EDIT_ITEM(ICON_Pwrlossr, MSG_OUTAGE_RECOVERY, onDrawChkbMenu, setPwrLossr, &recovery.enabled);
@@ -2789,7 +2789,7 @@ void drawAdvancedSettingsMenu() {
     #endif
     EDIT_ITEM(ICON_File, MSG_MEDIA_UPDATE, onDrawChkbMenu, setMediaAutoMount, &hmiData.mediaAutoMount);
     #if ENABLED(BAUD_RATE_GCODE)
-      EDIT_ITEM_F(ICON_SetBaudRate, "115K baud", onDrawChkbMenu, setBaudRate, &hmiData.baud115K);
+      EDIT_ITEM_F(ICON_SetBaudRate, "115K baud", onDrawChkbMenu, setBaudRate, &hmiData.baud250K);
     #endif
     #if HAS_LCD_BRIGHTNESS
       EDIT_ITEM(ICON_Brightness, MSG_BRIGHTNESS, onDrawPInt8Menu, setBrightness, &ui.brightness);

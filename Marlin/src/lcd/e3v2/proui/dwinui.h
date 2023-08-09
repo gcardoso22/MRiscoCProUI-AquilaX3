@@ -51,9 +51,8 @@
 #define ICON_BedTramming       CI(1,ICON_SetHome)
 #define ICON_Binary            CI(1,ICON_Contact)
 #define ICON_BltouchReset      CI(1,ICON_StockConfiguration)
-#define ICON_Brightness        CI(1,ICON_Motion)
 #define ICON_Cancel            CI(1,ICON_StockConfiguration)
-#define ICON_CustomPreheat     CI(1,ICON_SetEndTemp)
+#define ICON_CustomPreheat     CI(1,ICON_SetBedTemp)
 #define ICON_Error             CI(1,ICON_TempTooHigh)
 #define ICON_ESDiag            CI(1,ICON_Info)
 #define ICON_ExtrudeMinT       CI(1,ICON_HotendTemp)
@@ -83,14 +82,9 @@
 #define ICON_InvertE0          CI(1,ICON_StepE)
 #define ICON_JDmm              CI(1,ICON_MaxJerk)
 #define ICON_Tram              CI(1,ICON_SetEndTemp)
-#define ICON_LaserFocus        CI(1,ICON_MoveZ)
-#define ICON_LaserPrint        CI(1,ICON_StockConfiguration)
-#define ICON_LaserRunRange     CI(1,ICON_PrintSize)
-#define ICON_LaserSet          CI(1,ICON_StockConfiguration)
-#define ICON_LaserToggle       CI(1,ICON_Motion)
-#define ICON_Level             CI(1,ICON_HotendTemp)
+#define ICON_Level             CI(1,ICON_Mesh)
 #define ICON_Lock              CI(1,ICON_Cool)
-#define ICON_ManualMesh        CI(1,ICON_HotendTemp)
+#define ICON_ManualMesh        CI(1,ICON_Mesh)
 #define ICON_MaxPosX           CI(1,ICON_MoveX)
 #define ICON_MaxPosY           CI(1,ICON_MoveY)
 #define ICON_MaxPosZ           CI(1,ICON_MoveZ)
@@ -103,7 +97,7 @@
 #define ICON_MeshReset         CI(1,ICON_StockConfiguration)
 #define ICON_MeshSave          CI(1,ICON_WriteEEPROM)
 #define ICON_MeshViewer        CI(1,ICON_HotendTemp)
-#define ICON_MoveZ0            CI(1,ICON_HotendTemp)
+#define ICON_MoveZ0            CI(1,ICON_SetEndTemp)
 #define ICON_Park              CI(1,ICON_Motion)
 #define ICON_ParkPos           CI(1,ICON_AdvSet)
 #define ICON_ParkPosX          CI(1,ICON_StepX)
@@ -168,6 +162,13 @@
 #define ICON_UBLTiltGrid       CI(1,ICON_PrintSize)
 #define ICON_UBLSmartFill      CI(1,ICON_StockConfiguration)
 #define ICON_ZAfterHome        CI(1,ICON_SetEndTemp)
+
+//LASER CRC
+#define ICON_LaserFocus        CI(1,ICON_MoveZ)
+#define ICON_LaserPrint        CI(1,ICON_StockConfiguration)
+#define ICON_LaserRunRange     CI(1,ICON_PrintSize)
+#define ICON_LaserSet          CI(1,ICON_StockConfiguration)
+#define ICON_LaserToggle       CI(1,ICON_Motion)
 
 //LED Lights
 #define ICON_CaseLight         CI(1,ICON_Motion)
@@ -266,6 +267,7 @@ namespace DWINUI {
   extern uint16_t backColor;
   extern uint16_t buttonColor;
   extern fontid_t fontID;
+  extern FSTR_P const Author;
 
   extern void (*onTitleDraw)(Title* t);
 
@@ -277,11 +279,11 @@ namespace DWINUI {
 
   // Get font character width
   uint8_t fontWidth(fontid_t cfont);
-  inline uint8_t fontWidth() { return fontWidth(fontID); };
+  inline uint8_t fontWidth() { return fontWidth(fontID); }
 
   // Get font character height
   uint8_t fontHeight(fontid_t cfont);
-  inline uint8_t fontHeight() { return fontHeight(fontID); };
+  inline uint8_t fontHeight() { return fontHeight(fontID); }
 
   // Get screen x coordinates from text column
   uint16_t colToX(uint8_t col);
@@ -582,9 +584,11 @@ namespace DWINUI {
   //  maxv : Maximum value
   //  color1 : Start color
   //  color2 : End color
+  //  sel : true - draw box to select, or false - no box
   uint16_t colorInt(int16_t val, int16_t minv, int16_t maxv, uint16_t color1, uint16_t color2);
 
   // ------------------------- Buttons ------------------------------//
+  
 
   void drawButton(uint16_t color, uint16_t bcolor, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, const char * const caption);
   inline void drawButton(uint16_t color, uint16_t bcolor, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, FSTR_P caption) {
@@ -595,6 +599,10 @@ namespace DWINUI {
   }
   void drawButton(uint8_t id, uint16_t x, uint16_t y);
 
+  void drawButton(uint8_t id, uint16_t x, uint16_t y, bool sel);
+
+  void drawSelectBox(uint16_t xpos, uint16_t ypos);
+  
   // -------------------------- Extra -------------------------------//
 
   // Draw a circle filled with color
