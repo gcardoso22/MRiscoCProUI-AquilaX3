@@ -29,14 +29,14 @@ typedef uint8_t fontid_t;
  * 0x01=8*16  0x02=10*20  0x03=12*24  0x04=14*28  0x05=16*32
  */
 #if DISABLED(TJC_DISPLAY)
-  #define font6x12  (fontid_t)0x00
-  #define font20x40 (fontid_t)0x06
-  #define font24x48 (fontid_t)0x07
-  #define font28x56 (fontid_t)0x08
-  #define font32x64 (fontid_t)0x09
+  #define font6x12  0x00
+  #define font20x40 0x06
+  #define font24x48 0x07
+  #define font28x56 0x08
+  #define font32x64 0x09
 #endif
-#define font8x16  (fontid_t)0x01
-#define font10x20 (fontid_t)0x02
-#define font12x24 (fontid_t)0x03
-#define font14x28 (fontid_t)0x04
-#define font16x32 (fontid_t)0x05
+#define font8x16  0x01
+#define font10x20 0x02
+#define font12x24 0x03
+#define font14x28 0x04
+#define font16x32 0x05

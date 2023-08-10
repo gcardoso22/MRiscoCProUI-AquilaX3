@@ -80,6 +80,8 @@
 #elif ENABLED(DWIN_LCD_PROUI)
   #include "../lcd/e3v2/proui/dwin.h"
   #include "../lcd/e3v2/proui/bedlevel_tools.h"
+#elif ENABLED(DWIN_CREALITY_LCD_JYERSUI)
+  #include "../lcd/e3v2/jyersui/dwin.h"
 #endif
 
 #if ENABLED(HOST_PROMPT_SUPPORT)
@@ -589,7 +591,7 @@ typedef struct SettingsDataStruct {
   //
   // 2nd Mesh Viewer
   //
-  #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+  #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER) && ENABLED(DWIN_LCD_PROUI)
     bool view_mesh;
   #endif
 
@@ -1761,7 +1763,7 @@ void MarlinSettings::postprocess() {
       EEPROM_WRITE(ui.tick_on);
     #endif
 
-    #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+    #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER) && ENABLED(DWIN_LCD_PROUI)
       EEPROM_WRITE(bedLevelTools.view_mesh);
     #endif
     //
@@ -2866,7 +2868,7 @@ void MarlinSettings::postprocess() {
         EEPROM_READ(ui.tick_on);
       #endif
 
-      #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+      #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER) && ENABLED(DWIN_LCD_PROUI)
         _FIELD_TEST(view_mesh);
         EEPROM_READ(bedLevelTools.view_mesh);
       #endif
@@ -3373,7 +3375,7 @@ void MarlinSettings::reset() {
     ui.tick_on = ENABLED(TICK_ON_DEFAULT); //added encoder beep bool
   #endif
 
-  #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER)
+  #if ENABLED(HAS_MESH) && ENABLED(USE_GRID_MESHVIEWER) && ENABLED(DWIN_LCD_PROUI)
     bedLevelTools.view_mesh = false; //added mesh viewer option
   #endif
 

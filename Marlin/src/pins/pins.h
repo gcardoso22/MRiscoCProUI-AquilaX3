@@ -700,6 +700,9 @@
   #include "stm32f1/pins_KEDI_CONTROLLER_V1_2.h"    // STM32F1                              env:STM32F103RC_btt env:STM32F103RC_btt_USB env:STM32F103RC_btt_maple env:STM32F103RC_btt_USB_maple
 #elif MB(VOXELAB_AQUILA)
   #include "stm32f1/pins_CREALITY_V4.h"             // GD32F1, N32F1/N32G4, STM32F1         env:GD32F103RC_voxelab_maple env:N32F103RC_voxelab_maple env:N32G455RE_voxelab_maple env:STM32F103RE_creality_maple env:STM32F103RC_creality_maple env:STM32F103RE_creality env:STM32F103RC_creality env:GD32F103RC_voxelab
+#elif MB(AQUILA_V101)
+  #include "hc32f46x/pins_Aquila_V101.h"            // HC32F46x                             env:HC32F460xCxx_AQUILA_V101
+
 //
 // ARM Cortex-M4F
 //

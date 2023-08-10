@@ -25,6 +25,7 @@
 
 #include "dwin_api.h"
 #include "dwin_set.h"
+#include "dwin_font.h"
 
 #include "../../../inc/MarlinConfig.h"
 
@@ -93,6 +94,40 @@ bool dwinHandshake() {
     dwinSend(i);
   }
 #endif
+
+// Get font character width
+uint8_t fontWidth(uint8_t cfont) {
+  switch (cfont) {
+    case font6x12 : return 6;
+    case font8x16 : return 8;
+    case font10x20: return 10;
+    case font12x24: return 12;
+    case font14x28: return 14;
+    case font16x32: return 16;
+    case font20x40: return 20;
+    case font24x48: return 24;
+    case font28x56: return 28;
+    case font32x64: return 32;
+    default: return 0;
+  }
+}
+
+// Get font character height
+uint8_t fontHeight(uint8_t cfont) {
+  switch (cfont) {
+    case font6x12 : return 12;
+    case font8x16 : return 16;
+    case font10x20: return 20;
+    case font12x24: return 24;
+    case font14x28: return 28;
+    case font16x32: return 32;
+    case font20x40: return 40;
+    case font24x48: return 48;
+    case font28x56: return 56;
+    case font32x64: return 64;
+    default: return 0;
+  }
+}
 
 // Set screen display direction
 //  dir: 0=0°, 1=90°, 2=180°, 3=270°
@@ -197,18 +232,20 @@ void dwinFrameAreaMove(uint8_t mode, uint8_t dir, uint16_t dis,
   dwinSend(i);
 }
 
-//Color: color
-//x/y: Upper-left coordinate of the first pixel
-void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y) {
-  dwinDrawPoint(Color, 1, 1, x + 1, y);
-  dwinDrawPoint(Color, 1, 1, x + 2, y);
-  dwinDrawPoint(Color, 1, 1, x, y + 1);
-  dwinDrawPoint(Color, 1, 1, x + 3, y + 1);
-  dwinDrawPoint(Color, 1, 1, x, y + 2);
-  dwinDrawPoint(Color, 1, 1, x + 3, y + 2);
-  dwinDrawPoint(Color, 1, 1, x + 1, y + 3);
-  dwinDrawPoint(Color, 1, 1, x + 2, y + 3);
-}
+#if ENABLED(DWIN_LCD_PROUI)
+  //Color: color
+  //x/y: Upper-left coordinate of the first pixel
+  void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y) {
+    dwinDrawPoint(Color, 1, 1, x + 1, y);
+    dwinDrawPoint(Color, 1, 1, x + 2, y);
+    dwinDrawPoint(Color, 1, 1, x, y + 1);
+    dwinDrawPoint(Color, 1, 1, x + 3, y + 1);
+    dwinDrawPoint(Color, 1, 1, x, y + 2);
+    dwinDrawPoint(Color, 1, 1, x + 3, y + 2);
+    dwinDrawPoint(Color, 1, 1, x + 1, y + 3);
+    dwinDrawPoint(Color, 1, 1, x + 2, y + 3);
+  }
+#endif
 
 /*---------------------------------------- Text related functions ----------------------------------------*/
 
@@ -222,6 +259,9 @@ void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y) {
 //  *string: The string
 //  rlimit: To limit the drawn string length
 void dwinDrawString(bool bShow, uint8_t size, uint16_t color, uint16_t bColor, uint16_t x, uint16_t y, const char * const string, uint16_t rlimit/*=0xFFFF*/) {
+  #if NONE(DWIN_LCD_PROUI, DWIN_CREALITY_LCD_JYERSUI, IS_DWIN_MARLINUI)
+    dwinDrawRectangle(1, bColor, x, y, x + (fontWidth(size) * strlen_P(string)), y + fontHeight(size));
+  #endif
   constexpr uint8_t widthAdjust = 0;
   size_t i = 0;
   dwinByte(i, 0x11);
@@ -236,6 +276,98 @@ void dwinDrawString(bool bShow, uint8_t size, uint16_t color, uint16_t bColor, u
   dwinWord(i, y);
   dwinText(i, string, rlimit);
   dwinSend(i);
+}
+
+// Draw a positive integer
+//  bShow: true=display background color; false=don't display background color
+//  zeroFill: true=zero fill; false=no zero fill
+//  zeroMode: 1=leading 0 displayed as 0; 0=leading 0 displayed as a space
+//  size: Font size
+//  color: Character color
+//  bColor: Background color
+//  iNum: Number of digits
+//  x/y: Upper-left coordinate
+//  value: Integer value
+void dwinDrawIntValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                          uint16_t bColor, uint8_t iNum, uint16_t x, uint16_t y, uint32_t value) {
+  size_t i = 0;
+  #if DISABLED(DWIN_CREALITY_LCD_JYERSUI)
+    dwinDrawRectangle(1, bColor, x, y, x + fontWidth(size) * iNum + 1, y + fontHeight(size));
+  #endif
+  dwinByte(i, 0x14);
+  // Bit 7: bshow
+  // Bit 6: 1 = signed; 0 = unsigned number;
+  // Bit 5: zeroFill
+  // Bit 4: zeroMode
+  // Bit 3-0: size
+  dwinByte(i, (bShow * 0x80) | (zeroFill * 0x20) | (zeroMode * 0x10) | size);
+  dwinWord(i, color);
+  dwinWord(i, bColor);
+  dwinByte(i, iNum);
+  dwinByte(i, 0); // fNum
+  dwinWord(i, x);
+  dwinWord(i, y);
+  #if 0
+    for (char count = 0; count < 8; count++) {
+      dwinByte(i, value);
+      value >>= 8;
+      if (!(value & 0xFF)) break;
+    }
+  #else
+    // Write a big-endian 64 bit integer
+    const size_t p = i + 1;
+    for (char count = 8; count--;) { // 7..0
+      ++i;
+      dwinSendBuf[p + count] = value;
+      value >>= 8;
+    }
+  #endif
+
+  dwinSend(i);
+}
+
+// Draw a floating point number
+//  bShow: true=display background color; false=don't display background color
+//  zeroFill: true=zero fill; false=no zero fill
+//  zeroMode: 1=leading 0 displayed as 0; 0=leading 0 displayed as a space
+//  size: Font size
+//  color: Character color
+//  bColor: Background color
+//  iNum: Number of whole digits
+//  fNum: Number of decimal digits
+//  x/y: Upper-left point
+//  value: Float value
+void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                          uint16_t bColor, uint8_t iNum, uint8_t fNum, uint16_t x, uint16_t y, int32_t value) {
+  //uint8_t *fvalue = (uint8_t*)&value;
+  size_t i = 0;
+  #if DISABLED(DWIN_CREALITY_LCD_JYERSUI)
+    dwinDrawRectangle(1, bColor, x, y, x + fontWidth(size) * (iNum+fNum+1), y + fontHeight(size));
+  #endif
+  dwinByte(i, 0x14);
+  dwinByte(i, (bShow * 0x80) | (zeroFill * 0x20) | (zeroMode * 0x10) | size);
+  dwinWord(i, color);
+  dwinWord(i, bColor);
+  dwinByte(i, iNum);
+  dwinByte(i, fNum);
+  dwinWord(i, x);
+  dwinWord(i, y);
+  dwinLong(i, value);
+  /*
+  dwinByte(i, fvalue[3]);
+  dwinByte(i, fvalue[2]);
+  dwinByte(i, fvalue[1]);
+  dwinByte(i, fvalue[0]);
+  */
+  dwinSend(i);
+}
+
+// Draw a floating point number
+//  value: positive unscaled float value
+void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                            uint16_t bColor, uint8_t iNum, uint8_t fNum, uint16_t x, uint16_t y, float value) {
+  const int32_t val = round(value * POW(10, fNum));
+  dwinDrawFloatValue(bShow, zeroFill, zeroMode, size, color, bColor, iNum, fNum, x, y, val);
 }
 
 /*---------------------------------------- Picture related functions ----------------------------------------*/

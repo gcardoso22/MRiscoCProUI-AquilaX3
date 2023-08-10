@@ -169,11 +169,12 @@ inline void dwinDrawBox(uint8_t mode, uint16_t color, uint16_t xStart, uint16_t 
 void dwinFrameAreaMove(uint8_t mode, uint8_t dir, uint16_t dis,
                          uint16_t color, uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd);
 
-//Color: color
-//x: upper left point
-//y: bottom right point
-void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y);
-
+#if ENABLED(DWIN_LCD_PROUI)
+  //Color: color
+  //x: upper left point
+  //y: bottom right point
+  void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y);
+#endif
 
 /*---------------------------------------- Text related functions ----------------------------------------*/
 
@@ -196,6 +197,38 @@ inline void dwinDrawString(bool bShow, uint8_t size, uint16_t color, uint16_t bC
     dwinDrawString(bShow, size, color, bColor, x, y, FTOP(ftitle));
   #endif
 }
+
+// Draw a positive integer
+//  bShow: true=display background color; false=don't display background color
+//  zeroFill: true=zero fill; false=no zero fill
+//  zeroMode: 1=leading 0 displayed as 0; 0=leading 0 displayed as a space
+//  size: Font size
+//  color: Character color
+//  bColor: Background color
+//  iNum: Number of digits
+//  x/y: Upper-left coordinate
+//  value: Integer value
+void dwinDrawIntValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                          uint16_t bColor, uint8_t iNum, uint16_t x, uint16_t y, uint32_t value);
+
+// Draw a floating point number
+//  bShow: true=display background color; false=don't display background color
+//  zeroFill: true=zero fill; false=no zero fill
+//  zeroMode: 1=leading 0 displayed as 0; 0=leading 0 displayed as a space
+//  size: Font size
+//  color: Character color
+//  bColor: Background color
+//  iNum: Number of whole digits
+//  fNum: Number of decimal digits
+//  x/y: Upper-left point
+//  value: Float value
+void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                            uint16_t bColor, uint8_t iNum, uint8_t fNum, uint16_t x, uint16_t y, int32_t value);
+
+// Draw a floating point number
+//  value: positive unscaled float value
+void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                            uint16_t bColor, uint8_t iNum, uint8_t fNum, uint16_t x, uint16_t y, float value);
 
 /*---------------------------------------- Picture related functions ----------------------------------------*/
 
