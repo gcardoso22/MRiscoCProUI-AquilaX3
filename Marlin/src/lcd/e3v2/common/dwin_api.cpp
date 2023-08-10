@@ -197,18 +197,20 @@ void dwinFrameAreaMove(uint8_t mode, uint8_t dir, uint16_t dis,
   dwinSend(i);
 }
 
-//Color: color
-//x/y: Upper-left coordinate of the first pixel
-void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y) {
-  dwinDrawPoint(Color, 1, 1, x + 1, y);
-  dwinDrawPoint(Color, 1, 1, x + 2, y);
-  dwinDrawPoint(Color, 1, 1, x, y + 1);
-  dwinDrawPoint(Color, 1, 1, x + 3, y + 1);
-  dwinDrawPoint(Color, 1, 1, x, y + 2);
-  dwinDrawPoint(Color, 1, 1, x + 3, y + 2);
-  dwinDrawPoint(Color, 1, 1, x + 1, y + 3);
-  dwinDrawPoint(Color, 1, 1, x + 2, y + 3);
-}
+#if ENABLED(DWIN_LCD_PROUI)
+  //Color: color
+  //x/y: Upper-left coordinate of the first pixel
+  void dwinDrawDegreeSymbol(uint16_t Color, uint16_t x, uint16_t y) {
+    dwinDrawPoint(Color, 1, 1, x + 1, y);
+    dwinDrawPoint(Color, 1, 1, x + 2, y);
+    dwinDrawPoint(Color, 1, 1, x, y + 1);
+    dwinDrawPoint(Color, 1, 1, x + 3, y + 1);
+    dwinDrawPoint(Color, 1, 1, x, y + 2);
+    dwinDrawPoint(Color, 1, 1, x + 3, y + 2);
+    dwinDrawPoint(Color, 1, 1, x + 1, y + 3);
+    dwinDrawPoint(Color, 1, 1, x + 2, y + 3);
+  }
+#endif
 
 /*---------------------------------------- Text related functions ----------------------------------------*/
 
