@@ -341,7 +341,7 @@ void iconButton(const bool selected, const int iconid, const frame_rect_t &ico, 
 //
 void iconPrint() {
   constexpr frame_rect_t ico = { 17, 110 - TERN0(HAS_TOOLBAR,TBYOFFSET), 110, 100};
-  iconButton(select_page.now == PAGE_PRINT, ICON_Print_0, ico, GET_TEXT_F(MSG_BUTTON_MEDIA));
+  iconButton(select_page.now == PAGE_PRINT, ICON_Print_0, ico, GET_TEXT_F(MSG_BUTTON_PRINT));
 }
 
 //
@@ -365,8 +365,11 @@ void iconControl() {
 //
 void iconAdvSettings() {
   constexpr frame_rect_t ico = { 145, 226 - TERN0(HAS_TOOLBAR,TBYOFFSET), 110, 100};
-  iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_ADVANCED));
-}
+  #if ANY(AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL, MESH_BED_LEVELING)
+    iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_LEVEL));
+  #else
+    iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_ADVANCED));
+  #endif}
 
 //
 // Printing: "Tune"
