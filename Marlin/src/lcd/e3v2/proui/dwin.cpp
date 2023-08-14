@@ -369,9 +369,8 @@ void iconAdvSettings() {
     iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_LEVEL));
   #else
     iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_ADVANCED));
-  #endif
-}
-interface
+  #endif}
+
 //
 // Printing: "Tune"
 //
