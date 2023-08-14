@@ -409,17 +409,17 @@ void drawMenuIcon(const uint8_t line, const uint8_t icon) {
   dwinIconShow(ICON, icon, 26, MBASE(line) - 3);
 }
 
-void _decorateMenuItem(const uint8_t line, const uint8_t icon, bool more) {
+void decorateMenuItem(const uint8_t line, const uint8_t icon, bool more) {
   if (icon) drawMenuIcon(line, icon);
   if (more) drawMoreIcon(line);
 }
 void drawMenuItem(const uint8_t line, const uint8_t icon=0, const char * const label=nullptr, bool more=false) {
   if (label) dwinDrawString(false, font8x16, COLOR_WHITE, COLOR_BG_BLACK, LBLX, MBASE(line) - 1, (char*)label);
-  _decorateMenuItem(line, icon, more);
+  decorateMenuItem(line, icon, more);
 }
 void drawMenuItem(const uint8_t line, const uint8_t icon=0, FSTR_P const flabel=nullptr, bool more=false) {
   if (flabel) dwinDrawString(false, font8x16, COLOR_WHITE, COLOR_BG_BLACK, LBLX, MBASE(line) - 1, flabel);
-  _decorateMenuItem(line, icon, more);
+  decorateMenuItem(line, icon, more);
 }
 
 void drawMenuLine(const uint8_t line, const uint8_t icon=0, const char * const label=nullptr, bool more=false) {

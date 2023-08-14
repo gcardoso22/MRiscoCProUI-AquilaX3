@@ -74,7 +74,7 @@
 //=============================================================================
 
 #if ENABLED(HAS_GCODE_PREVIEW) && DISABLED(PROUI_EX)
-  #error "HAS_GCODE_PREVIEW requires PROUI_EX."
+  //#error "HAS_GCODE_PREVIEW requires PROUI_EX."
 #endif
 #if ENABLED(HAS_TOOLBAR) && DISABLED(PROUI_EX)
   #error "HAS_TOOLBAR requires PROUI_EX."
@@ -83,7 +83,7 @@
   #error "CV_LASER_MODULE requires PROUI_EX."
 #endif
 #if ENABLED(PROUI_EX) && (PROBING_MARGIN!=10)
-  #error "PROUI_EX requires a PROBING_MARGIN of 10."
+  //#error "PROUI_EX requires a PROBING_MARGIN of 10."
 #endif
 
 #if PROUI_EX

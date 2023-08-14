@@ -198,7 +198,7 @@ public:
     TERN_(HAS_MARLINUI_MENU, currentScreen = status_screen);
   }
   
-  #ifdef BED_SCREW_INSET
+#if BED_SCREW_INSET && ENABLED(DWIN_LCD_PROUI)
     static float screw_pos; // bed corner screw inset
   #endif
 
@@ -290,7 +290,7 @@ public:
   #endif
 
   #if LCD_BACKLIGHT_TIMEOUT_MINS
-    static constexpr uint8_t backlight_timeout_min = 1;
+    static constexpr uint8_t backlight_timeout_min = 0;
     static constexpr uint8_t backlight_timeout_max = 99;
     static uint8_t backlight_timeout_minutes;
     static millis_t backlight_off_ms;

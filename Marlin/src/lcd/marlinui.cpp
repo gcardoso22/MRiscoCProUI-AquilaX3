@@ -67,7 +67,7 @@ MarlinUI ui;
 
 constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
 
-#ifdef BED_SCREW_INSET
+#if BED_SCREW_INSET && ENABLED(DWIN_LCD_PROUI)
   float MarlinUI::screw_pos = BED_SCREW_INSET;
 #endif
 

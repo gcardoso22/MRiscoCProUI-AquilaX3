@@ -35,11 +35,11 @@
 
 #include "../../../inc/MarlinConfigPre.h"
 
-//#define DWIN_CREALITY_LCD_CUSTOM_ICONS
+#define DWIN_CREALITY_LCD_CUSTOM_ICONS
 
 enum processID : uint8_t {
   Proc_Main, Proc_Print, Proc_Menu, Proc_Value, Proc_Option,
-  Proc_File, Proc_Popup, Proc_Confirm, Proc_Wait
+  Proc_File, Proc_Popup, Proc_Confirm, OPTITEM(DRAW_KEYBOARD, Proc_Keyboard) Proc_Wait
 };
 
 enum PopupID : uint8_t {
@@ -83,6 +83,7 @@ enum menuID : uint8_t {
       ID_Preheat,
       ID_ChangeFilament,
       ID_MenuCustom,
+      OPTITEM(DRAW_KEYBOARD, ID_HostActions)
     ID_Control,
       ID_TempMenu,
         ID_PID,
@@ -95,6 +96,7 @@ enum menuID : uint8_t {
         #if ANY(MPC_EDIT_MENU, MPC_AUTOTUNE_MENU)
           ID_MPC,
         #endif
+        //#define DRAW_KEYBOARD
       ID_Motion,
         ID_HomeOffsets,
         ID_MaxSpeed,
@@ -103,11 +105,11 @@ enum menuID : uint8_t {
         ID_Steps,
       ID_Visual,
         ID_ColorSettings,
+      OPTITEM(DRAW_KEYBOARD, ID_HostSettings,
+        ID_ActionCommands)
       ID_Advanced,
         ID_ProbeMenu,
-        #if HAS_TRINAMIC_CONFIG
-          ID_TMCMenu,
-        #endif
+        OPTITEM(HAS_TRINAMIC_CONFIG, ID_TMCMenu)
       ID_Info,
     ID_Leveling,
       ID_LevelManual,
@@ -179,24 +181,29 @@ enum colorID : uint8_t {
 
 class JyersDWIN {
 public:
-  static constexpr size_t eeprom_data_size = 48;
+  static constexpr size_t eeprom_data_size = 64;
   static struct EEPROM_Settings { // use bit fields to save space, max 48 bytes
     bool time_format_textual : 1;
     #if ENABLED(AUTO_BED_LEVELING_UBL)
       uint8_t tilt_grid_size : 3;
     #endif
     uint16_t corner_pos : 10;
+    uint8_t bg_color : 4;
     uint8_t cursor_color : 4;
     uint8_t menu_split_line : 4;
     uint8_t menu_top_bg : 4;
     uint8_t menu_top_txt : 4;
-    uint8_t highlight_box : 4;
     uint8_t progress_percent : 4;
     uint8_t progress_time : 4;
     uint8_t status_bar_text : 4;
     uint8_t status_area_text : 4;
     uint8_t coordinates_text : 4;
     uint8_t coordinates_split_line : 4;
+    #if ENABLED(HOST_ACTION_COMMANDS) && ENABLED(DRAW_KEYBOARD)
+      uint64_t host_action_label_1 : 48;
+      uint64_t host_action_label_2 : 48;
+      uint64_t host_action_label_3 : 48;
+    #endif
   } eeprom_settings;
 
   static constexpr const char * const color_names[11] = { "Default", "White", "Green", "Cyan", "Blue", "Magenta", "Red", "Orange", "Yellow", "Brown", "Black" };
@@ -214,6 +221,7 @@ public:
   static void drawMenu(const uint8_t menu, const uint8_t select=0, const uint8_t scroll=0);
   static void redrawMenu(const bool lastproc=true, const bool lastsel=false, const bool lastmenu=false);
   static void redrawScreen();
+  static void decorateMenuItem(uint8_t row, uint8_t icon, bool more);
 
   static void mainMenuIcons();
   static void drawMainMenu(uint8_t select=0);
@@ -232,9 +240,15 @@ public:
   static void drawPopup(FSTR_P const line1, FSTR_P const line2, FSTR_P const line3, uint8_t mode, uint8_t icon=0);
   static void popupSelect();
   static void updateStatusBar(const bool refresh=false);
-
-  #if HAS_MESH
-    static void setMeshViewerStatus();
+  
+  #if ENABLED(DRAW_KEYBOARD)
+  static void drawString(char * string, uint8_t row, bool selected=false, bool below=false);
+  static const uint64_t encodeString(const char * string);
+  static void decodeString(const uint64_t num, char string[8]);
+  static void drawKeyboard(bool restrict, bool numeric, uint8_t selected=0, bool uppercase=false, bool lock=false);
+  static void drawKeys(uint8_t index, bool selected, bool uppercase=false, bool lock=false);
+  static void keyboardControl();
+  static void modifyString(char * string, uint8_t maxlength, bool restrict);
   #endif
 
   static FSTR_P getMenuTitle(const uint8_t menu);

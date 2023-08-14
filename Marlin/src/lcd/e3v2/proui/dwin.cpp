@@ -341,7 +341,7 @@ void iconButton(const bool selected, const int iconid, const frame_rect_t &ico, 
 //
 void iconPrint() {
   constexpr frame_rect_t ico = { 17, 110 - TERN0(HAS_TOOLBAR,TBYOFFSET), 110, 100};
-  iconButton(select_page.now == PAGE_PRINT, ICON_Print_0, ico, GET_TEXT_F(MSG_BUTTON_MEDIA));
+  iconButton(select_page.now == PAGE_PRINT, ICON_Print_0, ico, GET_TEXT_F(MSG_BUTTON_PRINT));
 }
 
 //
@@ -365,9 +365,13 @@ void iconControl() {
 //
 void iconAdvSettings() {
   constexpr frame_rect_t ico = { 145, 226 - TERN0(HAS_TOOLBAR,TBYOFFSET), 110, 100};
-  iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_ADVANCED));
+  #if ANY(AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL, MESH_BED_LEVELING)
+    iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_LEVEL));
+  #else
+    iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_ADVANCED));
+  #endif
 }
-
+interface
 //
 // Printing: "Tune"
 //
@@ -2148,7 +2152,7 @@ void autoHome() { queue.inject_P(G28_STR); }
 
   void setMoveZto0() {
     #if HAS_LEVELING && ANY(RESTORE_LEVELING_AFTER_G28, ENABLE_LEVELING_AFTER_G28)
-      set_bed_leveling_enabled(false));
+      set_bed_leveling_enabled(false);
     #endif
     #if ENABLED(Z_SAFE_HOMING)
       gcode.process_subcommands_now(TS(F("G28Z\nG0F5000X"), Z_SAFE_HOMING_X_POINT, F("Y"), Z_SAFE_HOMING_Y_POINT, F("\nG0Z0F300\nM400")));

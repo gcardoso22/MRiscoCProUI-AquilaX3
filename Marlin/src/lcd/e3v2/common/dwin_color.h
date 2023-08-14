@@ -32,7 +32,7 @@
 #define COLOR_WHITE         0xFFFF
 #define COLOR_YELLOW        0xFF0F  // RGB(0x1F,0x3F,0x00)
 #define COLOR_RED           0xA804  // RGB(0x1F,0x00,0x00)
-#define COLOR_ERROR_RED     0xc000  // Error!
+#define COLOR_ERROR_RED     0xC000  // Error!
 #define COLOR_BG_RED        COLOR_VOXELAB_RED  // Red background color
 #define COLOR_BG_WINDOW     0x31E8  // Popup background color
 #define COLOR_BG_BLUE       0x1125  // Dark blue background color

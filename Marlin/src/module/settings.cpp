@@ -598,7 +598,7 @@ typedef struct SettingsDataStruct {
   //
   // Bed corner screw position
   //
-  #if BED_SCREW_INSET
+  #if BED_SCREW_INSET && ENABLED(DWIN_LCD_PROUI)
     float ui_screw_pos;
   #endif
 
@@ -1692,7 +1692,7 @@ void MarlinSettings::postprocess() {
     //
     // BED_SCREW_INSET
     //
-    #if BED_SCREW_INSET
+    #if BED_SCREW_INSET && ENABLED(DWIN_LCD_PROUI)
       EEPROM_WRITE(ui.screw_pos);
     #endif
 
@@ -2791,7 +2791,7 @@ void MarlinSettings::postprocess() {
       //
       //BED_SCREW_INSET
       //
-      #if BED_SCREW_INSET
+      #if BED_SCREW_INSET && ENABLED(DWIN_LCD_PROUI)
         _FIELD_TEST(ui_screw_pos);
         EEPROM_READ(ui.screw_pos);
       #endif
@@ -3333,7 +3333,7 @@ void MarlinSettings::reset() {
   //
   //BED_SCREW_INSET
   //
-  #if BED_SCREW_INSET
+  #if BED_SCREW_INSET && ENABLED(DWIN_LCD_PROUI)
     ui.screw_pos = BED_SCREW_INSET; 
   #endif
 
