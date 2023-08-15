@@ -190,10 +190,9 @@
 #define BTN_Purge             92
 
 // Extended and default UI Colors
-#define COLOR_BLACK           0
-#define COLOR_GREEN           RGB(0,63,0)
-#define COLOR_AQUA            RGB(0,63,31)
-#define COLOR_BLUE            RGB(0,0,31)
+#define COLOR_BLACK           0x0000
+#define COLOR_GREEN           0x07E0
+#define COLOR_BLUE            0x001F
 #define COLOR_LIGHT_WHITE     0xBDD7
 #define COLOR_LIGHT_GREEN     0x3460
 #define COLOR_CYAN            0x07FF
@@ -201,12 +200,12 @@
 #define COLOR_LIGHT_BLUE      0x3A6A
 #define COLOR_MAGENTA         0xF81F
 #define COLOR_LIGHT_MAGENTA   0x9813
-#define COLOR_LIGHT_RED       0x8800
-#define COLOR_ORANGE          0xFA20
-#define COLOR_LIGHT_ORANGE    0xFBC0
-#define COLOR_LIGHT_YELLOW    0x8BE0
-#define COLOR_BROWN           0xCC27
-#define COLOR_LIGHT_BROWN     0x6204
+#define COLOR_LIGHT_RED       0xFA8A
+#define COLOR_ORANGE          0xFB00
+#define COLOR_LIGHT_ORANGE    0xFC80
+#define COLOR_LIGHT_YELLOW    0xFFE0
+#define COLOR_BROWN           0x8A22
+#define COLOR_LIGHT_BROWN     0xC530
 #define COLOR_GREY            0x18E3
 
 // UI element defines and constants
