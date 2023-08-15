@@ -122,7 +122,7 @@
   #include "lockscreen.h"
 #endif
 
-#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(TRAMWIZ_MENU_ITEM)
   #include "bed_tramming.h"
 #endif
 
@@ -228,7 +228,7 @@ char dateTime[16+1] =
 // New menu system pointers
 Menu *fileMenu = nullptr;
 Menu *prepareMenu = nullptr;
-#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(TRAMWIZ_MENU_ITEM)
   Menu *trammingMenu = nullptr;
 #endif
 Menu *moveMenu = nullptr;
@@ -369,7 +369,8 @@ void iconAdvSettings() {
     iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_LEVEL));
   #else
     iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_ADVANCED));
-  #endif}
+  #endif
+}
 
 //
 // Printing: "Tune"
@@ -1747,7 +1748,7 @@ void dwinSetDataDefaults() {
     hmiData.bedLevT = LEVELING_BED_TEMP;
   #endif
   TERN_(BAUD_RATE_GCODE, hmiData.baud250K = (BAUDRATE == 115200));
-  #if ALL(LCD_BED_TRAMMING, HAS_BED_PROBE)
+  #if ALL(TRAMWIZ_MENU_ITEM, HAS_BED_PROBE)
     hmiData.fullManualTramming = DISABLED(BED_TRAMMING_USE_PROBE);
   #endif
   #if ENABLED(MEDIASORT_MENU_ITEM)
@@ -2637,7 +2638,7 @@ void drawPrepareMenu() {
       MENU_ITEM(ICON_FilMan, MSG_FILAMENT_MAN, onDrawSubMenu, drawFilamentManMenu);
     #endif
     MENU_ITEM(ICON_Axis, MSG_MOVE_AXIS, onDrawSubMenu, drawMoveMenu);
-    #if ENABLED(LCD_BED_TRAMMING)
+    #if ENABLED(TRAMWIZ_MENU_ITEM)
       MENU_ITEM(ICON_Tram, MSG_BED_TRAMMING, onDrawSubMenu, drawTrammingMenu);
     #endif
     MENU_ITEM(ICON_CloseMotor, MSG_DISABLE_STEPPERS, onDrawMenuItem, disableMotors);
@@ -2668,7 +2669,7 @@ void drawPrepareMenu() {
   updateMenu(prepareMenu);
 }
 
-#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(TRAMWIZ_MENU_ITEM)
 
   void setManualTramming() {
     toggleCheckboxLine(hmiData.fullManualTramming);
@@ -2787,7 +2788,7 @@ void drawAdvancedSettingsMenu() {
     #endif
     EDIT_ITEM(ICON_File, MSG_MEDIA_UPDATE, onDrawChkbMenu, setMediaAutoMount, &hmiData.mediaAutoMount);
     #if ENABLED(BAUD_RATE_GCODE)
-      EDIT_ITEM_F(ICON_SetBaudRate, "115K baud", onDrawChkbMenu, setBaudRate, &hmiData.baud250K);
+      EDIT_ITEM_F(ICON_SetBaudRate, "250K baud", onDrawChkbMenu, setBaudRate, &hmiData.baud250K);
     #endif
     #if HAS_LCD_BRIGHTNESS
       EDIT_ITEM(ICON_Brightness, MSG_BRIGHTNESS, onDrawPInt8Menu, setBrightness, &ui.brightness);

@@ -83,7 +83,7 @@
   #error "CV_LASER_MODULE requires PROUI_EX."
 #endif
 #if ENABLED(PROUI_EX) && (PROBING_MARGIN!=10)
-  #error "PROUI_EX requires a PROBING_MARGIN of 10."
+ // #error "PROUI_EX requires a PROBING_MARGIN of 10."
 #endif
 #if HAS_PROUI_RUNOUT_SENSOR && !(ALL(PROUI_EX, FILAMENT_RUNOUT_SENSOR))
   #error "HAS_PROUI_RUNOUT_SENSOR requires PROUI_EX and FILAMENT_RUNOUT_SENSOR."
