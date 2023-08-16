@@ -12,18 +12,18 @@ on:
 jobs:
   bump_date:
     name: Bump Distribution Date
-    if: github.repository == 'classicrocker883/MriscocProUI'
+    if: github.repository == 'classicrocker883/MRiscoCProUI'
 
     runs-on: ubuntu-latest
 
     steps:
 
-    - name: Check out 2023-July
+    - name: Check out HC32-August
       uses: actions/checkout@v3
       with:
-        ref: 2023-July
+        ref: HC32-August
 
-    - name: Bump Date (2023-July)
+    - name: Bump Date (HC32-August)
       run: |
         # Inline Bump Script
         if [[ ! "$( git log -1 --pretty=%B )" =~ ^\[cron\] ]]; then

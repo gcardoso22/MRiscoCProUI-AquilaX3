@@ -81,13 +81,13 @@
   #define SOURCE_CODE_URL DEFAULT_SOURCE_CODE_URL
 #endif
 
-#ifdef CUSTOM_MACHINE_NAME
-  #undef  MACHINE_NAME
-  #define MACHINE_NAME CUSTOM_MACHINE_NAME
-#elif defined(DEFAULT_MACHINE_NAME)
-  #undef  MACHINE_NAME
-  #define MACHINE_NAME DEFAULT_MACHINE_NAME
-#endif
+// #ifdef CUSTOM_MACHINE_NAME
+//   #undef  MACHINE_NAME
+//   #define MACHINE_NAME CUSTOM_MACHINE_NAME
+// #elif defined(DEFAULT_MACHINE_NAME)
+//   #undef  MACHINE_NAME
+//   #define MACHINE_NAME DEFAULT_MACHINE_NAME
+// #endif
 
 #ifndef MACHINE_UUID
   #define MACHINE_UUID DEFAULT_MACHINE_UUID
@@ -250,6 +250,8 @@
 #define STR_LASER_TEMP                      "laser temperature"
 
 #define STR_STOPPED_HEATER                  ", system stopped! Heater_ID: "
+#define STR_DETECTED_TEMP_B                 " (temp: "
+#define STR_DETECTED_TEMP_E                 ")"
 #define STR_REDUNDANCY                      "Heater switched off. Temperature difference between temp sensors is too high !"
 #define STR_T_HEATING_FAILED                "Heating failed"
 #define STR_T_THERMAL_RUNAWAY               "Thermal Runaway"

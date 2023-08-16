@@ -68,9 +68,9 @@ public:
   int8_t pos = 0;
   OnDrawItem onDraw = nullptr;
   void (*onClick)() = nullptr;
-  CustomMenuItemClass() {}
+  CustomMenuItemClass() {};
   CustomMenuItemClass(OnDrawItem ondraw=nullptr, OnClickItem onclick=nullptr);
-  virtual ~CustomMenuItemClass(){}
+  virtual ~CustomMenuItemClass(){};
   virtual void draw(int8_t line);
   void redraw(bool erase=false);
 };

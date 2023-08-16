@@ -53,7 +53,7 @@ namespace LanguageNarrow_en {
   LSTR LANGUAGE                           = _UxGT("English");
 
   // These strings should be translated
-  LSTR WELCOME_MSG                        = MACHINE_NAME _UxGT(" Ready");
+  LSTR WELCOME_MSG                        = CUSTOM_MACHINE_NAME _UxGT(" Ready");
   LSTR MSG_YES                            = _UxGT("YES");
   LSTR MSG_NO                             = _UxGT("NO");
   LSTR MSG_HIGH                           = _UxGT("HIGH");
@@ -82,7 +82,8 @@ namespace LanguageNarrow_en {
   LSTR MSG_DISABLE_STEPPERS               = _UxGT("Disable Steppers");
   LSTR MSG_DEBUG_MENU                     = _UxGT("Debug Menu");
   LSTR MSG_PROGRESS_BAR_TEST              = _UxGT("Progress Bar Test");
-  LSTR MSG_ENDSTOP_TEST                   = _UxGT("End-stop Diagnostic");
+  LSTR MSG_ENDSTOP_TEST                   = _UxGT("Endstop Diagnostic");
+  LSTR MSG_Z_PROBE                        = _UxGT("Z-Probe");
   LSTR MSG_HOMING                         = _UxGT("Homing");
   LSTR MSG_AUTO_HOME                      = _UxGT("Auto Home");
   LSTR MSG_AUTO_HOME_A                    = _UxGT("Home @");
@@ -180,7 +181,7 @@ namespace LanguageNarrow_en {
   LSTR MSG_EDIT_MESH                      = _UxGT("Edit Mesh");
   LSTR MSG_MESH_VIEW                      = _UxGT("View Mesh");
   LSTR MSG_EDITING_STOPPED                = _UxGT("Mesh Editing Stopped");
-  LSTR MSG_NO_VALID_MESH                  = _UxGT("No valid mesh");
+  LSTR MSG_NO_VALID_MESH                  = _UxGT("No Valid Mesh");
   LSTR MSG_ACTIVATE_MESH                  = _UxGT("Activate Leveling");
   LSTR MSG_PROBING_POINT                  = _UxGT("Probing Point");
   LSTR MSG_MESH_X                         = _UxGT("Index X");
@@ -632,7 +633,6 @@ namespace LanguageNarrow_en {
   LSTR MSG_MANUAL_RESET                   = _UxGT("Reset Z-Probe");
   LSTR MSG_MANUAL_STOW                    = _UxGT("Stow Z-Probe");
   LSTR MSG_HOME_FIRST                     = _UxGT("Home %s First");
-  LSTR MSG_Z_PROBE                        = _UxGT("Z-Probe");
   LSTR MSG_ZPROBE_SETTINGS                = _UxGT("Probe Settings");
   LSTR MSG_ZPROBE_OFFSETS                 = _UxGT("Probe Offsets");
   LSTR MSG_ZPROBE_XOFFSET                 = _UxGT("Probe X Offset");

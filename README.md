@@ -23,8 +23,8 @@
 ---
 
 ### - Please read this: -
-Many Updates have been included in the most recent MriscocProUI in the **2023-July** release.<br>
-H32->HC32 support is currently only in the branch **HC32-July**. You can find the original repo here [@shadow578/Marlin-H32](https://github.com/shadow578/Marlin-H32)<br>
+Many Updates have been included in the most recent MriscocProUI in the **2023-August** release.<br>
+H32->HC32 support is currently only in the branch **HC32-August-B**. You can find the original repo here [@shadow578/Marlin-H32](https://github.com/shadow578/Marlin-H32)<br>
 #### Important Info regarding HC32:
 * Not all features or options have been fully tested with this chip.  
 * * <ins>**FOREWARNING**</ins>: So far everything has been working great - as normal - except there are reports of it restarting after saving with no other negative effects. So far, that is the only issue. I just wanted to give advance notice and if there is anything else to report please do so under [Issues tab](https://github.com/classicrocker883/MriscocProUI/issues).
@@ -33,7 +33,15 @@ H32->HC32 support is currently only in the branch **HC32-July**. You can find th
 General information about the firmware and updates is located in the _Wiki_ page [What's New In This Release](https://github.com/classicrocker883/MriscocProUI/wiki/What's-New-in-this-Release). <br> Other changes and updates are [addressed here](https://github.com/classicrocker883/MriscocProUI/releases/latest) and are [addressed here](https://github.com/mriscoc/Ender3V2S1/releases/latest).
 
 #### One important change to note is the `Mesh Inset` now saves upon restart -- it is working as normal.
-
+    /**
+     * The nozzle is only able to move within the physical bounds of the machine.
+     * If the PROBE has an OFFSET Marlin may need to apply additional limits so
+     * the probe can be prevented from going to unreachable points.
+     *
+     * e.g., If the PROBE is to the LEFT of the NOZZLE, it will be limited in how
+     * close it can get the RIGHT edge of the bed (unless the nozzle is able move
+     * far enough past the right edge).
+     */
 If you start printing and it says `Advance Pause` while **Runout** is enabled, you may have to change state it triggers no filament to **HIGH**, or **LOW** (depending on what is already selected). This is found in the _Prepare_ menu/ _Filament Management_/ _Filament Settings_ -> _Runout Active_. <br>
 A small issue which may occur is if you are in the <i>Print</i> menu and you quickly select to print between several printable *Gcode* files in a short amount of time. The screen can freeze for a moment and the printer will restart - that is it.<br><br>
 If you encounter any issues please feel free to post it on the issues tab, or if anything is going well please leave a comment. 

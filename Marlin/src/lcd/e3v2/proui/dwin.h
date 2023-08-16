@@ -265,9 +265,6 @@ void DWIN_Print_Pause();
 void DWIN_Print_Resume();
 void DWIN_Print_Finished();
 void DWIN_Print_Aborted();
-#if HAS_FILAMENT_SENSOR
-  void DWIN_FilamentRunout(const uint8_t extruder);
-#endif
 void DWIN_Print_Header(const char *text);
 void DWIN_SetColorDefaults();
 void DWIN_CopySettingsTo(char * const buff);
@@ -327,7 +324,6 @@ void Draw_Motion_Menu();
 #endif
 void Draw_FilamentMan_Menu();
 void Draw_Temperature_Menu();
-void Draw_PID_Menu();
 void Draw_MaxSpeed_Menu();
 void Draw_MaxAccel_Menu();
 #if HAS_CLASSIC_JERK
@@ -363,10 +359,11 @@ void Draw_Steps_Menu();
 #endif
 
 // PID
-#if PROUI_PID_TUNE
+#if HAS_PID_HEATING //#if PROUI_PID_TUNE
   #include "../../../module/temperature.h"
   void DWIN_M303(const bool seenC, const int c, const bool seenS, const heater_id_t hid, const celsius_t temp);
   void DWIN_PidTuning(tempcontrol_t result);
+  void Draw_PID_Menu();
 #endif
 #if ENABLED(PIDTEMP)
   #if ENABLED(PID_AUTOTUNE_MENU)
