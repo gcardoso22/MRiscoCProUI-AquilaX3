@@ -157,9 +157,8 @@ enum colorID : uint8_t {
 };
 
 #define Custom_Colors       10
-#define COLOR_AQUA          RGB(0x00,0x3F,0x1F)
 #define COLOR_LIGHT_WHITE   0xBDD7
-#define COLOR_GREEN         RGB(0x00,0x3F,0x00)
+#define COLOR_GREEN         0x07E0
 #define COLOR_LIGHT_GREEN   0x3460
 #define COLOR_CYAN          0x07FF
 #define COLOR_LIGHT_CYAN    0x04F3
@@ -179,6 +178,11 @@ enum colorID : uint8_t {
 #define COLOR_CONFIRM       0x34B9
 #define COLOR_CANCEL        0x3186
 
+#if ENABLED(HAS_GCODE_PREVIEW)
+#define Thumnail_Icon       0x00
+#define Thumnail_Preview    0x01
+#endif
+
 class JyersDWIN {
 public:
   static constexpr size_t eeprom_data_size = 64;
@@ -188,7 +192,7 @@ public:
       uint8_t tilt_grid_size : 3;
     #endif
     uint16_t corner_pos : 10;
-    uint8_t bg_color : 4;
+    uint16_t bg_color : 8;
     uint8_t cursor_color : 4;
     uint8_t menu_split_line : 4;
     uint8_t menu_top_bg : 4;
@@ -203,6 +207,9 @@ public:
       uint64_t host_action_label_1 : 48;
       uint64_t host_action_label_2 : 48;
       uint64_t host_action_label_3 : 48;
+    #endif
+    #if ENABLED(HAS_GCODE_PREVIEW)
+      bool gcode_thumbnails : 1;
     #endif
   } eeprom_settings;
 
@@ -240,7 +247,11 @@ public:
   static void drawPopup(FSTR_P const line1, FSTR_P const line2, FSTR_P const line3, uint8_t mode, uint8_t icon=0);
   static void popupSelect();
   static void updateStatusBar(const bool refresh=false);
-  
+
+  #if ENABLED(HAS_GCODE_PREVIEW)
+  static bool find_and_decode_gcode_preview(char *name, uint8_t preview_type, uint16_t *address, bool onlyCachedFileIcon=false);
+  #endif
+
   #if ENABLED(DRAW_KEYBOARD)
   static void drawString(char * string, uint8_t row, bool selected=false, bool below=false);
   static const uint64_t encodeString(const char * string);

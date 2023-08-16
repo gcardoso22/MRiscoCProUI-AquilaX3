@@ -83,6 +83,10 @@
   #define TMC_MAX_CURRENT 1500
 #endif
 
+#if HAS_GCODE_PREVIEW
+  #include "gcode_preview.h"
+#endif
+
 #define MACHINE_SIZE STRINGIFY(X_BED_SIZE) "x" STRINGIFY(Y_BED_SIZE) "x" STRINGIFY(Z_MAX_POS)
 
 #define DWIN_FONT_MENU font8x16
@@ -609,7 +613,7 @@ void JyersDWIN::drawMenu(const uint8_t menu, const uint8_t select/*=0*/, const u
   clearScreen();
   drawTitle(getMenuTitle(menu));
   for (uint8_t i = 0; i < TROWS; ++i) menuItemHandler(menu, i + scrollpos);
-  dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_RECTANGLE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
+  dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
 }
 
 void JyersDWIN::redrawMenu(const bool lastproc/*=true*/, const bool lastsel/*=false*/, const bool lastmenu/*=false*/) {
@@ -637,6 +641,7 @@ void JyersDWIN::mainMenuIcons() {
   if (selection == 0) {
     dwinIconShow(ICON, ICON_Print_1, 17, 130);
     dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 17, 130, 126, 229);
+    dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 18, 131, 125, 228);
     dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 52, 200, F("Print"));
   }
   else {
@@ -646,6 +651,7 @@ void JyersDWIN::mainMenuIcons() {
   if (selection == 1) {
     dwinIconShow(ICON, ICON_Prepare_1, 145, 130);
     dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 145, 130, 254, 229);
+    dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 146, 131, 253, 228);
     dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 170, 200, F("Prepare"));
   }
   else {
@@ -655,16 +661,18 @@ void JyersDWIN::mainMenuIcons() {
   if (selection == 2) {
     dwinIconShow(ICON, ICON_Control_1, 17, 246);
     dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 17, 246, 126, 345);
+    dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 18, 247, 125, 344);
     dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 43, 317, F("Control"));
   }
   else {
     dwinIconShow(ICON, ICON_Control_0, 17, 246);
     dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 43, 317, F("Control"));
   }
-  #if HAS_ABL_OR_UBL
+  #if HAS_LEVELING
     if (selection == 3) {
       dwinIconShow(ICON, ICON_Leveling_1, 145, 246);
       dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 145, 246, 254, 345);
+      dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 146, 247, 253, 344);
       dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 179, 317, F("Level"));
     }
     else {
@@ -675,11 +683,12 @@ void JyersDWIN::mainMenuIcons() {
     if (selection == 3) {
       dwinIconShow(ICON, ICON_Info_1, 145, 246);
       dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 145, 246, 254, 345);
-      dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 181, 317, F("Info"));
+      dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 146, 247, 253, 344);
+      dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 181, 317, F("Advanced"));
     }
     else {
       dwinIconShow(ICON, ICON_Info_0, 145, 246);
-      dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 181, 317, F("Info"));
+      dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 181, 317, F("Advanced"));
     }
   #endif
 }
@@ -699,6 +708,7 @@ void JyersDWIN::printScreenIcons() {
   if (selection == 0) {
     dwinIconShow(ICON, ICON_Setup_1, 8, 252);
     dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 8, 252, 87, 351);
+    dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 9, 253, 86, 350);
     dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 30, 322, F("Tune"));
   }
   else {
@@ -708,6 +718,7 @@ void JyersDWIN::printScreenIcons() {
   if (selection == 2) {
     dwinIconShow(ICON, ICON_Stop_1, 184, 252);
     dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 184, 252, 263, 351);
+    dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 185, 253, 262, 350);
     dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 205, 322, F("Stop"));
   }
   else {
@@ -718,6 +729,7 @@ void JyersDWIN::printScreenIcons() {
     if (selection == 1) {
       dwinIconShow(ICON, ICON_Continue_1, 96, 252);
       dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 96, 252, 175, 351);
+      dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 97, 253, 174, 350);
       dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 114, 322, F("Print"));
     }
     else {
@@ -729,6 +741,7 @@ void JyersDWIN::printScreenIcons() {
     if (selection == 1) {
       dwinIconShow(ICON, ICON_Pause_1, 96, 252);
       dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 96, 252, 175, 351);
+      dwinDrawRectangle(0, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 97, 253, 174, 350);
       dwinDrawString(false, DWIN_FONT_MENU, COLOR_WHITE, eeprom_settings.bg_color, 114, 322, F("Pause"));
     }
     else {
@@ -739,6 +752,7 @@ void JyersDWIN::printScreenIcons() {
 }
 
 void JyersDWIN::drawPrintScreen() {
+  Preview_Invalidate();
   process = Proc_Print;
   selection = 0;
   clearScreen();
@@ -852,7 +866,7 @@ void JyersDWIN::drawSDList(const bool removed/*=false*/) {
     dwinDrawRectangle(1, COLOR_BG_RED, 10, MBASE(3) - 10, DWIN_WIDTH - 10, MBASE(4));
     dwinDrawString(false, font16x32, COLOR_YELLOW, COLOR_BG_RED, ((DWIN_WIDTH) - 8 * 16) / 2, MBASE(3), F("No Media"));
   }
-  dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_RECTANGLE), 0, MBASE(0) - 18, 14, MBASE(0) + 33);
+  dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 0, MBASE(0) - 18, 14, MBASE(0) + 33);
 }
 
 void JyersDWIN::drawStatusArea(const bool icons/*=false*/) {
@@ -2907,7 +2921,8 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
       #define VISUAL_TIMEOUT (VISUAL_BRIGHTNESS + 1)
       #define VISUAL_TIME_FORMAT (VISUAL_TIMEOUT + 1)
       #define VISUAL_COLOR_THEMES (VISUAL_TIME_FORMAT + 1)
-      #define VISUAL_TOTAL VISUAL_COLOR_THEMES
+      #define VISUAL_FILE_TUMBNAILS (VISUAL_COLOR_THEMES + ENABLED(HAS_GCODE_PREVIEW))
+      #define VISUAL_TOTAL VISUAL_FILE_TUMBNAILS
 
       switch (item) {
         case VISUAL_BACK:
@@ -2928,15 +2943,15 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             drawFloat(ui.brightness, row, false, 1);
           }
           else
-            modifyValue(ui.brightness, ui.backlight_timeout_min, ui.backlight_timeout_max, 1, ui.refresh_brightness);
+            modifyValue(ui.brightness, LCD_BRIGHTNESS_MIN, LCD_BRIGHTNESS_MAX, 1, ui.refresh_brightness);
           break;
         case VISUAL_TIMEOUT:
           if (draw) {
             drawMenuItem(row, ICON_Brightness, GET_TEXT_F(MSG_SCREEN_TIMEOUT));
-            drawFloat(ui.brightness, row, false, 1);
+            drawFloat(ui.backlight_timeout_minutes, row, false, 1);
           }
           else
-            modifyValue(ui.brightness, LCD_BRIGHTNESS_MIN, LCD_BRIGHTNESS_MAX, 1, ui.refresh_brightness);
+            modifyValue(ui.backlight_timeout_minutes, ui.backlight_timeout_min, ui.backlight_timeout_max, 1, ui.refresh_backlight_timeout);
           break;
         case VISUAL_TIME_FORMAT:
           if (draw) {
@@ -2954,6 +2969,18 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           else
             drawMenu(ID_ColorSettings);
         break;
+        #if ENABLED(HAS_GCODE_PREVIEW)
+          case VISUAL_FILE_TUMBNAILS:
+            if (draw) {
+              drawMenuItem(row, ICON_PrintTime, "Show file thumbnails");
+              drawCheckbox(row, eeprom_settings.gcode_thumbnails);
+            }
+            else {
+              eeprom_settings.gcode_thumbnails ^= true;
+              drawCheckbox(row, eeprom_settings.gcode_thumbnails);
+            }
+            break;
+        #endif
       }
       break;
 
@@ -4561,6 +4588,7 @@ void JyersDWIN::popupHandler(const PopupID popupid, const bool option/*=false*/)
     case Popup_PIDWait:       drawPopup(F("PID Autotune"), F("in process"), F("Please wait until done."), Proc_Wait, ICON_BLTouch); break;
     case Popup_MPCWait:       drawPopup(F("MPC Autotune"), F("in process"), F("Please wait until done."), Proc_Wait, ICON_BLTouch); break;
     case Popup_Resuming:      drawPopup(F("Resuming Print"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
+    //case Popup_Preview:       drawPopup(F("Running Custom GCode"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
     case Popup_Custom:        drawPopup(F("Running Custom GCode"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
     default: break;
   }
@@ -4614,7 +4642,7 @@ void JyersDWIN::menuControl() {
       dwinFrameAreaMove(1, 2, MLINE, eeprom_settings.bg_color, 0, 31, DWIN_WIDTH, 349);
       menuItemHandler(active_menu, selection);
     }
-    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_RECTANGLE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
+    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
   }
   else if (encoder_diffState == ENCODER_DIFF_CCW && selection > 0) {
     dwinDrawRectangle(1, eeprom_settings.bg_color, 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
@@ -4624,7 +4652,7 @@ void JyersDWIN::menuControl() {
       dwinFrameAreaMove(1, 3, MLINE, eeprom_settings.bg_color, 0, 31, DWIN_WIDTH, 349);
       menuItemHandler(active_menu, selection);
     }
-    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_RECTANGLE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
+    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
   }
   else if (encoder_diffState == ENCODER_DIFF_ENTER)
     menuItemHandler(active_menu, selection, false);
@@ -4767,7 +4795,7 @@ void JyersDWIN::fileControl() {
       dwinFrameAreaMove(1, 2, MLINE, eeprom_settings.bg_color, 0, 31, DWIN_WIDTH, 349);
       drawSDItem(selection, selection - scrollpos);
     }
-    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_RECTANGLE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
+    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
   }
   else if (encoder_diffState == ENCODER_DIFF_CCW && selection > 0) {
     dwinDrawRectangle(1, eeprom_settings.bg_color, 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
@@ -4780,7 +4808,7 @@ void JyersDWIN::fileControl() {
       dwinFrameAreaMove(1, 3, MLINE, eeprom_settings.bg_color, 0, 31, DWIN_WIDTH, 349);
       drawSDItem(selection, selection - scrollpos);
     }
-    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_RECTANGLE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
+    dwinDrawRectangle(1, getColor(eeprom_settings.cursor_color, COLOR_WHITE), 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
   }
   else if (encoder_diffState == ENCODER_DIFF_ENTER) {
     if (selection == 0) {
@@ -4800,6 +4828,10 @@ void JyersDWIN::fileControl() {
         drawSDList();
       }
       else {
+        #if HAS_GCODE_PREVIEW
+          if (eeprom_settings.gcode_thumbnails) Preview_DrawFromSD();
+          else
+        #endif
         card.openAndPrintFile(card.filename);
       }
     }
@@ -5503,7 +5535,7 @@ void JyersDWIN::resetSettings() {
   #endif
   TERN_(AUTO_BED_LEVELING_UBL, mesh_conf.tilt_grid = eeprom_settings.tilt_grid_size + 1);
   corner_pos = eeprom_settings.corner_pos / 10.0f;
-  TERN_(SOUND_MENU_ITEM, ui.sound_on = ENABLED(SOUND_ON_DEFAULT));
+  TERN_(HAS_GCODE_PREVIEW, bool gcode_thumbnails = true);
   TERN_(SOUND_MENU_ITEM, ui.tick_on = ENABLED(TICK_ON_DEFAULT));
   redrawScreen();
 }
