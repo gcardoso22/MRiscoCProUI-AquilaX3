@@ -108,9 +108,9 @@ void MeshViewerClass::DrawMeshPoint(const uint8_t x, const uint8_t y, const floa
 
 void MeshViewerClass::DrawMesh(bed_mesh_t zval, const uint8_t csizex, const uint8_t csizey) {
   DrawMeshGrid(csizex, csizey);
-   for (uint8_t y = 0; y < csizey; ++y) {
+  for (uint8_t y = 0; y < csizey; ++y) {
     hal.watchdog_refresh();
-     for (uint8_t x = 0; x < csizex; ++x) DrawMeshPoint(x, y, zval[x][y]);
+    for (uint8_t x = 0; x < csizex; ++x) DrawMeshPoint(x, y, zval[x][y]);
   }
 }
 

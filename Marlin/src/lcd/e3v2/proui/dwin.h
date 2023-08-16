@@ -41,7 +41,7 @@ namespace GET_LANG(LCD_LANGUAGE) {
     LSTR MSG_PREHEAT_##N                  = _UxGT("Preheat ") PREHEAT_## N ##_LABEL; \
     LSTR MSG_PREHEAT_## N ##_SETTINGS     = _UxGT("Preheat ") PREHEAT_## N ##_LABEL _UxGT(" Settings");
   #if PREHEAT_COUNT > 3
-    REPEAT_S(4, INCREMENT(PREHEAT_COUNT, _MSG_PREHEAT)
+    REPEAT_S(4, INCREMENT(PREHEAT_COUNT), _MSG_PREHEAT)
   #endif
 }
 
