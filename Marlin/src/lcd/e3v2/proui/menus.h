@@ -167,7 +167,6 @@ void InitMenu();
 
 // Create a new menu
 bool SetMenu(MenuClass* &menu, FSTR_P title, int8_t totalitems);
-bool SetMenu(MenuClass* &menu, frame_rect_t cn, FSTR_P title, int8_t totalitems);
 
 // Reset top line and selected item
 void ResetMenu(MenuClass* &menu);

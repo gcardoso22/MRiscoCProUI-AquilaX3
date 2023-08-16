@@ -1506,7 +1506,6 @@ bool IDisPopUp() {    // If ID is popup...
       || (checkkey == Homing)
       || (checkkey == Leveling)
       || (checkkey == PidProcess)
-      || (checkkey == PlotProcess)
       TERN_(HAS_ESDIAG, || (checkkey == ESDiagProcess))
       || (checkkey == Popup);
 }
@@ -4099,7 +4098,7 @@ void Draw_GetColor_Menu() {
     void LiveEditMeshZ() { *MenuData.P_Float = MenuData.Value / POW(10, 3); if (AutoMovToMesh) { bedLevelTools.MoveToZ(); } }
     void ApplyEditMeshX() { bedLevelTools.mesh_x = MenuData.Value; if (AutoMovToMesh) { bedLevelTools.MoveToXY(); } }
     void ApplyEditMeshY() { bedLevelTools.mesh_y = MenuData.Value; if (AutoMovToMesh) { bedLevelTools.MoveToXY(); } }
-    void ResetMesh() { bedLevelTools.mesh_reset(); EditZValueItem->redraw(); LCD_MESSAGE(MSG_MESH_RESET); }
+    void ResetMesh() { ((MenuItemPtrClass*)EditZValueItem)->value = 0; EditZValueItem->redraw(); LCD_MESSAGE(MSG_MESH_RESET); }
     void ResetMesh2() { bedLevelTools.mesh_reset(); LCD_MESSAGE(MSG_MESH_RESET); }
     void SetEditMeshX() { HMI_value.Select = 0; SetIntOnClick(0, GRID_MAX_POINTS_X - 1, bedLevelTools.mesh_x, ApplyEditMeshX, LiveEditMesh); }
     void SetEditMeshY() { HMI_value.Select = 1; SetIntOnClick(0, GRID_MAX_POINTS_Y - 1, bedLevelTools.mesh_y, ApplyEditMeshY, LiveEditMesh); }
@@ -4116,7 +4115,6 @@ void Draw_GetColor_Menu() {
     if (HMI_flag.select_flag) {
       HMI_ReturnScreen();
       ResetMesh();
-      DONE_BUZZ(true);
     }
     else { HMI_ReturnScreen(); }
   }
