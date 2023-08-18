@@ -122,7 +122,7 @@
   #include "lockscreen.h"
 #endif
 
-#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(TRAMWIZ_MENU_ITEM)
   #include "bed_tramming.h"
 #endif
 
@@ -228,7 +228,7 @@ char dateTime[16+1] =
 // New menu system pointers
 Menu *fileMenu = nullptr;
 Menu *prepareMenu = nullptr;
-#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(TRAMWIZ_MENU_ITEM)
   Menu *trammingMenu = nullptr;
 #endif
 Menu *moveMenu = nullptr;
@@ -369,7 +369,8 @@ void iconAdvSettings() {
     iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_LEVEL));
   #else
     iconButton(select_page.now == PAGE_ADVANCE, ICON_Info_0, ico, GET_TEXT_F(MSG_BUTTON_ADVANCED));
-  #endif}
+  #endif
+}
 
 //
 // Printing: "Tune"
@@ -684,7 +685,7 @@ void _drawZOffsetIcon() {
   #endif
 }
 
-#if HAS_FILAMENT_SENSOR && PROUI_EX
+#if HAS_PROUI_RUNOUT_SENSOR
   void _drawRunoutIcon() {
     static bool _runout_active = false;
     _drawIconBlink(_runout_active, !!FilamentSensorBase::poll_runout_states(), ICON_StepE, ICON_FilRunOut, 112, 416);
@@ -792,7 +793,7 @@ void updateVariable() {
     DWINUI::drawSignedFloat(DWIN_FONT_STAT, hmiData.colorIndicator,  hmiData.colorBackground, 2, 2, 204, 417, _offset);
   }
 
-  #if HAS_FILAMENT_SENSOR && PROUI_EX
+  #if HAS_PROUI_RUNOUT_SENSOR
     _drawRunoutIcon();
   #endif
 
@@ -808,7 +809,7 @@ bool DWIN_lcd_sd_status = false;
 #if ENABLED(MEDIASORT_MENU_ITEM)
   void setMediaSort() {
     toggleCheckboxLine(hmiData.mediaSort);
-    card.setSortOn(hmiData.mediaSort);
+    card.setSortOn(hmiData.mediaSort ? TERN(SDSORT_REVERSE, AS_REV, AS_FWD) : AS_OFF);
   }
 #endif
 
@@ -1711,11 +1712,6 @@ void dwinPrintAborted() {
   dwinPrintFinished();
 }
 
-#if HAS_FILAMENT_SENSOR
-  // Filament Runout process
-  void dwinFilamentRunout(const uint8_t extruder) { LCD_MESSAGE(MSG_RUNOUT_SENSOR); }
-#endif
-
 void dwinSetColorDefaults() {
   hmiData.colorBackground = defColorBackground;
   hmiData.colorCursor     = defColorCursor;
@@ -1752,12 +1748,12 @@ void dwinSetDataDefaults() {
     hmiData.bedLevT = LEVELING_BED_TEMP;
   #endif
   TERN_(BAUD_RATE_GCODE, hmiData.baud250K = (BAUDRATE == 115200));
-  #if ALL(LCD_BED_TRAMMING, HAS_BED_PROBE)
+  #if ALL(TRAMWIZ_MENU_ITEM, HAS_BED_PROBE)
     hmiData.fullManualTramming = DISABLED(BED_TRAMMING_USE_PROBE);
   #endif
   #if ENABLED(MEDIASORT_MENU_ITEM)
     hmiData.mediaSort = true;
-    card.setSortOn(true);
+    card.setSortOn(TERN(SDSORT_REVERSE, AS_REV, AS_FWD));
   #endif
   hmiData.mediaAutoMount = ENABLED(HAS_SD_EXTENDER);
   #if ALL(INDIVIDUAL_AXIS_HOMING_SUBMENU, MESH_BED_LEVELING)
@@ -2343,7 +2339,7 @@ void applyMove() {
     toggleCheckboxLine(runout.enabled);
   }
 
-  #if PROUI_EX
+  #if HAS_PROUI_RUNOUT_SENSOR
     void liveRunoutActive() { proUIEx.drawRunoutActive(true); }
     void setRunoutActive() {
       uint8_t val;
@@ -2605,7 +2601,7 @@ void onDrawGetColorItem(MenuItem* menuitem, int8_t line) {
   dwinDrawHLine(hmiData.colorSplitLine, 16, MYPOS(line + 1), 240);
 }
 
-#if ALL(HAS_FILAMENT_SENSOR, PROUI_EX)
+#if HAS_PROUI_RUNOUT_SENSOR
   void ondrawRunoutActive(MenuItem* menuitem, int8_t line) {
     onDrawMenuItem(menuitem, line);
     if (PRO_data.FilamentMotionSensor)
@@ -2642,7 +2638,7 @@ void drawPrepareMenu() {
       MENU_ITEM(ICON_FilMan, MSG_FILAMENT_MAN, onDrawSubMenu, drawFilamentManMenu);
     #endif
     MENU_ITEM(ICON_Axis, MSG_MOVE_AXIS, onDrawSubMenu, drawMoveMenu);
-    #if ENABLED(LCD_BED_TRAMMING)
+    #if ENABLED(TRAMWIZ_MENU_ITEM)
       MENU_ITEM(ICON_Tram, MSG_BED_TRAMMING, onDrawSubMenu, drawTrammingMenu);
     #endif
     MENU_ITEM(ICON_CloseMotor, MSG_DISABLE_STEPPERS, onDrawMenuItem, disableMotors);
@@ -2673,7 +2669,7 @@ void drawPrepareMenu() {
   updateMenu(prepareMenu);
 }
 
-#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(TRAMWIZ_MENU_ITEM)
 
   void setManualTramming() {
     toggleCheckboxLine(hmiData.fullManualTramming);
@@ -2792,7 +2788,7 @@ void drawAdvancedSettingsMenu() {
     #endif
     EDIT_ITEM(ICON_File, MSG_MEDIA_UPDATE, onDrawChkbMenu, setMediaAutoMount, &hmiData.mediaAutoMount);
     #if ENABLED(BAUD_RATE_GCODE)
-      EDIT_ITEM_F(ICON_SetBaudRate, "115K baud", onDrawChkbMenu, setBaudRate, &hmiData.baud250K);
+      EDIT_ITEM_F(ICON_SetBaudRate, "250K baud", onDrawChkbMenu, setBaudRate, &hmiData.baud250K);
     #endif
     #if HAS_LCD_BRIGHTNESS
       EDIT_ITEM(ICON_Brightness, MSG_BRIGHTNESS, onDrawPInt8Menu, setBrightness, &ui.brightness);
@@ -2891,12 +2887,12 @@ void drawFilSetMenu() {
     BACK_ITEM(drawAdvancedSettingsMenu);
     #if HAS_FILAMENT_SENSOR
       EDIT_ITEM(ICON_Runout, MSG_RUNOUT_ENABLE, onDrawChkbMenu, setRunoutEnable, &runout.enabled);
-      #if PROUI_EX
+      #if HAS_PROUI_RUNOUT_SENSOR
         MENU_ITEM(ICON_Runout, MSG_RUNOUT_ACTIVE, ondrawRunoutActive, setRunoutActive);
       #endif
-    #endif
-    #if HAS_FILAMENT_RUNOUT_DISTANCE
-      EDIT_ITEM(ICON_Runout, MSG_RUNOUT_DISTANCE_MM, onDrawPFloatMenu, setRunoutDistance, &runout.runout_distance());
+      #if HAS_FILAMENT_RUNOUT_DISTANCE
+        EDIT_ITEM(ICON_Runout, MSG_RUNOUT_DISTANCE_MM, onDrawPFloatMenu, setRunoutDistance, &runout.runout_distance());
+      #endif
     #endif
     #if ALL(PROUI_EX, HAS_EXTRUDERS)
       EDIT_ITEM(ICON_InvertE0, MSG_INVERT_EXTRUDER, onDrawChkbMenu, setInvertE0, &PRO_data.Invert_E0);
@@ -3063,8 +3059,8 @@ void drawTuneMenu() {
 #endif
 
 #if ENABLED(SHAPING_MENU)
-  void applyShapingFreq() { stepper.set_shaping_frequency(hmiValue.axis, menuData.value / 100); }
-  void applyShapingZeta() { stepper.set_shaping_damping_ratio(hmiValue.axis, menuData.value / 100); }
+  void applyShapingFreq() { stepper.set_shaping_frequency(hmiValue.axis, menuData.value * 0.01); }
+  void applyShapingZeta() { stepper.set_shaping_damping_ratio(hmiValue.axis, menuData.value * 0.01); }
 
   #if ENABLED(INPUT_SHAPING_X)
     void onDrawShapingXFreq(MenuItem* menuitem, int8_t line) { onDrawFloatMenu(menuitem, line, 2, stepper.get_shaping_frequency(X_AXIS)); }

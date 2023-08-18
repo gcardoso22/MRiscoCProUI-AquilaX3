@@ -211,12 +211,12 @@ void doCoolDown();
 void applyExtMinT();
 void parkHead();
 // added
-TERN(HAS_BED_PROBE, float, void) tram(uint8_t point, bool stow_probe = true);
+//TERN(HAS_BED_PROBE, float, void) tram(uint8_t point, bool stow_probe = true);
 #if HAS_BED_PROBE && ENABLED(TRAMWIZ_MENU_ITEM)
-  void Trammingwizard();
-  void TramwizStart();
-  void onClick_StartTramwiz();
-  void PopUp_StartTramwiz();
+  void trammingwizard();
+  void tramwizStart();
+  void onClickStartTramwiz();
+  void popUpStartTramwiz();
   void drawTrammingMenu();
 #endif
 //
@@ -268,9 +268,6 @@ void dwinPrintPause();
 void dwinPrintResume();
 void dwinPrintFinished();
 void dwinPrintAborted();
-#if HAS_FILAMENT_SENSOR
-  void dwinFilamentRunout(const uint8_t extruder);
-#endif
 void dwinPrintHeader(const char *text);
 void dwinSetColorDefaults();
 void dwinCopySettingsTo(char * const buff);
@@ -305,9 +302,9 @@ void drawAdvancedSettingsMenu();
 void drawPrepareMenu();
 void drawMoveMenu();
 
-//#if ENABLED(LCD_BED_TRAMMING)
+#if ENABLED(LCD_BED_TRAMMING)
 //void drawTrammingMenu();
-//#endif
+#endif
 
 #if HAS_HOME_OFFSET
   void drawHomeOffsetMenu();

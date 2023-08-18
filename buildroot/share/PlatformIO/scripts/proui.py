@@ -45,12 +45,9 @@ if "MARLIN_FEATURES" in env:
          arch = 'stm32g0/'
          print ('STM32G0 Architecture detected')
       elif (gd32f10):
-         #arch = 'gd32f10/'
-         print ('GD32F1 Architecture detected\n(Maple Environment depreciated - Exiting)')
-         exit()
+         exit(KeyError("GD32F1 Architecture detected\n(Maple Environment depreciated - Exiting)"))
       else:
-         print("Error: can't detect the correct architecture")
-         exit()
+         exit(KeyError("Error: can't detect the correct architecture"))
 
       if (marlin_manualmesh):
          print("Manual Mesh Bed Leveling detected")
