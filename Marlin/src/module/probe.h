@@ -362,3 +362,7 @@ private:
 };
 
 extern Probe probe;
+
+#if ENABLED(PROUI_EX)
+  float probe_at_point(const_float_t rx, const_float_t ry, const bool raise_after);
+#endif

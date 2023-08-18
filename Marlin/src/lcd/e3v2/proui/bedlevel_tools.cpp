@@ -203,7 +203,7 @@ bool BedLevelTools::meshValidate() {
     const uint16_t total_width_px = DWIN_WIDTH - padding_x - padding_x;
     const uint16_t cell_width_px  = total_width_px / (GRID_MAX_POINTS_X);
     const uint16_t cell_height_px = total_width_px / (GRID_MAX_POINTS_Y);
-    const float v_max = abs(getMaxValue()), v_min = abs(getMinValue()), range = _MAX(v_min, v_max), range2 = _MIN(v_min, v_max);
+    const float v_max = abs(getMaxValue()), v_min = abs(getMinValue()), range = _MAX(v_min, v_max);
 
     // Clear background from previous selection and select new square
     dwinDrawRectangle(1, COLOR_BG_BLACK, _MAX(0, padding_x - gridline_width), _MAX(0, padding_y_top - gridline_width), padding_x + total_width_px, padding_y_top + total_width_px);
@@ -223,9 +223,9 @@ bool BedLevelTools::meshValidate() {
       const auto end_y_px   = start_y_px + cell_height_px - 1 - gridline_width;
       dwinDrawRectangle(1,                                                                                        // RGB565 colors: http://www.barth-dev.de/online/rgb565-color-picker/
         isnan(bedlevel.z_values[x][y]) ? COLOR_GREY : (                                                           // grey if undefined
-          (bedlevel.z_values[x][y] < 0 ?
-            (uint16_t)round(0x1F * -bedlevel.z_values[x][y] / range) << 11 : // red if mesh point value is negative
-            (uint16_t)round(0x3F *  bedlevel.z_values[x][y] / range2) << 5) | // green if mesh point value is positive
+          (bedlevel.z_values[x][y] > 0 ?
+            (uint16_t)round(0x1F *  bedlevel.z_values[x][y] / range) << 11 : // red if mesh point value is positive
+            (uint16_t)round(0x3F * -bedlevel.z_values[x][y] / range) << 5) | // green if mesh point value is negative
               _MIN(0x1F, (((uint8_t)abs(bedlevel.z_values[x][y]) / 10) * 4))),                                    // + blue stepping for every mm
         start_x_px, start_y_px, end_x_px, end_y_px
       );
@@ -262,9 +262,9 @@ bool BedLevelTools::meshValidate() {
     if (range2 > 3e+10f) range2 = 0.0000001;
     ui.set_status(
       &MString<47>(
-        F("Red "),  p_float_t(-range, 3),
-        F("..0.."), p_float_t(range2, 3),
-        F("+ Green")
+        F("Green "), p_float_t(-range2, 3),
+        F("..0.."),  p_float_t(range, 3),
+        F("+ Red")
       )
     );
     drawing_mesh = false;

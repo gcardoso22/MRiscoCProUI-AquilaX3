@@ -1834,7 +1834,7 @@ void dwinCopySettingsFrom(const char * const buff) {
   TERN_(PREVENT_COLD_EXTRUSION, applyExtMinT());
   feedrate_percentage = 100;
   TERN_(BAUD_RATE_GCODE, if (hmiData.baud250K) setBaud115K(); else setBaud250K());
-  TERN_(MEDIASORT_MENU_ITEM, card.setSortOn(hmiData.mediaSort));
+  TERN_(MEDIASORT_MENU_ITEM, card.setSortOn(hmiData.mediaSort ? TERN(SDSORT_REVERSE, AS_REV, AS_FWD) : AS_OFF));
   #if ALL(LED_CONTROL_MENU, HAS_COLOR_LEDS)
     leds.set_color(
       (hmiData.ledColor >> 16) & 0xFF,
