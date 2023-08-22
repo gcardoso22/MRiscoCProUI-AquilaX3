@@ -58,8 +58,12 @@
 #define defColorIndicator   COLOR_WHITE
 #define defColorCoordinate  COLOR_WHITE
 #define defColorButton      RGB( 0, 23, 16)
-#define defColorLeds        0xFFFFFFFF
-#define defCaseLightBrightness 255
+#if ALL(LED_CONTROL_MENU, HAS_COLOR_LEDS)
+  #define defColorLeds      LEDColorWhite()
+#endif
+#if CASELIGHT_USES_BRIGHTNESS
+  #define defCaseLightBrightness 255
+#endif
 #ifdef Z_AFTER_HOMING
   #define DEF_Z_AFTER_HOMING Z_AFTER_HOMING
 #else
