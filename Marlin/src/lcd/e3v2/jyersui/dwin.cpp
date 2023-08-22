@@ -133,6 +133,10 @@
 #define JERK_UNIT 10
 #define STEPS_UNIT 10
 
+#ifdef LCD_BACKLIGHT_TIMEOUT_MINS
+  #define HAS_TIMEOUT 1
+#endif
+
 //
 // Custom menu items with JyersLCD
 //
@@ -752,7 +756,7 @@ void JyersDWIN::printScreenIcons() {
 }
 
 void JyersDWIN::drawPrintScreen() {
-  Preview_Invalidate();
+  TERN_(HAS_GCODE_PREVIEW, Preview_Invalidate();)
   process = Proc_Print;
   selection = 0;
   clearScreen();
@@ -897,9 +901,9 @@ void JyersDWIN::drawStatusArea(const bool icons/*=false*/) {
       dwinIconShow(ICON, ICON_StepE, 112, 417);
       dwinDrawString(false, DWIN_FONT_STAT, getColor(eeprom_settings.status_area_text, COLOR_WHITE), eeprom_settings.bg_color, 116 + 5 * STAT_CHR_W + 2, 417, F("%"));
     }
-    if (planner.flow_percentage[0] != flow) {
-      flow = planner.flow_percentage[0];
-      dwinDrawIntValue(true, true, 0, DWIN_FONT_STAT, getColor(eeprom_settings.status_area_text, COLOR_WHITE), eeprom_settings.bg_color, 3, 116 + 2 * STAT_CHR_W, 417, planner.flow_percentage[0]);
+    if (planner.flow_percentage[active_extruder] != flow) {
+      flow = planner.flow_percentage[active_extruder];
+      dwinDrawIntValue(true, true, 0, DWIN_FONT_STAT, getColor(eeprom_settings.status_area_text, COLOR_WHITE), eeprom_settings.bg_color, 3, 116 + 2 * STAT_CHR_W, 417, planner.flow_percentage[active_extruder]);
     }
   #endif
 
@@ -1887,7 +1891,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
 
           #define _PREHEAT_CASE(N) \
             case PREHEAT_##N: { \
-              if (draw) drawMenuItem(row, ICON_Temperature, F(PREHEAT_## N ##_LABEL)); \
+              if (draw) drawMenuItem(row, ICON_Temperature, GET_TEXT_F(MSG_PREHEAT_## N ##)); \
               else do_preheat(N - 1); \
             } break;
 
@@ -2292,7 +2296,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
 
         #define _TEMP_PREHEAT_CASE(N) \
           case TEMP_PREHEAT##N: { \
-            if (draw) drawMenuItem(row, ICON_Step, F(PREHEAT_## N ##_LABEL), nullptr, true); \
+            if (draw) drawMenuItem(row, ICON_Step, GET_TEXT_F(MSG_PREHEAT_## N ##_SETTINGS), nullptr, true); \
             else drawMenu(ID_Preheat##N); \
           } break;
 
@@ -2627,10 +2631,10 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           case MOTION_FLOW:
             if (draw) {
               drawMenuItem(row, ICON_Speed, F("Flow Rate"));
-              drawFloat(planner.flow_percentage[0], row, false, 1);
+              drawFloat(planner.flow_percentage[active_extruder], row, false, 1);
             }
             else
-              modifyValue(planner.flow_percentage[0], MIN_FLOW_RATE, MAX_FLOW_RATE, 1, []{ planner.refresh_e_factor(0); });
+              modifyValue(planner.flow_percentage[active_extruder], MIN_FLOW_RATE, MAX_FLOW_RATE, 1, []{ planner.refresh_e_factor(active_extruder); });
             break;
         #endif
 
@@ -2918,7 +2922,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
       #define VISUAL_BACK 0
       #define VISUAL_BACKLIGHT (VISUAL_BACK + 1)
       #define VISUAL_BRIGHTNESS (VISUAL_BACKLIGHT + 1)
-      #define VISUAL_TIMEOUT (VISUAL_BRIGHTNESS + 1)
+      #define VISUAL_TIMEOUT (VISUAL_BRIGHTNESS + ENABLED(HAS_TIMEOUT))
       #define VISUAL_TIME_FORMAT (VISUAL_TIMEOUT + 1)
       #define VISUAL_COLOR_THEMES (VISUAL_TIME_FORMAT + 1)
       #define VISUAL_FILE_TUMBNAILS (VISUAL_COLOR_THEMES + ENABLED(HAS_GCODE_PREVIEW))
@@ -2945,14 +2949,16 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           else
             modifyValue(ui.brightness, LCD_BRIGHTNESS_MIN, LCD_BRIGHTNESS_MAX, 1, ui.refresh_brightness);
           break;
-        case VISUAL_TIMEOUT:
-          if (draw) {
-            drawMenuItem(row, ICON_Brightness, GET_TEXT_F(MSG_SCREEN_TIMEOUT));
-            drawFloat(ui.backlight_timeout_minutes, row, false, 1);
-          }
-          else
-            modifyValue(ui.backlight_timeout_minutes, ui.backlight_timeout_min, ui.backlight_timeout_max, 1, ui.refresh_backlight_timeout);
-          break;
+        #if ENABLED(HAS_TIMEOUT)
+          case VISUAL_TIMEOUT:
+            if (draw) {
+              drawMenuItem(row, ICON_Brightness, GET_TEXT_F(MSG_SCREEN_TIMEOUT));
+              drawFloat(ui.backlight_timeout_minutes, row, false, 1);
+            }
+            else
+              modifyValue(ui.backlight_timeout_minutes, ui.backlight_timeout_min, ui.backlight_timeout_max, 1, ui.refresh_backlight_timeout);
+            break;
+        #endif
         case VISUAL_TIME_FORMAT:
           if (draw) {
             drawMenuItem(row, ICON_PrintTime, F("Progress as __h__m"));
@@ -4149,7 +4155,8 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
     case ID_Tune:
 
       #define TUNE_BACK 0
-      #define TUNE_SPEED (TUNE_BACK + 1)
+      #define TUNE_BACKLIGHT_OFF (TUNE_BACK + 1)
+      #define TUNE_SPEED (TUNE_BACKLIGHT_OFF + 1)
       #define TUNE_FLOW (TUNE_SPEED + ENABLED(HAS_HOTEND))
       #define TUNE_HOTEND (TUNE_FLOW + ENABLED(HAS_HOTEND))
       #define TUNE_BED (TUNE_HOTEND + ENABLED(HAS_HEATED_BED))
@@ -4160,8 +4167,8 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
       #define TUNE_LA (TUNE_ZDOWN + ENABLED(LIN_ADVANCE))
       #define TUNE_CHANGEFIL (TUNE_LA + ENABLED(FILAMENT_LOAD_UNLOAD_GCODES))
       #define TUNE_FILSENSORENABLED (TUNE_CHANGEFIL + ENABLED(FILAMENT_RUNOUT_SENSOR))
-      #define TUNE_BACKLIGHT_OFF (TUNE_FILSENSORENABLED + 1)
-      #define TUNE_BACKLIGHT (TUNE_BACKLIGHT_OFF + 1)
+      #define TUNE_TIMEOUT (TUNE_FILSENSORENABLED + ENABLED(HAS_TIMEOUT))
+      #define TUNE_BACKLIGHT (TUNE_TIMEOUT + 1)
       #define TUNE_TOTAL TUNE_BACKLIGHT
 
       switch (item) {
@@ -4170,6 +4177,12 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             drawMenuItem(row, ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK));
           else
             drawPrintScreen();
+          break;
+        case TUNE_BACKLIGHT_OFF:
+          if (draw)
+            drawMenuItem(row, ICON_Brightness, F("Display Off"));
+          else
+            ui.set_brightness(0);
           break;
         case TUNE_SPEED:
           if (draw) {
@@ -4184,10 +4197,10 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           case TUNE_FLOW:
             if (draw) {
               drawMenuItem(row, ICON_Speed, F("Flow Rate"));
-              drawFloat(planner.flow_percentage[0], row, false, 1);
+              drawFloat(planner.flow_percentage[active_extruder], row, false, 1);
             }
             else
-              modifyValue(planner.flow_percentage[0], MIN_FLOW_RATE, MAX_FLOW_RATE, 1, []{ planner.refresh_e_factor(0); });
+              modifyValue(planner.flow_percentage[active_extruder], MIN_FLOW_RATE, MAX_FLOW_RATE, 1, []{ planner.refresh_e_factor(0); });
             break;
           case TUNE_HOTEND:
             if (draw) {
@@ -4282,13 +4295,18 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             }
             break;
         #endif
+        
+        #if ENABLED(HAS_TIMEOUT)
+          case TUNE_TIMEOUT:
+            if (draw) {
+              drawMenuItem(row, ICON_Brightness, GET_TEXT_F(MSG_SCREEN_TIMEOUT));
+              drawFloat(ui.backlight_timeout_minutes, row, false, 1);
+            }
+            else
+              modifyValue(ui.backlight_timeout_minutes, ui.backlight_timeout_min, ui.backlight_timeout_max, 1, ui.refresh_backlight_timeout);
+            break;
+        #endif
 
-        case TUNE_BACKLIGHT_OFF:
-          if (draw)
-            drawMenuItem(row, ICON_Brightness, F("Display Off"));
-          else
-            ui.set_brightness(0);
-          break;
         case TUNE_BACKLIGHT:
           if (draw) {
             drawMenuItem(row, ICON_Brightness, F("LCD Brightness"));
@@ -4311,8 +4329,8 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #define PREHEATHOTEND_3 (PREHEATHOTEND_2 + (PREHEAT_COUNT >= 3))
         #define PREHEATHOTEND_4 (PREHEATHOTEND_3 + (PREHEAT_COUNT >= 4))
         #define PREHEATHOTEND_5 (PREHEATHOTEND_4 + (PREHEAT_COUNT >= 5))
-        #define PREHEATHOTEND_CUSTOM (PREHEATHOTEND_5 + 1)
-        #define PREHEATHOTEND_TOTAL PREHEATHOTEND_CUSTOM
+        //#define PREHEATHOTEND_CUSTOM (PREHEATHOTEND_5 + 1)
+        #define PREHEATHOTEND_TOTAL PREHEATHOTEND_5 //PREHEATHOTEND_CUSTOM
 
         switch (item) {
           case PREHEATHOTEND_BACK:
@@ -4364,23 +4382,23 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             }
             break;
 
-
           #define _PREHEAT_HOTEND_CASE(N) \
             case PREHEATHOTEND_##N: \
-              if (draw) drawMenuItem(row, ICON_Temperature, F(PREHEAT_## N ##_LABEL)); \
+              if (draw) drawMenuItem(row, ICON_Temperature, GET_TEXT_F(MSG_PREHEAT_## N ##)); \
               else ui.preheat_hotend_and_fan((N) - 1); \
               break;
 
           REPEAT_1(PREHEAT_COUNT, _PREHEAT_HOTEND_CASE)
-
-          case PREHEATHOTEND_CUSTOM:
-            if (draw) {
-              drawMenuItem(row, ICON_Temperature, F("Custom"));
-              drawFloat(thermalManager.degTargetHotend(0), row, false, 1);
-            }
-            else
-              modifyValue(thermalManager.temp_hotend[0].target, EXTRUDE_MINTEMP, MAX_E_TEMP, 1);
-            break;
+          #ifdef PREHEATHOTEND_CUSTOM 
+            case PREHEATHOTEND_CUSTOM:
+              if (draw) {
+                drawMenuItem(row, ICON_Temperature, F("Custom"));
+                drawFloat(thermalManager.degTargetHotend(0), row, false, 1);
+              }
+              else
+                modifyValue(thermalManager.temp_hotend[0].target, EXTRUDE_MINTEMP, MAX_E_TEMP, 1);
+              break;
+          #endif
         }
         break;
 
@@ -4430,7 +4448,7 @@ FSTR_P JyersDWIN::getMenuTitle(const uint8_t menu) {
       case ID_MPC:          return F("MPC Menu");
     #endif
     #if HAS_PREHEAT
-      #define _PREHEAT_TITLE_CASE(N) case ID_Preheat##N: return F(PREHEAT_## N ##_LABEL " Settings");
+      #define _PREHEAT_TITLE_CASE(N) case ID_Preheat##N: return GET_TEXT_F(MSG_PREHEAT_## N ##_SETTINGS);
       REPEAT_1(PREHEAT_COUNT, _PREHEAT_TITLE_CASE)
     #endif
     case ID_Motion:         return F("Motion Settings");
@@ -5379,6 +5397,13 @@ void JyersDWIN::screenUpdate() {
     if (process == Proc_File)
       drawSDList();
   }
+
+  #if HAS_TIMEOUT
+    if (ui.backlight_off_ms && ELAPSED(ms, ui.backlight_off_ms)) {
+      ui.set_brightness(0); // Backlight off
+      ui.backlight_off_ms = 0;
+    }
+  #endif
 
   #if HAS_HOTEND
     static int16_t hotendtarget = -1;
