@@ -2071,19 +2071,19 @@ void gotoConfirmToPrint() {
 
 #if ENABLED(EEPROM_SETTINGS)
 
-  void writeEeprom() {
+  void writeEEPROM() {
     dwinDrawStatusLine(GET_TEXT_F(MSG_STORE_EEPROM));
     dwinUpdateLCD();
     DONE_BUZZ(settings.save());
   }
 
-  void readEeprom() {
+  void readEEPROM() {
     const bool success = settings.load();
     dwinRedrawScreen();
     DONE_BUZZ(success);
   }
 
-  void resetEeprom() {
+  void resetEEPROM() {
     settings.reset();
     dwinRedrawScreen();
     DONE_BUZZ(true);
@@ -2707,8 +2707,8 @@ void drawControlMenu() {
   checkkey = ID_Menu;
   if (SET_MENU(controlMenu, MSG_CONTROL, 10)) {
     BACK_ITEM(gotoMainMenu);
-    MENU_ITEM(ICON_Temperature, MSG_TEMPERATURE, onDrawTempSubMenu, drawTemperatureMenu);
-    MENU_ITEM(ICON_Motion, MSG_MOTION, onDrawMotionSubMenu, drawMotionMenu);
+    MENU_ITEM(ICON_Temperature, MSG_TEMPERATURE, onDrawSubMenu, drawTemperatureMenu);
+    MENU_ITEM(ICON_Motion, MSG_MOTION, onDrawSubMenu, drawMotionMenu);
     #if ENABLED(CASE_LIGHT_MENU)
       #if CASELIGHT_USES_BRIGHTNESS
         enableLiveCaseLightBrightness = true;  // Allow live update of brightness in control menu
@@ -2722,12 +2722,12 @@ void drawControlMenu() {
       MENU_ITEM(ICON_LedControl, MSG_LED_CONTROL, onDrawSubMenu, drawLedControlMenu);
     #endif
     #if ENABLED(EEPROM_SETTINGS)
-      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawWriteEeprom, writeEEPROM);
-      MENU_ITEM(ICON_ReadEEPROM, MSG_LOAD_EEPROM, onDrawReadEeprom, readEEPROM);
-      MENU_ITEM(ICON_ResumeEEPROM, MSG_RESTORE_DEFAULTS, onDrawResetEeprom, resetEEPROM);
+      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEEPROM);
+      MENU_ITEM(ICON_ReadEEPROM, MSG_LOAD_EEPROM, onDrawMenuItem, readEEPROM);
+      MENU_ITEM(ICON_ResumeEEPROM, MSG_RESTORE_DEFAULTS, onDrawMenuItem, resetEEPROM);
     #endif
     MENU_ITEM(ICON_Reboot, MSG_RESET_PRINTER, onDrawMenuItem, rebootPrinter);
-    MENU_ITEM(ICON_Info, MSG_INFO_SCREEN, onDrawInfoSubMenu, gotoInfoMenu);
+    MENU_ITEM(ICON_Info, MSG_INFO_SCREEN, onDrawMenuItem, gotoInfoMenu);
   }
   ui.reset_status(true);
   updateMenu(controlMenu);
