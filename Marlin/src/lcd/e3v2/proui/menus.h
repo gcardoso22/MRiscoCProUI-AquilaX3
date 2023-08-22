@@ -174,13 +174,13 @@ void resetMenu(Menu* &menu);
 // Invalidate currentMenu to prepare for full menu drawing
 void invalidateMenu();
 
-//Update the Menu and Draw if it is valid
+// Update the Menu and Draw if it is valid
 void updateMenu(Menu* &menu);
 
-//Redraw the current Menu if it is valid
+// Redraw the current Menu if it is valid
 void redrawMenu(bool force = false);
 
-//Redraw selected menu item
+// Redraw selected menu item
 void redrawItem();
 
 // Clear menuItems array and free menuItems elements
