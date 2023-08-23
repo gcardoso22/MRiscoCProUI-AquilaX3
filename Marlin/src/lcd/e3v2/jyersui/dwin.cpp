@@ -370,20 +370,14 @@ private:
     }
 
     float getMaxValue() {
-      float max = __FLT_MAX__ * -1;
-      GRID_LOOP(x, y) {
-        if (!isnan(bedlevel.z_values[x][y]) && bedlevel.z_values[x][y] > max)
-          max = bedlevel.z_values[x][y];
-      }
+      float max = -(__FLT_MAX__);
+      GRID_LOOP(x, y) { const float z = bedlevel.z_values[x][y]; if (!isnan(z)) NOLESS(max, z); }
       return max;
     }
 
     float getMinValue() {
       float min = __FLT_MAX__;
-      GRID_LOOP(x, y) {
-        if (!isnan(bedlevel.z_values[x][y]) && bedlevel.z_values[x][y] < min)
-          min = bedlevel.z_values[x][y];
-      }
+      GRID_LOOP(x, y) { const float z = bedlevel.z_values[x][y]; if (!isnan(z)) NOMORE(min, z); }
       return min;
     }
 
@@ -392,7 +386,7 @@ private:
       const uint16_t total_width_px = DWIN_WIDTH - padding_x - padding_x,
                      cell_width_px  = total_width_px / (GRID_MAX_POINTS_X),
                      cell_height_px = total_width_px / (GRID_MAX_POINTS_Y);
-      const float v_max = abs(getMaxValue()), v_min = abs(getMinValue()), range = _MAX(v_min, v_max), range2 = _MIN(v_min, v_max);
+      const float v_max = abs(getMaxValue()), v_min = abs(getMinValue()), rmax = _MAX(v_min, v_max);
 
       // Clear background from previous selection and select new square
       dwinDrawRectangle(1, JyersDWIN::eeprom_settings.bg_color, _MAX(0, padding_x - gridline_width), _MAX(0, padding_y_top - gridline_width), padding_x + total_width_px, padding_y_top + total_width_px);
@@ -413,8 +407,8 @@ private:
         dwinDrawRectangle(1,                                                                                        // RGB565 colors: http://www.barth-dev.de/online/rgb565-color-picker/
           isnan(bedlevel.z_values[x][y]) ? COLOR_GREY : (                                                           // gray if undefined
             (bedlevel.z_values[x][y] > 0 ?
-              (uint16_t)round(0x1F *  bedlevel.z_values[x][y] / range2) << 11 : // red if mesh point value is negative
-              (uint16_t)round(0x3F * -bedlevel.z_values[x][y] / range) << 5) | // green if mesh point value is positive
+              (uint16_t)round(0x1F *  bedlevel.z_values[x][y] / rmax) << 11 : // red if mesh point value is negative
+              (uint16_t)round(0x3F * -bedlevel.z_values[x][y] / rmax) << 5) | // green if mesh point value is positive
                 _MIN(0x1F, (((uint8_t)abs(bedlevel.z_values[x][y]) / 10) * 4))),                                    // + blue stepping for every mm
           start_x_px, start_y_px, end_x_px, end_y_px
         );
@@ -433,7 +427,7 @@ private:
             if (GRID_MAX_POINTS_X < 10)
               msg.set(p_float_t(abs(bedlevel.z_values[x][y]), 2));
             else
-              msg.setf(F("%02i"), uint16_t(abs(bedlevel.z_values[x][y] - int16_t(bedlevel.z_values[x][y])) * 100));
+              msg.setf(F("%2i"), uint16_t(abs(bedlevel.z_values[x][y] - int16_t(bedlevel.z_values[x][y])) * 100));
             offset_x = cell_width_px / 2 - 3 * msg.length() - 2;
             if (GRID_MAX_POINTS_X >= 10)
               dwinDrawString(false, font6x12, COLOR_WHITE, JyersDWIN::eeprom_settings.bg_color, start_x_px - 2 + offset_x, start_y_px + offset_y /*+ square / 2 - 6*/, F("."));
@@ -446,14 +440,23 @@ private:
     }
 
     void setMeshViewerStatus() { // TODO: draw gradient with values as a legend instead
-      float v_max = abs(getMaxValue()), v_min = abs(getMinValue()), range = _MAX(v_min, v_max), range2 = _MIN(v_min, v_max);
-      if (range > 3e+10F) { range = 0.0000001; }
-      if (range2 > 3e+10F) { range2 = 0.0000001; }
-      jyersDWIN.updateStatus(TS(
-        F("Green "), p_float_t(-range, 3),
-        F("..0.."),  p_float_t(range2, 3),
-        F("+ Red")
-      ));
+      float v1, v2,
+            v_min = abs(getMinValue()),
+            v_max = abs(getMaxValue());
+      if (viewer_asymmetric_range) {
+        if (v_min > 3e+10f) v_min = 0.0000001;
+        if (v_max > 3e+10f) v_max = 0.0000001;
+        v1 = -v_min;
+        v2 =  v_max;
+      }
+      else {
+        float rmax = _MAX(v_min, v_max), rmin = _MIN(v_min, v_max);
+      if (rmax > 3e+10f) rmax = 0.0000001;
+      if (rmin > 3e+10f) rmin = 0.0000001;
+        v1 = -rmax;
+        v2 =  rmin;
+      }
+      jyersDWIN.updateStatus(TS(F("Green "), p_float_t(v1, 3) , F("..0.."), p_float_t(v2, 3), F("+ Red")));
       drawing_mesh = false;
     }
 
@@ -5325,7 +5328,6 @@ void JyersDWIN::update() {
     case Proc_Popup:   popupControl();        break;
     case Proc_Confirm: confirmControl();      break;
     TERN_(DRAW_KEYBOARD, case Proc_Keyboard:  keyboardControl();     break;)
-
   }
 }
 
