@@ -46,11 +46,7 @@ uint8_t rmax;                               // Maximum radius
 #define px(xp) (margin + (xp) * (width) / (sizex - 1))
 #define py(yp) (30 + DWIN_WIDTH - margin - (yp) * (width) / (sizey - 1))
 
-#if ENABLED(TJC_DISPLAY)
-  #define meshfont font8x16
-#else
-  #define meshfont font6x12
-#endif
+constexpr uint8_t meshfont = TERN(TJC_DISPLAY, font8x16, font6x12);
 
 MeshViewer meshViewer;
 
@@ -59,7 +55,7 @@ float MeshViewer::max, MeshViewer::min;
 void MeshViewer::drawMeshGrid(const uint8_t csizex, const uint8_t csizey) {
   sizex = csizex;
   sizey = csizey;
-  rmax = _MIN(margin - 2, 0.5*(width)/(sizex - 1));
+  rmax = _MIN(margin - 2, 0.5 * (width) / (sizex - 1));
   min = 100;
   max = -100;
   DWINUI::clearMainArea();
@@ -78,36 +74,27 @@ void MeshViewer::drawMeshPoint(const uint8_t x, const uint8_t y, const float z) 
   NOLESS(max, z); NOMORE(min, z);
   const uint16_t color = DWINUI::rainbowInt(v, zmin, zmax);
   DWINUI::drawFillCircle(color, px(x), py(y), r(_MAX(_MIN(v, zmax), zmin)));
-  if (sizex < (ENABLED(TJC_DISPLAY) ? 8 : 9)) {
-    if (v == 0) dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2 * fs - 1, py(y) - fs, "0.00");
-    else DWINUI::drawSignedFloat(meshfont, 1, 2, px(x) - 3 * fs, py(y) - fs, z);
+  TERN_(TJC_DISPLAY, delay(100));
+  const uint16_t fy = py(y) - fs;
+  if (sizex < TERN(TJC_DISPLAY, 8, 9)) {
+    if (v == 0) DWINUI::drawFloat(meshfont, 1, 2, px(x) - 2 * fs, fy, 0);
+    else DWINUI::drawSignedFloat(meshfont, 1, 2, px(x) - 3 * fs, fy, z);
   }
   else {
-    char str_1[9];
-    str_1[0] = 0;
+    char msg[9]; msg[0] = '\0';
     switch (v) {
-      case -999 ... -100:  // -9.99 .. -1.00 mm
-        DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3 * fs, py(y) - fs, z);
-        break;
-      case -99 ... -1:  // -.99 .. -.01 mm
-        sprintf_P(str_1, PSTR("-.%2i"), -v);
-        break;
-      case 0:
-        dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 4, py(y) - fs, "0");
-        break;
-      case 1 ... 99:  // .01 .. .99 mm
-        sprintf_P(str_1, PSTR(".%2i"), v);
-        break;
-      case 100 ... 999:  // 1.00 .. 9.99 mm
-        DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3 * fs, py(y) - fs, z);
-        break;
+      case -999 ... -100:  // -9.99 .. -1.00 || 1.00 .. 9.99 
+      case  100 ...  999: DWINUI::drawSignedFloat(meshfont, 1, 1, px(x) - 3 * fs, fy, z); break;
+      case  -99 ...   -1: sprintf_P(msg, PSTR("-.%2i"), -v); break; // -0.99 .. -0.01 mm
+      case    1 ...   99: sprintf_P(msg, PSTR( ".%2i"),  v); break; //  0.01 ..  0.99 mm
+      default:
+        dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 4, fy, "0");
+        return;
     }
-    if (str_1[0])
-      dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2 * fs, py(y) - fs, str_1);
+    dwinDrawString(false, meshfont, DWINUI::textColor, DWINUI::backColor, px(x) - 2 * fs, fy, msg);
   }
   SERIAL_FLUSH();
-  TERN_(TJC_DISPLAY, delay(100));
-}
+  }
 
 void MeshViewer::drawMesh(const bed_mesh_t zval, const uint8_t csizex, const uint8_t csizey) {
   drawMeshGrid(csizex, csizey);
