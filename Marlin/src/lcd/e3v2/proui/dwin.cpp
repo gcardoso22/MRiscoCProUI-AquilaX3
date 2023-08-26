@@ -157,8 +157,8 @@
 #define MIN_BEDTEMP 0
 #define MAX_BEDTEMP BED_MAX_TARGET
 
-#define DWIN_VAR_UPDATE_INTERVAL         1024
-#define DWIN_UPDATE_INTERVAL             1024
+#define DWIN_VAR_UPDATE_INTERVAL          500
+#define DWIN_UPDATE_INTERVAL             1000
 
 #define BABY_Z_VAR TERN(HAS_BED_PROBE, probe.offset.z, hmiData.manualZOffset)
 
@@ -320,7 +320,7 @@ MenuItem *fanSpeedItem = nullptr;
 MenuItem *mMeshMoveZItem = nullptr;
 MenuItem *editZValueItem = nullptr;
 
-bool isPrinting() { return (printingIsActive() || print_job_timer.isPaused()); }
+bool isPrinting() { return (printingIsActive() || printingIsPaused()); }
 bool sdPrinting() { return (isPrinting() && IS_SD_FILE_OPEN()); }
 bool hostPrinting() { return (isPrinting() && !IS_SD_FILE_OPEN()); }
 
@@ -1217,6 +1217,13 @@ void eachMomentUpdate() {
   static millis_t next_var_update_ms = 0, next_rts_update_ms = 0, next_status_update_ms = 0;
   const millis_t ms = millis();
 
+  #if LCD_BACKLIGHT_TIMEOUT_MINS
+    if (ui.backlight_off_ms && ELAPSED(ms, ui.backlight_off_ms)) {
+      turnOffBacklight(); // Backlight off
+      ui.backlight_off_ms = 0;
+    }
+  #endif
+
   if (ELAPSED(ms, next_var_update_ms)) {
     next_var_update_ms = ms + DWIN_VAR_UPDATE_INTERVAL;
     blink = !blink;
@@ -1240,7 +1247,7 @@ void eachMomentUpdate() {
   #endif
 
   if (ELAPSED(ms, next_status_update_ms)) {
-    next_status_update_ms = ms + 500;
+    next_status_update_ms = ms + DWIN_VAR_UPDATE_INTERVAL;
     dwinDrawStatusMessage();
     #if ENABLED(SCROLL_LONG_FILENAMES)
       if (isMenu(fileMenu)) fileMenuIdle();
@@ -1254,6 +1261,7 @@ void eachMomentUpdate() {
         neo.show();
       #endif
       dimBacklight();
+      turnOffBacklight(); // Backlight off
       ui.backlight_off_ms = 0;
     }
   #endif
@@ -2338,6 +2346,10 @@ void applyMove() {
   void setParkZRaise() { setPIntOnClick(Z_MIN_POS, 50); }
 #endif
 
+#if LCD_BACKLIGHT_TIMEOUT_MINS
+  void setTimer() { setPIntOnClick(ui.backlight_timeout_min, ui.backlight_timeout_max); }
+#endif
+
 #if HAS_FILAMENT_SENSOR
   void setRunoutEnable() {
     runout.reset();
@@ -2387,19 +2399,19 @@ void setSpeed() { setPIntOnClick(MIN_PRINT_SPEED, MAX_PRINT_SPEED); }
   void setFanSpeed() { setIntOnClick(0, 255, thermalManager.fan_speed[FAN], applyFanSpeed); }
 #endif
 
+#if ENABLED(NOZZLE_PARK_FEATURE)
+  void parkHead() {
+    LCD_MESSAGE(MSG_FILAMENT_PARK_ENABLED);
+    queue.inject(F("G28O\nG27"));
+  }
+#endif
+
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
   void changeFilament() {
     hmiSaveProcessID(ID_NothingToDo);
     queue.inject(F("M600 B2"));
   }
-
-  #if ENABLED(NOZZLE_PARK_FEATURE)
-    void parkHead() {
-      LCD_MESSAGE(MSG_FILAMENT_PARK_ENABLED);
-      queue.inject(F("G28O\nG27"));
-    }
-  #endif
 
   #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
     void unloadFilament() {
@@ -2639,9 +2651,7 @@ void drawPrepareMenu() {
   checkkey = ID_Menu;
   if (SET_MENU(prepareMenu, MSG_PREPARE, 9 + PREHEAT_COUNT)) {
     BACK_ITEM(gotoMainMenu);
-    #if ENABLED(ADVANCED_PAUSE_FEATURE)
-      MENU_ITEM(ICON_FilMan, MSG_FILAMENT_MAN, onDrawSubMenu, drawFilamentManMenu);
-    #endif
+    MENU_ITEM(ICON_FilMan, MSG_FILAMENT_MAN, onDrawSubMenu, drawFilamentManMenu);
     MENU_ITEM(ICON_Axis, MSG_MOVE_AXIS, onDrawSubMenu, drawMoveMenu);
     #if ENABLED(TRAMWIZ_MENU_ITEM)
       MENU_ITEM(ICON_Tram, MSG_BED_TRAMMING, onDrawSubMenu, drawTrammingMenu);
@@ -2780,6 +2790,9 @@ void drawAdvancedSettingsMenu() {
     #endif
     #if ENABLED(HOST_SHUTDOWN_MENU_ITEM) && defined(SHUTDOWN_ACTION)
       MENU_ITEM(ICON_Host, MSG_HOST_SHUTDOWN, onDrawMenuItem, hostShutDown);
+    #endif
+    #if LCD_BACKLIGHT_TIMEOUT_MINS
+      EDIT_ITEM(ICON_Brightness, MSG_SCREEN_TIMEOUT, onDrawPIntMenu, setTimer, &ui.backlight_timeout_minutes);
     #endif
     #if ENABLED(SOUND_MENU_ITEM)
       EDIT_ITEM(ICON_Sound, MSG_SOUND, onDrawChkbMenu, setEnableSound, &ui.sound_on);
@@ -3049,6 +3062,9 @@ void drawTuneMenu() {
       EDIT_ITEM(ICON_Brightness, MSG_BRIGHTNESS, onDrawPInt8Menu, setBrightness, &ui.brightness);
       MENU_ITEM(ICON_Brightness, MSG_BRIGHTNESS_OFF, onDrawMenuItem, turnOffBacklight);
     #endif
+    #if LCD_BACKLIGHT_TIMEOUT_MINS
+      EDIT_ITEM(ICON_Brightness, MSG_SCREEN_TIMEOUT, onDrawPIntMenu, setTimer, &ui.backlight_timeout_minutes);
+    #endif
     #if ENABLED(CASE_LIGHT_MENU)
       EDIT_ITEM(ICON_CaseLight, MSG_CASE_LIGHT, onDrawChkbMenu, setCaseLight, &caselight.on);
       #if CASELIGHT_USES_BRIGHTNESS
@@ -3171,9 +3187,8 @@ void drawMotionMenu() {
   updateMenu(motionMenu);
 }
 
-#if ENABLED(ADVANCED_PAUSE_FEATURE)
+#if ALL(ADVANCED_PAUSE_FEATURE, HAS_PREHEAT)
 
-  #if HAS_PREHEAT
     void drawPreheatHotendMenu() {
       checkkey = ID_Menu;
       if (SET_MENU(preheatHotendMenu, MSG_PREHEAT_HOTEND, 1 + PREHEAT_COUNT + 1)) {
@@ -3184,15 +3199,17 @@ void drawMotionMenu() {
       }
       updateMenu(preheatHotendMenu);
     }
-  #endif
 
-  void drawFilamentManMenu() {
-    checkkey = ID_Menu;
-    if (SET_MENU(filamentMenu, MSG_FILAMENT_MAN, 7)) {
-      BACK_ITEM(drawPrepareMenu);
-      #if ENABLED(NOZZLE_PARK_FEATURE)
-        MENU_ITEM(ICON_Park, MSG_FILAMENT_PARK_ENABLED, onDrawMenuItem, parkHead);
-      #endif
+#endif
+
+void drawFilamentManMenu() {
+  checkkey = ID_Menu;
+  if (SET_MENU(filamentMenu, MSG_FILAMENT_MAN, 7)) {
+    BACK_ITEM(drawPrepareMenu);
+    #if ENABLED(NOZZLE_PARK_FEATURE)
+      MENU_ITEM(ICON_Park, MSG_FILAMENT_PARK_ENABLED, onDrawMenuItem, parkHead);
+    #endif
+    #if ENABLED(ADVANCED_PAUSE_FEATURE)
       #if HAS_PREHEAT
         MENU_ITEM(ICON_SetEndTemp, MSG_PREHEAT_HOTEND, onDrawSubMenu, drawPreheatHotendMenu);
       #endif
@@ -3200,15 +3217,14 @@ void drawMotionMenu() {
         MENU_ITEM(ICON_FWRetract, MSG_FWRETRACT, onDrawMenuItem, doRetract);
       #endif
       MENU_ITEM(ICON_FilMan, MSG_FILAMENTCHANGE, onDrawMenuItem, changeFilament);
-      #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
-        MENU_ITEM(ICON_FilUnload, MSG_FILAMENTUNLOAD, onDrawMenuItem, unloadFilament);
-        MENU_ITEM(ICON_FilLoad, MSG_FILAMENTLOAD, onDrawMenuItem, loadFilament);
-      #endif
-    }
-    updateMenu(filamentMenu);
+    #endif
+    #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+      MENU_ITEM(ICON_FilUnload, MSG_FILAMENTUNLOAD, onDrawMenuItem, unloadFilament);
+      MENU_ITEM(ICON_FilLoad, MSG_FILAMENTLOAD, onDrawMenuItem, loadFilament);
+    #endif
   }
-
-#endif // ADVANCED_PAUSE_FEATURE
+  updateMenu(filamentMenu);
+}
 
 #if ENABLED(MESH_BED_LEVELING)
 
