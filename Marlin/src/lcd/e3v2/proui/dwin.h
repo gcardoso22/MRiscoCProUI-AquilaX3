@@ -328,9 +328,7 @@ void drawPhySetMenu();
 #endif
 void drawTuneMenu();
 void drawMotionMenu();
-#if ENABLED(ADVANCED_PAUSE_FEATURE)
-  void drawFilamentManMenu();
-#endif
+void drawFilamentManMenu();
 //#if ENABLED(MESH_BED_LEVELING)
 //  void drawManualMeshMenu();
 //#endif
