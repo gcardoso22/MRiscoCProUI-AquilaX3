@@ -35,7 +35,7 @@
 
 #include "../../../inc/MarlinConfigPre.h"
 
-//#define DWIN_CREALITY_LCD_CUSTOM_ICONS
+#define DWIN_CREALITY_LCD_CUSTOM_ICONS
 
 enum processID : uint8_t {
   Proc_Main, Proc_Print, Proc_Menu, Proc_Value, Proc_Option,

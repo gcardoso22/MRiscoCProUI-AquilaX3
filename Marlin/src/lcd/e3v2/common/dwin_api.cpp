@@ -240,6 +240,100 @@ void dwinDrawString(bool bShow, uint8_t size, uint16_t color, uint16_t bColor, u
   dwinSend(i);
 }
 
+#if ANY(DWIN_CREALITY_LCD, DWIN_CREALITY_LCD_JYERSUI)
+// Draw a positive integer
+//  bShow: true=display background color; false=don't display background color
+//  zeroFill: true=zero fill; false=no zero fill
+//  zeroMode: 1=leading 0 displayed as 0; 0=leading 0 displayed as a space
+//  size: Font size
+//  color: Character color
+//  bColor: Background color
+//  iNum: Number of digits
+//  x/y: Upper-left coordinate
+//  value: Integer value
+void dwinDrawIntValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                          uint16_t bColor, uint8_t iNum, uint16_t x, uint16_t y, uint32_t value) {
+  size_t i = 0;
+  #if DISABLED(DWIN_CREALITY_LCD_JYERSUI)
+    dwinDrawRectangle(1, bColor, x, y, x + fontWidth(size) * iNum + 1, y + fontHeight(size));
+  #endif
+  dwinByte(i, 0x14);
+  // Bit 7: bshow
+  // Bit 6: 1 = signed; 0 = unsigned number;
+  // Bit 5: zeroFill
+  // Bit 4: zeroMode
+  // Bit 3-0: size
+  dwinByte(i, (bShow * 0x80) | (zeroFill * 0x20) | (zeroMode * 0x10) | size);
+  dwinWord(i, color);
+  dwinWord(i, bColor);
+  dwinByte(i, iNum);
+  dwinByte(i, 0); // fNum
+  dwinWord(i, x);
+  dwinWord(i, y);
+  #if 0
+    for (char count = 0; count < 8; count++) {
+      dwinByte(i, value);
+      value >>= 8;
+      if (!(value & 0xFF)) break;
+    }
+  #else
+    // Write a big-endian 64 bit integer
+    const size_t p = i + 1;
+    for (char count = 8; count--;) { // 7..0
+      ++i;
+      dwinSendBuf[p + count] = value;
+      value >>= 8;
+    }
+  #endif
+
+  dwinSend(i);
+}
+
+// Draw a floating point number
+//  bShow: true=display background color; false=don't display background color
+//  zeroFill: true=zero fill; false=no zero fill
+//  zeroMode: 1=leading 0 displayed as 0; 0=leading 0 displayed as a space
+//  size: Font size
+//  color: Character color
+//  bColor: Background color
+//  iNum: Number of whole digits
+//  fNum: Number of decimal digits
+//  x/y: Upper-left point
+//  value: Float value
+void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                          uint16_t bColor, uint8_t iNum, uint8_t fNum, uint16_t x, uint16_t y, int32_t value) {
+  //uint8_t *fvalue = (uint8_t*)&value;
+  size_t i = 0;
+  #if DISABLED(DWIN_CREALITY_LCD_JYERSUI)
+    dwinDrawRectangle(1, bColor, x, y, x + fontWidth(size) * (iNum+fNum+1), y + fontHeight(size));
+  #endif
+  dwinByte(i, 0x14);
+  dwinByte(i, (bShow * 0x80) | (zeroFill * 0x20) | (zeroMode * 0x10) | size);
+  dwinWord(i, color);
+  dwinWord(i, bColor);
+  dwinByte(i, iNum);
+  dwinByte(i, fNum);
+  dwinWord(i, x);
+  dwinWord(i, y);
+  dwinLong(i, value);
+  /*
+  dwinByte(i, fvalue[3]);
+  dwinByte(i, fvalue[2]);
+  dwinByte(i, fvalue[1]);
+  dwinByte(i, fvalue[0]);
+  */
+  dwinSend(i);
+}
+
+// Draw a floating point number
+//  value: positive unscaled float value
+void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
+                            uint16_t bColor, uint8_t iNum, uint8_t fNum, uint16_t x, uint16_t y, float value) {
+  const int32_t val = round(value * POW(10, fNum));
+  dwinDrawFloatValue(bShow, zeroFill, zeroMode, size, color, bColor, iNum, fNum, x, y, val);
+}
+#endif
+
 /*---------------------------------------- Picture related functions ----------------------------------------*/
 
 // Draw JPG and cached in #0 virtual display area

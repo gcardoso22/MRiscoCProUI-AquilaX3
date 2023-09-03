@@ -497,6 +497,8 @@
 // Aliases for LCD features
 #if ANY(DWIN_CREALITY_LCD, DWIN_LCD_PROUI)
   #define HAS_DWIN_E3V2_BASIC 1
+#endif
+#if ANY(HAS_DWIN_E3V2_BASIC, DWIN_CREALITY_LCD_JYERSUI)
   #define HAS_DWIN_E3V2 1
 #endif
 
