@@ -70,6 +70,7 @@ enum PopupID : uint8_t {
   Popup_InvalidMesh,
   Popup_UI,
   Popup_Complete,
+  OPTITEM(HAS_GCODE_PREVIEW, Popup_Preview)
   Popup_Custom
 };
 
@@ -84,6 +85,7 @@ enum menuID : uint8_t {
       ID_ChangeFilament,
       ID_MenuCustom,
       OPTITEM(DRAW_KEYBOARD, ID_HostActions)
+      OPTITEM(FWRETRACT, ID_FWMenu)
     ID_Control,
       ID_TempMenu,
         ID_PID,
@@ -118,7 +120,7 @@ enum menuID : uint8_t {
       ID_LevelSettings,
       ID_ManualMesh,
       ID_UBLMesh,
-    ID_InfoMain,
+    ID_AdvMain,
   ID_Tune,
   ID_PreheatHotend
 };
@@ -133,12 +135,13 @@ enum menuID : uint8_t {
   #define ICON_Mesh                 203
   #define ICON_Tilt                 204
   #define ICON_Brightness           205
-  #define ICON_AxisD                249
-  #define ICON_AxisBR               250
-  #define ICON_AxisTR               251
-  #define ICON_AxisBL               252
-  #define ICON_AxisTL               253
-  #define ICON_AxisC                254
+
+  #define ICON_FWRetract            ICON_StepE
+  #define ICON_FWRetLength          ICON_StepE
+  #define ICON_FWRetSpeed           ICON_Setspeed
+  #define ICON_FWRetZRaise          ICON_MoveZ
+  #define ICON_FWRecSpeed           ICON_Setspeed
+  #define ICON_FWRecExtra           ICON_StepE
 #else
   #define ICON_Fade                 ICON_Version
   #define ICON_Mesh                 ICON_Version
@@ -249,7 +252,6 @@ public:
   static void updateStatusBar(const bool refresh=false);
 
   #if ENABLED(HAS_GCODE_PREVIEW)
-  static bool find_and_decode_gcode_preview(char *name, uint8_t preview_type, uint16_t *address, bool onlyCachedFileIcon=false);
   #endif
 
   #if ENABLED(DRAW_KEYBOARD)

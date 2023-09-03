@@ -38,7 +38,7 @@
 #include "../../../sd/cardreader.h"
 #include "../../../MarlinCore.h" // for wait_for_user
 #include "dwin.h"
-#include "dwin_popup.h"
+//#include "dwin_popup.h"
 #include "base64.h"
 
 #define THUMBWIDTH 200
@@ -63,14 +63,14 @@ typedef struct {
   }
 
   void clear() {
-    fileprop.name[0] = '\0';
-    fileprop.thumbstart = 0;
-    fileprop.thumbsize = 0;
-    fileprop.thumbheight = fileprop.thumbwidth = 0;
-    fileprop.time = 0;
-    fileprop.filament = 0;
-    fileprop.layer = 0;
-    fileprop.height = fileprop.width = fileprop.length = 0;
+    name[0] = '\0';
+    thumbstart = 0;
+    thumbsize = 0;
+    thumbheight = thumbwidth = 0;
+    time = 0;
+    filament = 0;
+    layer = 0;
+    height = width = length = 0;
   }
 
 } fileprop_t;
@@ -172,7 +172,7 @@ bool Preview::hasPreview() {
 
   uint8_t thumbdata[3 + 3 * (fileprop.thumbsize / 4)];  // Reserve space for the JPEG thumbnail
   fileprop.thumbsize = decode_base64(buf64, thumbdata);
-  DWINUI::writeToSRAM(0x00, fileprop.thumbsize, thumbdata);
+  writeToSRAM(0x00, fileprop.thumbsize, thumbdata);
 
   fileprop.thumbwidth = THUMBWIDTH;
   fileprop.thumbheight = THUMBHEIGHT;
@@ -181,34 +181,34 @@ bool Preview::hasPreview() {
 }
 
 void Preview::drawFromSD() {
+  
+  jyersDWIN.popupHandler(Popup_Preview);
+
   if (!hasPreview()) {
-    hmiFlag.select_flag = 1;
-    wait_for_user = false;
+    //jyersDWIN.drawSDList();
+    jyersDWIN.redrawMenu();
     return;
   }
 
   MString<45> buf;
-  dwinDrawRectangle(1, hmiData.colorBackground, 0, 0, DWIN_WIDTH, STATUS_Y - 1);
+  dwinDrawRectangle(1, jyersDWIN.eeprom_settings.bg_color, 0, 0, DWIN_WIDTH, 353);
   if (fileprop.time) {
     buf.setf(F("Estimated time: %i:%02i"), (uint16_t)fileprop.time / 3600, ((uint16_t)fileprop.time % 3600) / 60);
-    DWINUI::drawString(20, 10, &buf);
+    dwinDrawString(false, font20x40, COLOR_WHITE, JyersDWIN::eeprom_settings.bg_color, 20, 10, &buf);
   }
   if (fileprop.filament) {
     buf.set(F("Filament used: "), p_float_t(fileprop.filament, 2), F(" m"));
-    DWINUI::drawString(20, 30, &buf);
+    dwinDrawString(false, font20x40, COLOR_WHITE, JyersDWIN::eeprom_settings.bg_color, 20, 30, &buf);
   }
   if (fileprop.layer) {
     buf.set(F("Layer height: "), p_float_t(fileprop.layer, 2), F(" mm"));
-    DWINUI::drawString(20, 50, &buf);
+    dwinDrawString(false, font20x40, COLOR_WHITE, JyersDWIN::eeprom_settings.bg_color, 20, 50, &buf);
   }
   if (fileprop.width) {
     buf.set(F("Volume: "), p_float_t(fileprop.width, 1), 'x', p_float_t(fileprop.length, 1), 'x', p_float_t(fileprop.height, 1), F(" mm"));
-    DWINUI::drawString(20, 70, &buf);
+    dwinDrawString(false, font20x40, COLOR_WHITE, JyersDWIN::eeprom_settings.bg_color, 20, 70, &buf);
   }
-  DWINUI::drawButton(BTN_Print, 26, 290);
-  DWINUI::drawButton(BTN_Cancel, 146, 290);
   show();
-  drawSelectHighlight(true, 290);
   dwinUpdateLCD();
 }
 

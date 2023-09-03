@@ -61,4 +61,47 @@ void dwinIconShow(uint8_t libID, uint8_t picID, uint16_t x, uint16_t y) {
   dwinIconShow(true, false, false, libID, picID, x, y);
 }
 
+// Write buffer data to the SRAM or Flash
+//  mem: 0x5A=32KB SRAM, 0xA5=16KB Flash
+//  addr: start address
+//  length: Bytes to write
+//  data: address of the buffer with data
+void dwinWriteToMem(uint8_t mem, uint16_t addr, uint16_t length, uint8_t *data) {
+  const uint8_t max_size = 128;
+  uint16_t pending = length;
+  uint16_t to_send;
+  uint16_t indx;
+  uint8_t block = 0;
+
+  while (pending > 0) {
+    indx = block * max_size;
+    to_send = _MIN(pending, max_size);
+    size_t i = 0;
+    dwinByte(i, 0x31);
+    dwinByte(i, mem);
+    dwinWord(i, addr + indx); // start address of the data block
+    ++i;
+    for (uint8_t j = 0; j < i; ++j) { LCD_SERIAL.write(dwinSendBuf[j]); delayMicroseconds(1); }  // Buf header
+    for (uint16_t j = indx; j <= indx + to_send - 1; j++) LCD_SERIAL.write(*(data + j)); delayMicroseconds(1);  // write block of data
+    for (uint8_t j = 0; j < 4; ++j) { LCD_SERIAL.write(dwinBufTail[j]); delayMicroseconds(1); }
+    block++;
+    pending -= to_send;
+  }
+}
+
+void dwinIconShow(uint16_t x, uint16_t y, uint16_t addr) {
+  dwinIconShow(0, 0, 1, x, y, addr);
+}
+
+// Write the contents of the 32KB SRAM data memory into the designated image memory space.
+//  picID: Picture memory space location, 0x00-0x0F, each space is 32Kbytes
+void dwinSRAMToPic(uint8_t picID) {
+  size_t i = 0;
+  dwinByte(i, 0x33);
+  dwinByte(i, 0x5A);
+  dwinByte(i, 0xA5);
+  dwinByte(i, picID);
+  dwinSend(i);
+}
+
 #endif // DWIN_CREALITY_LCD_JYERSUI

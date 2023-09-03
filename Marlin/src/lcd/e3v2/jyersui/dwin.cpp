@@ -94,7 +94,7 @@
 #define DWIN_FONT_HEAD font10x20
 
 #define MENU_CHAR_LIMIT  24
-#define STATUS_Y 352
+#define STATUS_Y 354
 
 #define MAX_PRINT_SPEED   999
 #define MIN_PRINT_SPEED   10
@@ -752,7 +752,7 @@ void JyersDWIN::printScreenIcons() {
 }
 
 void JyersDWIN::drawPrintScreen() {
-  TERN_(HAS_GCODE_PREVIEW, Preview_Invalidate();)
+  TERN_(HAS_GCODE_PREVIEW, preview.invalidate();)
   process = Proc_Print;
   selection = 0;
   clearScreen();
@@ -1251,7 +1251,8 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
       #define PREPARE_CHANGEFIL (PREPARE_COOLDOWN + ENABLED(ADVANCED_PAUSE_FEATURE))
       #define PREPARE_CUSTOM_MENU (PREPARE_CHANGEFIL + ENABLED(HAS_CUSTOM_MENU))
       #define PREPARE_ACTIONCOMMANDS (PREPARE_CUSTOM_MENU + ENABLED(DRAW_KEYBOARD))
-      #define PREPARE_TOTAL PREPARE_ACTIONCOMMANDS
+      #define PREPARE_FWRETRACT (PREPARE_ACTIONCOMMANDS + ENABLED(FWRETRACT))
+      #define PREPARE_TOTAL PREPARE_FWRETRACT
 
       switch (item) {
         case PREPARE_BACK:
@@ -1297,7 +1298,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if HAS_ZOFFSET_ITEM
           case PREPARE_ZOFFSET:
             if (draw)
-              drawMenuItem(row, ICON_Zoffset, F("Z-Offset"), nullptr, true);
+              drawMenuItem(row, ICON_Zoffset, GET_TEXT_F(MSG_ZPROBE_ZOFFSET), nullptr, true);
             else {
               #if HAS_LEVELING
                 level_state = planner.leveling_active;
@@ -1330,9 +1331,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           case PREPARE_CHANGEFIL:
             if (draw) {
               drawMenuItem(row, ICON_ResumeEEPROM, GET_TEXT_F(MSG_FILAMENTCHANGE)
-                #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
-                  , nullptr, true
-                #endif
+                OPTARG(FILAMENT_LOAD_UNLOAD_GCODES, nullptr, true)
               );
             }
             else {
@@ -1368,13 +1367,23 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
 
         #if ENABLED(HOST_ACTION_COMMANDS) && ENABLED(DRAW_KEYBOARD)
           case PREPARE_ACTIONCOMMANDS:
-          if (draw) {
-            drawMenuItem(row, ICON_SetHome, F("Host Actions"), nullptr, true);
-          }
-          else {
-            drawMenu(ID_HostActions);
-          }
+            if (draw) {
+              drawMenuItem(row, ICON_SetHome, F("Host Actions"), nullptr, true);
+            }
+            else {
+              drawMenu(ID_HostActions);
+            }
           break;
+        #endif
+
+        #if ENABLED(FWRETRACT)
+          case PREPARE_FWRETRACT:
+            if (draw) 
+              drawMenuItem(row, ICON_SetHome, GET_TEXT_F(MSG_FWRETRACT), nullptr, true);
+            else
+              drawMenu(ID_FWMenu);
+            break;
+
         #endif
       }
       break;
@@ -1807,7 +1816,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             break;
           case ZOFFSET_OFFSET:
             if (draw) {
-              drawMenuItem(row, ICON_SetZOffset, F("Z-Offset"));
+              drawMenuItem(row, ICON_SetZOffset, GET_TEXT_F(MSG_ZPROBE_ZOFFSET));
               drawFloat(zoffsetvalue, row, false, 100);
             }
             else
@@ -1887,7 +1896,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
 
           #define _PREHEAT_CASE(N) \
             case PREHEAT_##N: { \
-              if (draw) drawMenuItem(row, ICON_Temperature, GET_TEXT_F(MSG_PREHEAT_## N ##)); \
+              if (draw) drawMenuItem(row, ICON_Temperature, GET_TEXT_F(MSG_PREHEAT_##N)); \
               else do_preheat(N - 1); \
             } break;
 
@@ -2135,6 +2144,67 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         break;
     #endif
 
+    #if ENABLED(FWRETRACT)
+      case ID_FWMenu:
+        #define FWRETRACT_BACK 0
+        #define FWRETRACT_RETLEN (FWRETRACT_BACK + 1)
+        #define FWRETRACT_RETSPD (FWRETRACT_RETLEN + 1)
+        #define FWRETRACT_RETZHOP (FWRETRACT_RETSPD + 1)
+        #define FWRETRACT_RECSPD (FWRETRACT_RETZHOP + 1)
+        #define FWRETRACT_RECLEN (FWRETRACT_RECSPD + 1)
+        #define FWRETRACT_TOTAL (FWRETRACT_RECLEN + 1)
+
+        switch (item) {
+          case FWRETRACT_BACK:
+            if (draw)
+              drawMenuItem(row, ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK));
+            else
+              drawMenu(ID_Prepare, PREPARE_FWRETRACT);
+            break;
+          case FWRETRACT_RETLEN:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT));
+              drawFloat(fwretract.settings.retract_length, row, false, 10);
+            }
+            else
+              modifyValue(fwretract.settings.retract_length, 0, 10, 10);
+            break;
+          case FWRETRACT_RETSPD:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_SINGLENOZZLE_RETRACT_SPEED));
+              drawFloat(fwretract.settings.retract_feedrate_mm_s, row, false, 1);
+            }
+            else
+              modifyValue(fwretract.settings.retract_feedrate_mm_s, 1, 90, 1);
+            break;
+          case FWRETRACT_RETZHOP:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT_ZHOP));
+              drawFloat(fwretract.settings.retract_zraise, row, false, 100);
+            }
+            else
+              modifyValue(fwretract.settings.retract_zraise, 0, 2, 100);
+            break;
+          case FWRETRACT_RECSPD:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_SINGLENOZZLE_UNRETRACT_SPEED));
+              drawFloat(fwretract.settings.retract_recover_feedrate_mm_s, row, false, 1);
+            }
+            else
+              modifyValue(fwretract.settings.retract_recover_feedrate_mm_s, 1, 90, 1);
+            break;
+          case FWRETRACT_RECLEN:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT_RECOVER));
+              drawFloat(fwretract.settings.retract_recover_extra, row, false, 10);
+            }
+            else
+              modifyValue(fwretract.settings.retract_recover_extra, -5, 5, 10);
+            break;
+        }
+        break;
+    #endif
+
     case ID_Control:
 
       #define CONTROL_BACK 0
@@ -2186,7 +2256,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #endif
         case CONTROL_ADVANCED:
           if (draw)
-            drawMenuItem(row, ICON_Version, F("Advanced"), nullptr, true);
+            drawMenuItem(row, ICON_Version, GET_TEXT_F(MSG_BUTTON_ADVANCED), nullptr, true);
           else
             drawMenu(ID_Advanced);
           break;
@@ -2598,27 +2668,27 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           break;
         case MOTION_SPEED:
           if (draw)
-            drawMenuItem(row, ICON_MaxSpeed, F("Max Speed"), nullptr, true);
+            drawMenuItem(row, ICON_MaxSpeed, GET_TEXT_F(MSG_MAX_SPEED), nullptr, true);
           else
             drawMenu(ID_MaxSpeed);
           break;
         case MOTION_ACCEL:
           if (draw)
-            drawMenuItem(row, ICON_MaxAccelerated, F("Max Acceleration"), nullptr, true);
+            drawMenuItem(row, ICON_MaxAccelerated, GET_TEXT_F(MSG_ACCELERATION), nullptr, true);
           else
             drawMenu(ID_MaxAcceleration);
           break;
         #if HAS_CLASSIC_JERK
           case MOTION_JERK:
             if (draw)
-              drawMenuItem(row, ICON_MaxJerk, F("Max Jerk"), nullptr, true);
+              drawMenuItem(row, ICON_MaxJerk, GET_TEXT_F(MSG_JERK), nullptr, true);
             else
               drawMenu(ID_MaxJerk);
             break;
         #endif
         case MOTION_STEPS:
           if (draw)
-            drawMenuItem(row, ICON_Step, F("Steps/mm"), nullptr, true);
+            drawMenuItem(row, ICON_Step, GET_TEXT_F(MSG_STEPS_PER_MM), nullptr, true);
           else
             drawMenu(ID_Steps);
           break;
@@ -2873,7 +2943,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if HAS_X_AXIS
           case STEPS_X:
             if (draw) {
-              drawMenuItem(row, ICON_StepX, F("X Axis"));
+              drawMenuItem(row, ICON_StepX, GET_TEXT_F(MSG_A_STEPS));
               drawFloat(planner.settings.axis_steps_per_mm[X_AXIS], row, false, STEPS_UNIT);
             }
             else
@@ -2883,7 +2953,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if HAS_Y_AXIS
           case STEPS_Y:
             if (draw) {
-              drawMenuItem(row, ICON_StepY, F("Y Axis"));
+              drawMenuItem(row, ICON_StepY, GET_TEXT_F(MSG_B_STEPS));
               drawFloat(planner.settings.axis_steps_per_mm[Y_AXIS], row, false, STEPS_UNIT);
             }
             else
@@ -2893,7 +2963,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if HAS_Z_AXIS
           case STEPS_Z:
             if (draw) {
-              drawMenuItem(row, ICON_StepZ, F("Z Axis"));
+              drawMenuItem(row, ICON_StepZ, GET_TEXT_F(MSG_C_STEPS));
               drawFloat(planner.settings.axis_steps_per_mm[Z_AXIS], row, false, STEPS_UNIT);
             }
             else
@@ -2903,7 +2973,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if HAS_HOTEND
           case STEPS_E:
             if (draw) {
-              drawMenuItem(row, ICON_StepE, F("Extruder"));
+              drawMenuItem(row, ICON_StepE, GET_TEXT_F(MSG_E_STEPS));
               drawFloat(planner.settings.axis_steps_per_mm[E_AXIS], row, false, STEPS_UNIT);
             }
             else
@@ -2967,7 +3037,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           break;
         case VISUAL_COLOR_THEMES:
           if (draw)
-            drawMenuItem(row, ICON_MaxSpeed, F("UI Color Settings"), nullptr, true);
+            drawMenuItem(row, ICON_MaxSpeed, GET_TEXT_F(MSG_COLORS_SELECT), nullptr, true);
           else
             drawMenu(ID_ColorSettings);
         break;
@@ -3177,6 +3247,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
       break;
     #endif
 
+    case ID_AdvMain:
     case ID_Advanced:
 
       #define ADVANCED_BACK 0
@@ -3203,7 +3274,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if ENABLED(SOUND_MENU_ITEM)
           case ADVANCED_BEEPER:
             if (draw) {
-              drawMenuItem(row, ICON_Version, F("LCD Beeper"));
+              drawMenuItem(row, ICON_Version, GET_TEXT_F(MSG_TICK));
               drawCheckbox(row, ui.tick_on);
             }
             else {
@@ -3216,7 +3287,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if HAS_BED_PROBE
           case ADVANCED_PROBE:
             if (draw)
-              drawMenuItem(row, ICON_StepX, F("Probe"), nullptr, true);
+              drawMenuItem(row, ICON_StepX, GET_TEXT_F(MSG_ZPROBE_SETTINGS), nullptr, true);
             else
               drawMenu(ID_ProbeMenu);
             break;
@@ -3243,7 +3314,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if ENABLED(ADVANCED_PAUSE_FEATURE)
           case ADVANCED_LOAD:
             if (draw) {
-              drawMenuItem(row, ICON_WriteEEPROM, F("Load Length"));
+              drawMenuItem(row, ICON_WriteEEPROM, GET_TEXT_F(MSG_FILAMENT_LOAD));
               drawFloat(fc_settings[0].load_length, row, false, 1);
             }
             else
@@ -3251,7 +3322,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             break;
           case ADVANCED_UNLOAD:
             if (draw) {
-              drawMenuItem(row, ICON_ReadEEPROM, F("Unload Length"));
+              drawMenuItem(row, ICON_ReadEEPROM, GET_TEXT_F(MSG_FILAMENT_UNLOAD));
               drawFloat(fc_settings[0].unload_length, row, false, 1);
             }
             else
@@ -3262,7 +3333,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if ENABLED(PREVENT_COLD_EXTRUSION)
           case ADVANCED_COLD_EXTRUDE:
             if (draw) {
-              drawMenuItem(row, ICON_Cool, F("Min Extrusion T"));
+              drawMenuItem(row, ICON_Cool, GET_TEXT_F(MSG_EXTRUDER_MIN_TEMP));
               drawFloat(thermalManager.extrude_min_temp, row, false, 1);
             }
             else {
@@ -3275,7 +3346,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if ENABLED(FILAMENT_RUNOUT_SENSOR)
           case ADVANCED_FILSENSORENABLED:
             if (draw) {
-              drawMenuItem(row, ICON_Extruder, F("Filament Sensor"));
+              drawMenuItem(row, ICON_Extruder, GET_TEXT_F(MSG_RUNOUT_ENABLE));
               drawCheckbox(row, runout.enabled);
             }
             else {
@@ -3287,7 +3358,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           #if ENABLED(HAS_FILAMENT_RUNOUT_DISTANCE)
             case ADVANCED_FILSENSORDISTANCE:
               if (draw) {
-                drawMenuItem(row, ICON_MaxAccE, F("Runout Distance"));
+                drawMenuItem(row, ICON_MaxAccE, GET_TEXT_F(MSG_RUNOUT_DISTANCE_MM));
                 drawFloat(runout.runout_distance(), row, false, 10);
               }
               else
@@ -3333,7 +3404,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
 
             case PROBE_XOFFSET:
               if (draw) {
-                drawMenuItem(row, ICON_StepX, F("Probe X Offset"));
+                drawMenuItem(row, ICON_StepX, GET_TEXT_F(MSG_ZPROBE_XOFFSET));
                 drawFloat(probe.offset.x, row, false, 10);
               }
               else
@@ -3341,7 +3412,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
               break;
             case PROBE_YOFFSET:
               if (draw) {
-                drawMenuItem(row, ICON_StepY, F("Probe Y Offset"));
+                drawMenuItem(row, ICON_StepY, GET_TEXT_F(MSG_ZPROBE_YOFFSET));
                 drawFloat(probe.offset.y, row, false, 10);
               }
               else
@@ -3349,7 +3420,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
               break;
             case PROBE_TEST:
               if (draw)
-                drawMenuItem(row, ICON_StepY, F("M48 Probe Test"));
+                drawMenuItem(row, ICON_StepY, GET_TEXT_F(MSG_M48_TEST));
               else {
                 gcode.process_subcommands_now(
                   TS(F("G28O\nM48X") , p_float_t((X_BED_SIZE + X_MIN_POS) / 2.0f, 3), 'Y', p_float_t((Y_BED_SIZE + Y_MIN_POS) / 2.0f, 3), 'P', testcount)
@@ -3447,7 +3518,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         break;
     #endif // HAS_TRINAMIC_CONFIG
 
-    case ID_InfoMain:
     case ID_Info:
 
       #define INFO_BACK 0
@@ -3520,7 +3590,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             break;
           case LEVELING_ACTIVE:
             if (draw) {
-              drawMenuItem(row, ICON_StockConfiguration, F("Leveling Active"));
+              drawMenuItem(row, ICON_StockConfiguration, GET_TEXT_F(MSG_ACTIVATE_MESH));
               drawCheckbox(row, planner.leveling_active);
             }
             else {
@@ -3672,7 +3742,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           #if ENABLED(AUTO_BED_LEVELING_UBL)
           case LEVELING_SLOT:
             if (draw) {
-              drawMenuItem(row, ICON_PrintSize, F("Mesh Slot"));
+              drawMenuItem(row, ICON_PrintSize, GET_TEXT_F(MSG_UBL_STORAGE_SLOT));
               drawFloat(bedlevel.storage_slot, row, false, 1);
             }
             else
@@ -3680,7 +3750,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             break;
           case LEVELING_LOAD:
             if (draw)
-              drawMenuItem(row, ICON_ReadEEPROM, F("Load Mesh"));
+              drawMenuItem(row, ICON_ReadEEPROM, GET_TEXT_F(MSG_UBL_LOAD_MESH));
             else {
               if (bedlevel.storage_slot < 0) {
                 popupHandler(Popup_MeshSlot);
@@ -3693,7 +3763,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             break;
           case LEVELING_SAVE:
             if (draw)
-              drawMenuItem(row, ICON_WriteEEPROM, F("Save Mesh"));
+              drawMenuItem(row, ICON_WriteEEPROM, GET_TEXT_F(MSG_UBL_LOAD_MESH));
             else {
               if (bedlevel.storage_slot < 0) {
                 popupHandler(Popup_MeshSlot);
@@ -3707,7 +3777,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           #endif
         }
         break;
-/*/
+      /*/
       case ID_LevelView:
 
         #define LEVELING_VIEW_BACK 0
@@ -3751,16 +3821,15 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             break;
         }
         break;
-//*/
+        //*/
       case ID_LevelSettings:
 
         #define LEVELING_SETTINGS_BACK 0
         #define LEVELING_SETTINGS_FADE (LEVELING_SETTINGS_BACK + 1)
         #define LEVELING_SETTINGS_TILT (LEVELING_SETTINGS_FADE + ENABLED(AUTO_BED_LEVELING_UBL))
         #define LEVELING_SETTINGS_PLANE (LEVELING_SETTINGS_TILT + ENABLED(AUTO_BED_LEVELING_UBL))
-        #define LEVELING_SETTINGS_ZERO (LEVELING_SETTINGS_PLANE + ENABLED(AUTO_BED_LEVELING_UBL))
-        #define LEVELING_SETTINGS_UNDEF (LEVELING_SETTINGS_ZERO + ENABLED(AUTO_BED_LEVELING_UBL))
-        #define LEVELING_SETTINGS_TOTAL LEVELING_SETTINGS_UNDEF
+        #define LEVELING_SETTINGS_ZERO (LEVELING_SETTINGS_PLANE + 1)
+        #define LEVELING_SETTINGS_TOTAL LEVELING_SETTINGS_ZERO
 
         switch (item) {
           case LEVELING_SETTINGS_BACK:
@@ -3784,7 +3853,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           #if ENABLED(AUTO_BED_LEVELING_UBL)
             case LEVELING_SETTINGS_TILT:
               if (draw) {
-                drawMenuItem(row, ICON_Tilt, F("Tilting Grid Size"));
+                drawMenuItem(row, ICON_Tilt, GET_TEXT_F(MSG_UBL_TILTING_GRID));
                 drawFloat(mesh_conf.tilt_grid, row, false, 1);
               }
               else
@@ -3800,19 +3869,13 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
                 audioFeedback(true);
               }
               break;
-            case LEVELING_SETTINGS_ZERO:
-              if (draw)
-                drawMenuItem(row, ICON_Mesh, F("Zero Current Mesh"));
-              else
-                ZERO(bedlevel.z_values);
-              break;
-            case LEVELING_SETTINGS_UNDEF:
-              if (draw)
-                drawMenuItem(row, ICON_Mesh, F("Clear Current Mesh"));
-              else
-                bedlevel.invalidate();
-              break;
           #endif // AUTO_BED_LEVELING_UBL
+          case LEVELING_SETTINGS_ZERO:
+            if (draw)
+              drawMenuItem(row, ICON_Mesh, F("Zero Current Mesh"));
+            else
+              ZERO(bedlevel.z_values);
+            break;
         }
         break;
 
@@ -3843,7 +3906,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #define LEVELING_M_UP (LEVELING_M_OFFSET + 1)
         #define LEVELING_M_DOWN (LEVELING_M_UP + 1)
         #define LEVELING_M_GOTO_VALUE (LEVELING_M_DOWN + 1)
-        #define LEVELING_M_UNDEF (LEVELING_M_GOTO_VALUE + ENABLED(AUTO_BED_LEVELING_UBL))
+        #define LEVELING_M_UNDEF (LEVELING_M_GOTO_VALUE + 1)
         #define LEVELING_M_TOTAL LEVELING_M_UNDEF
 
         switch (item) {
@@ -3934,16 +3997,14 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
               drawCheckbox(row, mesh_conf.goto_mesh_value);
             }
             break;
-          #if ENABLED(AUTO_BED_LEVELING_UBL)
           case LEVELING_M_UNDEF:
             if (draw)
               drawMenuItem(row, ICON_ResumeEEPROM, F("Clear Point Value"));
             else {
-              mesh_conf.manualValueUpdate(true);
+              mesh_conf.manualValueUpdate(TERN_(AUTO_BED_LEVELING_UBL, true));
               redrawMenu(false);
             }
             break;
-          #endif
         }
         break;
     #endif // HAS_MESH
@@ -4162,7 +4223,8 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
       #define TUNE_ZDOWN (TUNE_ZUP + ENABLED(HAS_ZOFFSET_ITEM))
       #define TUNE_LA (TUNE_ZDOWN + ENABLED(LIN_ADVANCE))
       #define TUNE_CHANGEFIL (TUNE_LA + ENABLED(FILAMENT_LOAD_UNLOAD_GCODES))
-      #define TUNE_FILSENSORENABLED (TUNE_CHANGEFIL + ENABLED(FILAMENT_RUNOUT_SENSOR))
+      #define TUNE_FWRETRACT (TUNE_CHANGEFIL + ENABLED(FWRETRACT))
+      #define TUNE_FILSENSORENABLED (TUNE_FWRETRACT + ENABLED(FILAMENT_RUNOUT_SENSOR))
       #define TUNE_TIMEOUT (TUNE_FILSENSORENABLED + ENABLED(HAS_TIMEOUT))
       #define TUNE_BACKLIGHT (TUNE_TIMEOUT + 1)
       #define TUNE_TOTAL TUNE_BACKLIGHT
@@ -4233,7 +4295,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if HAS_ZOFFSET_ITEM
           case TUNE_ZOFFSET:
             if (draw) {
-              drawMenuItem(row, ICON_FanSpeed, F("Z-Offset"));
+              drawMenuItem(row, ICON_FanSpeed, GET_TEXT_F(MSG_ZPROBE_ZOFFSET));
               drawFloat(zoffsetvalue, row, false, 100);
             }
             else
@@ -4262,7 +4324,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         #if ENABLED(LIN_ADVANCE)
           case TUNE_LA:
             if (draw) {
-              drawMenuItem(row, ICON_MaxAccelerated, F("Lin Advance K"));
+              drawMenuItem(row, ICON_MaxAccelerated, GET_TEXT_F(MSG_ADVANCE_K));
               drawFloat(planner.extruder_advance_K[0], row, false, 100);
             }
             else
@@ -4380,7 +4442,7 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
 
           #define _PREHEAT_HOTEND_CASE(N) \
             case PREHEATHOTEND_##N: \
-              if (draw) drawMenuItem(row, ICON_Temperature, GET_TEXT_F(MSG_PREHEAT_## N ##)); \
+              if (draw) drawMenuItem(row, ICON_Temperature, GET_TEXT_F(MSG_PREHEAT_##N)); \
               else ui.preheat_hotend_and_fan((N) - 1); \
               break;
 
@@ -4427,8 +4489,9 @@ FSTR_P JyersDWIN::getMenuTitle(const uint8_t menu) {
         #endif
     #endif
     #if ENABLED(HOST_ACTION_COMMANDS) && ENABLED(DRAW_KEYBOARD)
-      case ID_HostActions:     return F("Host Action Commands");
+      case ID_HostActions:  return F("Host Action Commands");
     #endif
+    case ID_FWMenu:         return GET_TEXT_F(MSG_FWRETRACT);
     case ID_Control:        return GET_TEXT_F(MSG_CONTROL);
     case ID_TempMenu:       return GET_TEXT_F(MSG_TEMPERATURE);
     #if ANY(PIDTEMP, PIDTEMPBED)
@@ -4467,18 +4530,23 @@ FSTR_P JyersDWIN::getMenuTitle(const uint8_t menu) {
     #if HAS_TRINAMIC_CONFIG
       case ID_TMCMenu:      return GET_TEXT_F(MSG_TMC_DRIVERS);
     #endif
-    case ID_ColorSettings:  return F("UI Color Settings");
+    case ID_ColorSettings:  return GET_TEXT_F(MSG_COLORS_SELECT);
     case ID_Info:           return F("Info");
-    case ID_InfoMain:       return F("Info");
+    case ID_AdvMain:        return GET_TEXT_F(MSG_BUTTON_ADVANCED);
     #if HAS_MESH
-      case ID_Leveling:     return TERN_(AUTO_BED_LEVELING_UBL, GET_TEXT_F(MSG_UBL_LEVEL_BED)) TERN_(MESH_BED_LEVELING, MSG_) TERN_(AUTO_BED_LEVELING_BILINEAR, MSG_);
+      TERN_(AUTO_BED_LEVELING_UBL, 
+      case ID_Leveling:     return GET_TEXT_F(MSG_UBL_LEVELING));
+      TERN_(AUTO_BED_LEVELING_BILINEAR, 
+      case ID_Leveling:     return GET_TEXT_F(MSG_BILINEAR_LEVELING));
+      TERN_(MESH_BED_LEVELING, 
+      case ID_Leveling:     return GET_TEXT_F(MSG_MANUAL_LEVELING));
       //case ID_LevelView:    return GET_TEXT_F(MSG_MESH_VIEW);
       case ID_LevelSettings: return F("Leveling Settings");
       case ID_MeshViewer:   return GET_TEXT_F(MSG_MESH_VIEW);
       case ID_LevelManual:  return F("Manual Tuning");
     #endif
     #if ENABLED(AUTO_BED_LEVELING_UBL) && !HAS_BED_PROBE
-      case ID_UBLMesh:      return F("UBL Bed Leveling");
+      case ID_UBLMesh:      return GET_TEXT_F(MSG_UBL_LEVELING);
     #endif
     #if ENABLED(PROBE_MANUALLY)
       case ID_ManualMesh:   return GET_TEXT_F(MSG_MANUAL_LEVELING);
@@ -4508,8 +4576,9 @@ uint8_t JyersDWIN::getMenuSize(const uint8_t menu) {
       case ID_MenuCustom:   return CUSTOM_MENU_TOTAL;
     #endif
     #if ENABLED(HOST_ACTION_COMMANDS) && ENABLED(DRAW_KEYBOARD)
-      case ID_HostActions:     return HOSTACTIONS_TOTAL;
+      case ID_HostActions:  return HOSTACTIONS_TOTAL;
     #endif
+    case ID_FWMenu:         return FWRETRACT_TOTAL;
     case ID_Control:        return CONTROL_TOTAL;
     case ID_TempMenu:       return TEMP_TOTAL;
     #if ANY(PIDTEMP, PIDTEMPBED)
@@ -4547,10 +4616,9 @@ uint8_t JyersDWIN::getMenuSize(const uint8_t menu) {
     #endif
     #if HAS_TRINAMIC_CONFIG
       case ID_TMCMenu:      return TMC_TOTAL;
-      case ID_TMCMenu:      return TMC_TOTAL;
     #endif
     case ID_Info:           return INFO_TOTAL;
-    case ID_InfoMain:       return INFO_TOTAL;
+    case ID_AdvMain:       return ADVANCED_TOTAL;
     #if ENABLED(AUTO_BED_LEVELING_UBL) && !HAS_BED_PROBE
       case ID_UBLMesh:      return UBL_M_TOTAL;
     #endif
@@ -4594,7 +4662,7 @@ void JyersDWIN::popupHandler(const PopupID popupid, const bool option/*=false*/)
     case Popup_Level:         drawPopup(F("Auto Bed Leveling"), F("Please wait until done."), F(""), Proc_Wait, ICON_AutoLeveling); break;
     case Popup_Home:          drawPopup(option ? F("Parking") : F("Homing"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
     case Popup_MoveWait:      drawPopup(F("Moving to Point"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
-    case Popup_Heating:       drawPopup(F("Heating"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
+    case Popup_Heating:       drawPopup(F("Heating"), F("Please wait until done."), F(""), Proc_Wait, ICON_TempTooHigh); break;
     case Popup_FilLoad:       drawPopup(option ? F("Unloading Filament") : F("Loading Filament"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
     case Popup_FilChange:     drawPopup(F("Filament Change"), F("Please wait for prompt."), F(""), Proc_Wait, ICON_BLTouch); break;
     case Popup_TempWarn:      drawPopup(option ? F("Nozzle temp too low!") : F("Nozzle temp too high!"), F(""), F(""), Proc_Wait, option ? ICON_TempTooLow : ICON_TempTooHigh); break;
@@ -4602,7 +4670,7 @@ void JyersDWIN::popupHandler(const PopupID popupid, const bool option/*=false*/)
     case Popup_PIDWait:       drawPopup(F("PID Autotune"), F("in process"), F("Please wait until done."), Proc_Wait, ICON_BLTouch); break;
     case Popup_MPCWait:       drawPopup(F("MPC Autotune"), F("in process"), F("Please wait until done."), Proc_Wait, ICON_BLTouch); break;
     case Popup_Resuming:      drawPopup(F("Resuming Print"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
-    //case Popup_Preview:       drawPopup(F("Running Custom GCode"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
+    TERN_(HAS_GCODE_PREVIEW, case Popup_Preview:       drawPopup(F(""), F(""), F(""), Proc_Popup); break;)
     case Popup_Custom:        drawPopup(F("Running Custom GCode"), F("Please wait until done."), F(""), Proc_Wait, ICON_BLTouch); break;
     default: break;
   }
@@ -4640,7 +4708,7 @@ void JyersDWIN::mainMenuControl() {
       case PAGE_PRINT: card.mount(); drawSDList(); break;
       case PAGE_PREPARE: drawMenu(ID_Prepare); break;
       case PAGE_CONTROL: drawMenu(ID_Control); break;
-      case PAGE_INFO_LEVELING: drawMenu(TERN(HAS_MESH, ID_Leveling, ID_InfoMain)); break;
+      case PAGE_INFO_LEVELING: drawMenu(TERN(HAS_MESH, ID_Leveling, ID_AdvMain)); break;
     }
   dwinUpdateLCD();
 }
@@ -4843,8 +4911,7 @@ void JyersDWIN::fileControl() {
       }
       else {
         #if HAS_GCODE_PREVIEW
-          if (eeprom_settings.gcode_thumbnails) Preview_DrawFromSD();
-          else
+          if (eeprom_settings.gcode_thumbnails) return preview.drawFromSD();
         #endif
         card.openAndPrintFile(card.filename);
       }
@@ -5040,6 +5107,14 @@ void JyersDWIN::popupControl() {
         case Popup_MeshSlot:
           if (selection == 0) bedlevel.storage_slot = 0;
           redrawMenu(true, true);
+          break;
+      #endif
+
+      #if ENABLED(HAS_GCODE_PREVIEW)
+        case Popup_Preview:
+          if (selection == 0) return card.openAndPrintFile(card.filename);
+///preview.drawFromSD();
+          redrawMenu(true, true, false);
           break;
       #endif
       default: break;
@@ -5555,7 +5630,7 @@ void JyersDWIN::resetSettings() {
   #endif
   TERN_(AUTO_BED_LEVELING_UBL, mesh_conf.tilt_grid = eeprom_settings.tilt_grid_size + 1);
   corner_pos = eeprom_settings.corner_pos / 10.0f;
-  TERN_(HAS_GCODE_PREVIEW, bool gcode_thumbnails = true);
+  TERN_(HAS_GCODE_PREVIEW, eeprom_settings.gcode_thumbnails = true);
   TERN_(SOUND_MENU_ITEM, ui.tick_on = ENABLED(TICK_ON_DEFAULT));
   redrawScreen();
 }

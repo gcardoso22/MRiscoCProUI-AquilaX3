@@ -198,6 +198,7 @@ inline void dwinDrawString(bool bShow, uint8_t size, uint16_t color, uint16_t bC
   #endif
 }
 
+#if ANY(DWIN_CREALITY_LCD, DWIN_CREALITY_LCD_JYERSUI)
 // Draw a positive integer
 //  bShow: true=display background color; false=don't display background color
 //  zeroFill: true=zero fill; false=no zero fill
@@ -230,6 +231,7 @@ void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t 
 void dwinDrawFloatValue(uint8_t bShow, bool zeroFill, uint8_t zeroMode, uint8_t size, uint16_t color,
                             uint16_t bColor, uint8_t iNum, uint8_t fNum, uint16_t x, uint16_t y, float value);
 
+#endif
 /*---------------------------------------- Picture related functions ----------------------------------------*/
 
 // Draw JPG and cached in #0 virtual display area
@@ -259,10 +261,6 @@ void dwinIconShow(bool IBD, bool BIR, bool BFI, uint8_t libID, uint8_t picID, ui
 //  addr: SRAM address
 void dwinIconShow(bool IBD, bool BIR, bool BFI, uint16_t x, uint16_t y, uint16_t addr);
 
-inline void dwinIconShow(uint16_t x, uint16_t y, uint16_t addr) {
-  dwinIconShow(0, 0, 1, x, y, addr);
-}
-
 // Unzip the JPG picture to a virtual display area
 //  n: Cache index
 //  id: Picture ID
@@ -286,12 +284,3 @@ void dwinIconAnimation(uint8_t animID, bool animate, uint8_t libID, uint8_t picI
 //  state: 16 bits, each bit is the state of an animation id
 void dwinIconAnimationControl(uint16_t state);
 
-void dwinWriteToMem(uint8_t mem, uint16_t addr, uint16_t length, uint8_t *data);
-
-// Write buffer data to the SRAM
-//  addr: SRAM start address 0x0000-0x7FFF
-//  length: Bytes to write
-//  data: address of the buffer with data
-inline void WriteToSRAM(uint16_t addr, uint16_t length, uint8_t *data) {
-  dwinWriteToMem(0x5A, addr, length, data);
-}

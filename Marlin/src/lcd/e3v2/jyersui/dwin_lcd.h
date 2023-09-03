@@ -32,3 +32,35 @@
 // color: color
 //  x/y: Upper-left coordinate of the first pixel
 void dwinDrawDegreeSymbol(uint16_t color, uint16_t x, uint16_t y);
+
+// Write buffer data to the SRAM or Flash
+//  mem: 0x5A=32KB SRAM, 0xA5=16KB Flash
+//  addr: start address
+//  length: Bytes to write
+//  data: address of the buffer with data
+void dwinWriteToMem(uint8_t mem, uint16_t addr, uint16_t length, uint8_t *data);
+
+// Draw an Icon from SRAM without background transparency for DACAI Screen support
+//  x/y: Upper-left point
+//  addr: SRAM address
+void dwinIconShow(uint16_t x, uint16_t y, uint16_t addr);
+
+// Write the contents of the 32KB SRAM data memory into the designated image memory space.
+//  picID: Picture memory space location, 0x00-0x0F, each space is 32Kbytes
+void dwinSRAMToPic(uint8_t picID);
+
+// Write buffer data to the SRAM
+//  addr: SRAM start address 0x0000-0x7FFF
+//  length: Bytes to write
+//  data: address of the buffer with data
+inline void writeToSRAM(uint16_t addr, uint16_t length, uint8_t *data) {
+  dwinWriteToMem(0x5A, addr, length, data);
+}
+
+// Write buffer data to the Flash
+//  addr: Flash start address 0x0000-0x3FFF
+//  length: Bytes to write
+//  data: address of the buffer with data
+inline void writeToFlash(uint16_t addr, uint16_t length, uint8_t *data) {
+  dwinWriteToMem(0xA5, addr, length, data);
+}
