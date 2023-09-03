@@ -84,6 +84,10 @@
   #include "../../../feature/powerloss.h"
 #endif
 
+#if HAS_GCODE_PREVIEW
+  #include "gcode_preview.h"
+#endif
+
 #include <WString.h>
 #include <stdio.h>
 #include <string.h>
@@ -107,8 +111,8 @@
 #define UNITFDIGITS 1
 #define MINUNITMULT pow(10, UNITFDIGITS)
 
-#define ENCODER_WAIT_MS                  20
-#define DWIN_VAR_UPDATE_INTERVAL         1024
+#define ENCODER_WAIT_MS                  10
+#define DWIN_VAR_UPDATE_INTERVAL         1000
 #define DWIN_SCROLL_UPDATE_INTERVAL      SEC_TO_MS(2)
 #define DWIN_REMAIN_TIME_UPDATE_INTERVAL SEC_TO_MS(20)
 
@@ -4096,7 +4100,17 @@ void eachMomentUpdate() {
       TERN_(POWER_LOSS_RECOVERY, recovery.cancel());
 
       planner.finish_and_disable();
-
+      #if HAS_GCODE_PREVIEW
+        const bool haspreview = preview.valid();
+        if (haspreview) {
+          preview.show();
+          dwinIconShow(ICON, hmiIsChinese() ? ICON_Confirm_C : ICON_Confirm_E, 86, 295);
+        }
+      #else
+        constexpr bool haspreview = false;
+      #endif
+      
+      if (!haspreview) {
       // show percent bar and value
       _card_percent = 0;
       drawPrintProgressBar();
@@ -4104,6 +4118,7 @@ void eachMomentUpdate() {
       // show print done confirm
       dwinDrawRectangle(1, COLOR_BG_BLACK, 0, 250, DWIN_WIDTH - 1, STATUS_Y);
       dwinIconShow(ICON, hmiIsChinese() ? ICON_Confirm_C : ICON_Confirm_E, 86, 283);
+      }
     }
     else if (hmiFlag.pause_flag != printingIsPaused()) {
       // print status update
