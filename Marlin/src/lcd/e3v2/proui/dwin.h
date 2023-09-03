@@ -171,9 +171,9 @@ extern uint8_t checkkey;
 
 // Tool Functions
 #if ENABLED(EEPROM_SETTINGS)
-  void writeEeprom();
-  void readEeprom();
-  void resetEeprom();
+  void writeEEPROM();
+  void readEEPROM();
+  void resetEEPROM();
   #if HAS_MESH
     void saveMesh();
   #endif

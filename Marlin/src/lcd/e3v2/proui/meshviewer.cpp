@@ -107,15 +107,15 @@ void MeshViewer::drawMesh(const bed_mesh_t zval, const uint8_t csizex, const uin
 void MeshViewer::draw(const bool withsave/*=false*/, const bool redraw/*=true*/) {
   title.showCaption(GET_TEXT_F(MSG_MESH_VIEWER));
   #if ENABLED(USE_GRID_MESHVIEWER)
-  if(bedLevelTools.view_mesh) {
-    DWINUI::clearMainArea();
-    bedLevelTools.viewer_print_value = true;
-    bedLevelTools.drawBedMesh(-1, 1, 8, 10 + TITLE_HEIGHT);
-  }
-  else {
-    if (redraw) drawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y); // Draw complete mesh viewer
-    else DWINUI::drawBox(1, hmiData.colorBackground, { 89, 305, 99, 38 }); // Erase "Continue" button
-  }
+    if(bedLevelTools.view_mesh) {
+      DWINUI::clearMainArea();
+      bedLevelTools.viewer_print_value = true;
+      bedLevelTools.drawBedMesh(-1, 1, 8, 10 + TITLE_HEIGHT);
+    }
+    else {
+      if (redraw) drawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y); // Draw complete mesh viewer
+      else DWINUI::drawBox(1, hmiData.colorBackground, { 89, 305, 99, 38 }); // Erase "Continue" button
+    }
   #else
     if (redraw) drawMesh(bedlevel.z_values, GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y); // Draw complete mesh viewer
     else DWINUI::drawBox(1, hmiData.colorBackground, { 89, 305, 99, 38 }); // Erase "Continue" button

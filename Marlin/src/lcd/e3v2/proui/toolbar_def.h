@@ -50,6 +50,6 @@ const TBItem_t TBItemA[] = {
   #endif
   {ICON_Box, GET_TEXT_F(MSG_BRIGHTNESS_OFF), turnOffBacklight},
   {ICON_Reboot, GET_TEXT_F(MSG_RESET_PRINTER), rebootPrinter},
-  {ICON_WriteEEPROM, GET_TEXT_F(MSG_STORE_EEPROM), writeEeprom},
+  {ICON_WriteEEPROM, GET_TEXT_F(MSG_STORE_EEPROM), writeEEPROM},
   {ICON_Park, GET_TEXT_F(MSG_FILAMENT_PARK_ENABLED), parkHead}
 };
