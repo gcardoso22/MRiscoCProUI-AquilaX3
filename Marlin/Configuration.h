@@ -3405,18 +3405,19 @@
 // Ender-3 v2 OEM display. A DWIN display with Rotary Encoder.
 //
 // DWIN / DACAI LCD 4.3" 480x272
+//#define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers
 
 #define DWIN_LCD_PROUI          // Pro UI by MRiscoC
-#define USE_STOCK_DWIN_SET      // Enabled ? 9.ICO : 7.ICO | in DWIN_SET
 //#define HAS_DACAI 1
 
 #if ENABLED(DWIN_LCD_PROUI)
 // Professional firmware features:
- // #define PROUI_EX 1            // Extended UI features (15152 bytes of flash)
+  #define PROUI_EX 1            // Extended UI features (15152 bytes of flash)
   #ifdef PROUI_EX
     #define HAS_GCODE_PREVIEW 1
     #define HAS_TOOLBAR 1
     #define HAS_PROUI_RUNOUT_SENSOR 1
+    #define TRAMWIZ_MENU_ITEM   // Menu item: enable Tramming Wizard (2304 bytes of flash)
   #endif
   #define DISABLE_TUNING_GRAPH 0// Graph Temp as grid plot - PID/MPC Tuning (1624 bytes of flash)
   #define HAS_ESDIAG 1          // View End-stop switch continuity (560 bytes of flash)
@@ -3443,7 +3444,6 @@
   #define ADVK_TUNE_ITEM        // Linear Advance item in Tune Menu (only if JD is enabled)
   #define SHOW_REAL_POS
   #define CCLOUD_PRINT_SUPPORT  // Menu item: enable/disable Creality Cloud Print Support (192 bytes of flash)
-  //#define TRAMWIZ_MENU_ITEM     // Menu item: enable Tramming Wizard (2304 bytes of flash)
   #define MEDIASORT_MENU_ITEM   // Menu item: enable/disable file list sorting (104 bytes of flash)
   //#define ENC_MENU_ITEM       // Menu item: faster/slower encoder rate (272 bytes of flash)
   #define SHOW_SPEED_IND        // Menu item: blink speed in mm/s along with speed percentage (296 bytes of flash)
