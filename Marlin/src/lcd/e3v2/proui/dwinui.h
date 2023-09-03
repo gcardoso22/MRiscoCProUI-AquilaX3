@@ -633,7 +633,6 @@ namespace DWINUI {
   //  length: Bytes to write
   //  data: address of the buffer with data
   inline void writeToFlash(uint16_t addr, uint16_t length, uint8_t *data) {
-  inline void writeToFlash(uint16_t addr, uint16_t length, uint8_t *data) {
     dwinWriteToMem(0xA5, addr, length, data);
   }
 

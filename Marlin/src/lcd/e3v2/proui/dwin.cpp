@@ -1899,7 +1899,7 @@ void MarlinUI::refresh() { /* Nothing to see here */ }
 #endif
 
 void MarlinUI::kill_screen(FSTR_P const lcd_error, FSTR_P const) {
-  dwinDrawPopup(ICON_BLTouch, GET_TEXT_F(MSG_PRINTER_KILLED), lcd_error);
+  dwinDrawPopup(ICON_AutoLeveling, GET_TEXT_F(MSG_PRINTER_KILLED), lcd_error);
   DWINUI::drawCenteredString(hmiData.colorPopupTxt, 270, GET_TEXT_F(MSG_TURN_OFF));
   dwinUpdateLCD();
 }
@@ -2098,7 +2098,7 @@ void gotoConfirmToPrint() {
   }
 
   #if HAS_MESH
-    void saveMesh() { TERN(AUTO_BED_LEVELING_UBL, ublMeshSave(), writeEeprom()); }
+    void saveMesh() { TERN(AUTO_BED_LEVELING_UBL, ublMeshSave(), writeEEPROM()); }
   #endif
 
 #endif // EEPROM_SETTINGS
@@ -2748,7 +2748,7 @@ void drawAdvancedSettingsMenu() {
   if (SET_MENU(advancedSettings, MSG_ADVANCED_SETTINGS, 26)) {
     BACK_ITEM(gotoMainMenu);
     #if ENABLED(EEPROM_SETTINGS)
-      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEeprom);
+      MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEEPROM);
     #endif
     #if ENABLED(CV_LASER_MODULE)
       MENU_ITEM(ICON_LaserSet, MSG_LASER_MENU, onDrawSubMenu, drawLaserSettingsMenu);
@@ -3259,7 +3259,7 @@ void drawFilamentManMenu() {
         EDIT_ITEM(ICON_FanSpeed, MSG_FAN_SPEED, onDrawPIntMenu, setPreheatFanSpeed, &ui.material_preset[hmiValue.select].fan_speed);
       #endif
       #if ENABLED(EEPROM_SETTINGS)
-        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEeprom);
+        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEEPROM);
       #endif
     }
     updateMenu(preheatMenu);
@@ -3582,7 +3582,7 @@ void drawStepsMenu() {
         EDIT_ITEM_F(ICON_PIDValue, "Set" STR_KD, onDrawPIDd, setKd, &thermalManager.temp_hotend[EXT].pid.Kd);
       #endif
       #if ENABLED(EEPROM_SETTINGS)
-        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEeprom);
+        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEEPROM);
       #endif
     }
     updateMenu(hotendPIDMenu);
@@ -3612,7 +3612,7 @@ void drawStepsMenu() {
         EDIT_ITEM_F(ICON_PIDValue, "Set" STR_KD, onDrawPIDd, setKd, &thermalManager.temp_bed.pid.Kd);
       #endif
       #if ENABLED(EEPROM_SETTINGS)
-        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEeprom);
+        MENU_ITEM(ICON_WriteEEPROM, MSG_STORE_EEPROM, onDrawMenuItem, writeEEPROM);
       #endif
     }
     updateMenu(bedPIDMenu);
