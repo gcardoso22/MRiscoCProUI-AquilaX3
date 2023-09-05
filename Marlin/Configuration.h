@@ -69,14 +69,14 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "Miguel A. Risco-Castillo (MRiscoC)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "Miguel Risco-Castillo (MRiscoC)" // Who made the changes.
 #define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 // @section machine
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_AQUILA_V101
+  #define MOTHERBOARD BOARD_VOXELAB_AQUILA
 #endif
 
 /**
@@ -87,7 +87,7 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT 2
+#define SERIAL_PORT 1
 #define NO_AUTO_ASSIGN_WARNING  // Disable serial warnings
 #define NO_MAPLE_WARNING        // Disable warning when using Maple env
 
@@ -2092,7 +2092,7 @@
 #if ANY(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.
-  #define GRID_MAX_POINTS_X 5  // HC32
+  #define GRID_MAX_POINTS_X 5       // Don't use more than 9 points per axis, implementation limited
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
   #define MESH_EDIT_MENU            // Add a menu to edit mesh points
   #define MESH_INSET 10             // Set Mesh bounds as an inset region of the bed
@@ -2352,7 +2352,7 @@
 #define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
   #define EEPROM_AUTO_INIT    // Init EEPROM automatically on any errors  // Ender Configs
-  #define EEPROM_INIT_NOW     // Init EEPROM on first boot after a new build  // MRiscoC Reset EEPROM on first boot
+  //#define EEPROM_INIT_NOW     // Init EEPROM on first boot after a new build  // MRiscoC Reset EEPROM on first boot
 #endif
 
 // @section host
@@ -2390,16 +2390,16 @@
 //#define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
-//#define PREHEAT_2_LABEL       "ABS" //PETG 
-//#define PREHEAT_2_TEMP_HOTEND 240
-//#define PREHEAT_2_TEMP_BED     75
+#define PREHEAT_2_LABEL       "ABS" //PETG
+#define PREHEAT_2_TEMP_HOTEND 240
+#define PREHEAT_2_TEMP_BED     75
 //#define PREHEAT_2_TEMP_CHAMBER 35
-//#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
+#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
-//#define PREHEAT_3_LABEL       "Warmup"
-//#define PREHEAT_3_TEMP_HOTEND 200
-//#define PREHEAT_3_TEMP_BED     50
-//#define PREHEAT_3_FAN_SPEED     0
+#define PREHEAT_3_LABEL       "Warmup"
+#define PREHEAT_3_TEMP_HOTEND 200
+#define PREHEAT_3_TEMP_BED     50
+#define PREHEAT_3_FAN_SPEED     0
 
 //#define PREHEAT_4_LABEL       "TPU"
 //#define PREHEAT_4_TEMP_HOTEND 230
@@ -2471,7 +2471,7 @@
  *
  *   Caveats: The ending Z should be the same as starting Z.
  */
-//#define NOZZLE_CLEAN_FEATURE
+#define NOZZLE_CLEAN_FEATURE
 
 #if ENABLED(NOZZLE_CLEAN_FEATURE)
   #define NOZZLE_CLEAN_PATTERN_LINE     // Provide 'G12 P0' - a simple linear cleaning pattern
@@ -2558,7 +2558,7 @@
  *
  * View the current statistics with M78.
  */
-//#define PRINTCOUNTER
+#define PRINTCOUNTER  // MRiscoC Enable Print Statistics
 #if ENABLED(PRINTCOUNTER)
   #define PRINTCOUNTER_SAVE_INTERVAL 60 // (minutes) EEPROM save interval during print. A value of 0 will save stats at end of print.
 #endif
@@ -3387,45 +3387,43 @@
 
 #define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers
 //#define HAS_GCODE_PREVIEW 1
-#define USE_GRID_MESHVIEWER 1 // Enable two mesh graph types : one (1728 bytes of flash)
 //#define DWIN_LCD_PROUI          // Pro UI by MRiscoC
-#define USE_STOCK_DWIN_SET      // Enabled ? 9.ICO : 7.ICO | in DWIN_SET
 //#define HAS_DACAI 1
 
 #if ENABLED(DWIN_LCD_PROUI)
 // Professional firmware features:
- // #define PROUI_EX 1            // Extended UI features (15152 bytes of flash)
+  #define PROUI_EX 1            // Extended UI features (15152 bytes of flash)
   #ifdef PROUI_EX
     #define HAS_GCODE_PREVIEW 1
     #define HAS_TOOLBAR 1
     #define HAS_PROUI_RUNOUT_SENSOR 1
+    #define TRAMWIZ_MENU_ITEM   // Menu item: enable Tramming Wizard (2304 bytes of flash)
   #endif
-  #define DISABLE_TUNING_GRAPH 0// Graph Temp as grid plot - PID/MPC Tuning (1624 bytes of flash)
-  #define HAS_ESDIAG 1          // View End-stop switch continuity (560 bytes of flash)
-  #define HAS_CGCODE 1          // Extra Gcode options (3320 bytes of flash)
-  //#define HAS_LOCKSCREEN 1    // Simple lockscreen as to not accidentally change something (568 bytes of flash)
+  //#define DISABLE_TUNING_GRAPH 0// Temp plot graph - PID/MPC Tuning (1624 bytes of flash)
+  //#define HAS_ESDIAG 1          // View End-stop switch continuity (560 bytes of flash)
+  //#define HAS_CGCODE 1          // Extra Gcode options (3320 bytes of flash)
+  //#define HAS_LOCKSCREEN 1      // Simple lockscreen as to not accidentally change something (568 bytes of flash)
   #define HAS_SD_EXTENDER 1     // Enable to support SD card extender cables (48 bytes of flash)
   #define USE_GRID_MESHVIEWER 1 // Enable two mesh graph types : one (1728 bytes of flash)
-  #define HAS_CUSTOM_COLORS 1   // Able to change display colors (2040 bytes of flash)
+  //#define HAS_CUSTOM_COLORS 1   // Able to change display colors (2040 bytes of flash)
   #define ALT_COLOR_MENU 0      // Color palette options >> 0 = Voxelab Default | 1 = Alternate Aquila | 2 = Ender3V2 Default
   #if ENABLED(AUTO_BED_LEVELING_UBL)
-    //#define ACTIVATE_MESH_ITEM// Active Mesh Leveling menu option (152 bytes of flash)
+    #define ACTIVATE_MESH_ITEM  // Active Mesh Leveling menu option (152 bytes of flash)
   #endif
   #if ENABLED(FILAMENT_RUNOUT_SENSOR) // (2528 bytes of flash)
-    #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu 
+    #define RUNOUT_TUNE_ITEM    // Filament Runout option in Tune Menu
   #endif
   #if ENABLED(BLTOUCH)
     #define HS_MENU_ITEM        // BLTOUCH_HS_MODE menu option (56 bytes of flash)
   #endif
   #if DISABLED(DISABLE_TUNING_GRAPH)
-    #define PLOT_TUNE_ITEM      // Temperature Plot Graph item in Tune Menu (688 bytes of flash)
+    #define PLOT_TUNE_ITEM      // Temperature Plot Graph item in Tune/Prepare Menu (688 bytes of flash)
   #endif
   //#define PLR_TUNE_ITEM       // Power-loss Recovery option in Tune Menu (POWER_LOSS_RECOVERY 3400 bytes of flash)
   //#define JD_TUNE_ITEM        // Juntion Deviation item in Tune Menu (only if JD is enabled)
   #define ADVK_TUNE_ITEM        // Linear Advance item in Tune Menu (only if JD is enabled)
   #define SHOW_REAL_POS
   #define CCLOUD_PRINT_SUPPORT  // Menu item: enable/disable Creality Cloud Print Support (192 bytes of flash)
-  //#define TRAMWIZ_MENU_ITEM     // Menu item: enable Tramming Wizard (2304 bytes of flash)
   #define MEDIASORT_MENU_ITEM   // Menu item: enable/disable file list sorting (104 bytes of flash)
   //#define ENC_MENU_ITEM       // Menu item: faster/slower encoder rate (272 bytes of flash)
   #define SHOW_SPEED_IND        // Menu item: blink speed in mm/s along with speed percentage (296 bytes of flash)
