@@ -426,7 +426,7 @@ private:
             if (GRID_MAX_POINTS_X < 10)
               msg.set(p_float_t(abs(bedlevel.z_values[x][y]), 2));
             else
-              msg.setf(F("%2i"), uint16_t(abs(bedlevel.z_values[x][y] - int16_t(bedlevel.z_values[x][y])) * 100));
+              msg.setf(F("%02i"), uint16_t(abs(bedlevel.z_values[x][y] - int16_t(bedlevel.z_values[x][y])) * 100));
             offset_x = cell_width_px / 2 - 3 * msg.length() - 2;
             if (GRID_MAX_POINTS_X >= 10)
               dwinDrawString(false, font6x12, COLOR_WHITE, JyersDWIN::eeprom_settings.bg_color, start_x_px - 2 + offset_x, start_y_px + offset_y /*+ square / 2 - 6*/, F("."));
@@ -585,7 +585,7 @@ void JyersDWIN::drawMenuItem(const uint8_t row, const uint8_t icon/*=0*/, FSTR_P
 
 void JyersDWIN::drawCheckbox(const uint8_t row, const bool value) {
   #if ENABLED(DWIN_CREALITY_LCD_CUSTOM_ICONS)   // Draw appropriate checkbox icon
-    dwinIconShow(ICON, (value ? ICON_Checkbox_T : ICON_Checkbox_F), 226, MBASE(row) - 3);
+    dwinIconShow(ICON, (value ? ICON_Checkbox : ICON_Box), 226, MBASE(row) - 3);
   #else                                         // Draw a basic checkbox using rectangles and lines
     dwinDrawRectangle(1, eeprom_settings.bg_color, 226, MBASE(row) - 3, 226 + 20, MBASE(row) - 3 + 20);
     dwinDrawRectangle(0, COLOR_WHITE, 226, MBASE(row) - 3, 226 + 20, MBASE(row) - 3 + 20);
@@ -1383,7 +1383,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             else
               drawMenu(ID_FWMenu);
             break;
-
         #endif
       }
       break;
@@ -1979,7 +1978,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
     #endif // FILAMENT_LOAD_UNLOAD_GCODES
 
     #if HAS_CUSTOM_MENU
-
       case ID_MenuCustom:
 
         #define CUSTOM_MENU_BACK 0
@@ -2095,7 +2093,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           #endif // Custom Menu
         }
         break;
-
     #endif // HAS_CUSTOM_MENU
 
     #if ENABLED(HOST_ACTION_COMMANDS) && ENABLED(DRAW_KEYBOARD)
@@ -2139,67 +2136,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             else {
               if (!strcmp(action3, "-") == 0) hostui.action(F(action3));
             }
-            break;
-        }
-        break;
-    #endif
-
-    #if ENABLED(FWRETRACT)
-      case ID_FWMenu:
-        #define FWRETRACT_BACK 0
-        #define FWRETRACT_RETLEN (FWRETRACT_BACK + 1)
-        #define FWRETRACT_RETSPD (FWRETRACT_RETLEN + 1)
-        #define FWRETRACT_RETZHOP (FWRETRACT_RETSPD + 1)
-        #define FWRETRACT_RECSPD (FWRETRACT_RETZHOP + 1)
-        #define FWRETRACT_RECLEN (FWRETRACT_RECSPD + 1)
-        #define FWRETRACT_TOTAL (FWRETRACT_RECLEN + 1)
-
-        switch (item) {
-          case FWRETRACT_BACK:
-            if (draw)
-              drawMenuItem(row, ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK));
-            else
-              drawMenu(ID_Prepare, PREPARE_FWRETRACT);
-            break;
-          case FWRETRACT_RETLEN:
-            if (draw) {
-              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT));
-              drawFloat(fwretract.settings.retract_length, row, false, 10);
-            }
-            else
-              modifyValue(fwretract.settings.retract_length, 0, 10, 10);
-            break;
-          case FWRETRACT_RETSPD:
-            if (draw) {
-              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_SINGLENOZZLE_RETRACT_SPEED));
-              drawFloat(fwretract.settings.retract_feedrate_mm_s, row, false, 1);
-            }
-            else
-              modifyValue(fwretract.settings.retract_feedrate_mm_s, 1, 90, 1);
-            break;
-          case FWRETRACT_RETZHOP:
-            if (draw) {
-              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT_ZHOP));
-              drawFloat(fwretract.settings.retract_zraise, row, false, 100);
-            }
-            else
-              modifyValue(fwretract.settings.retract_zraise, 0, 2, 100);
-            break;
-          case FWRETRACT_RECSPD:
-            if (draw) {
-              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_SINGLENOZZLE_UNRETRACT_SPEED));
-              drawFloat(fwretract.settings.retract_recover_feedrate_mm_s, row, false, 1);
-            }
-            else
-              modifyValue(fwretract.settings.retract_recover_feedrate_mm_s, 1, 90, 1);
-            break;
-          case FWRETRACT_RECLEN:
-            if (draw) {
-              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT_RECOVER));
-              drawFloat(fwretract.settings.retract_recover_extra, row, false, 10);
-            }
-            else
-              modifyValue(fwretract.settings.retract_recover_extra, -5, 5, 10);
             break;
         }
         break;
@@ -2692,7 +2628,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
           else
             drawMenu(ID_Steps);
           break;
-
         #if HAS_HOTEND
           case MOTION_FLOW:
             if (draw) {
@@ -2703,7 +2638,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
               modifyValue(planner.flow_percentage[active_extruder], MIN_FLOW_RATE, MAX_FLOW_RATE, 1, []{ planner.refresh_e_factor(active_extruder); });
             break;
         #endif
-
         #if ENABLED(LIN_ADVANCE)
           case MOTION_LA:
             if (draw) {
@@ -2714,7 +2648,6 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
               modifyValue(planner.extruder_advance_K[0], 0, 10, 100);
             break;
         #endif
-
       }
       break;
 
@@ -4341,6 +4274,15 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
             break;
         #endif
 
+        #if ENABLED(FWRETRACT)
+          case TUNE_FWRETRACT:
+            if (draw) 
+              drawMenuItem(row, ICON_SetHome, GET_TEXT_F(MSG_FWRETRACT), nullptr, true);
+            else
+              drawMenu(ID_FWMenu);
+            break;
+        #endif
+
         #if ENABLED(FILAMENT_RUNOUT_SENSOR)
           case TUNE_FILSENSORENABLED:
             if (draw) {
@@ -4461,6 +4403,71 @@ void JyersDWIN::menuItemHandler(const uint8_t menu, const uint8_t item, bool dra
         break;
 
     #endif // HAS_PREHEAT && HAS_HOTEND
+
+    #if ENABLED(FWRETRACT)
+      case ID_FWMenu:
+        #define FWRETRACT_BACK 0
+        #define FWRETRACT_RETLEN (FWRETRACT_BACK + 1)
+        #define FWRETRACT_RETSPD (FWRETRACT_RETLEN + 1)
+        #define FWRETRACT_RETZHOP (FWRETRACT_RETSPD + 1)
+        #define FWRETRACT_RECSPD (FWRETRACT_RETZHOP + 1)
+        #define FWRETRACT_RECLEN (FWRETRACT_RECSPD + 1)
+        #define FWRETRACT_TOTAL FWRETRACT_RECLEN
+
+        switch (item) {
+          case FWRETRACT_BACK:
+            if (draw)
+              drawMenuItem(row, ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK));
+            else {
+              if (last_menu == ID_Prepare)
+                drawMenu(ID_Prepare, PREPARE_FWRETRACT);
+              else if (last_menu == ID_Tune)
+                drawMenu(ID_Tune, TUNE_FWRETRACT);
+            }
+            break;
+          case FWRETRACT_RETLEN:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT));
+              drawFloat(fwretract.settings.retract_length, row, false, 10);
+            }
+            else
+              modifyValue(fwretract.settings.retract_length, 0, 10, 10);
+            break;
+          case FWRETRACT_RETSPD:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_SINGLENOZZLE_RETRACT_SPEED));
+              drawFloat(fwretract.settings.retract_feedrate_mm_s, row, false, 1);
+            }
+            else
+              modifyValue(fwretract.settings.retract_feedrate_mm_s, 1, 90, 1);
+            break;
+          case FWRETRACT_RETZHOP:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT_ZHOP));
+              drawFloat(fwretract.settings.retract_zraise, row, false, 100);
+            }
+            else
+              modifyValue(fwretract.settings.retract_zraise, 0, 2, 100);
+            break;
+          case FWRETRACT_RECSPD:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_SINGLENOZZLE_UNRETRACT_SPEED));
+              drawFloat(fwretract.settings.retract_recover_feedrate_mm_s, row, false, 1);
+            }
+            else
+              modifyValue(fwretract.settings.retract_recover_feedrate_mm_s, 1, 90, 1);
+            break;
+          case FWRETRACT_RECLEN:
+            if (draw) {
+              drawMenuItem(row, ICON_FWRetLength, GET_TEXT_F(MSG_CONTROL_RETRACT_RECOVER));
+              drawFloat(fwretract.settings.retract_recover_extra, row, false, 10);
+            }
+            else
+              modifyValue(fwretract.settings.retract_recover_extra, -5, 5, 10);
+            break;
+        }
+        break;
+    #endif
   }
 }
 
@@ -4491,7 +4498,9 @@ FSTR_P JyersDWIN::getMenuTitle(const uint8_t menu) {
     #if ENABLED(HOST_ACTION_COMMANDS) && ENABLED(DRAW_KEYBOARD)
       case ID_HostActions:  return F("Host Action Commands");
     #endif
-    case ID_FWMenu:         return GET_TEXT_F(MSG_FWRETRACT);
+    #if ENABLED(FWRETRACT)
+      case ID_FWMenu:       return GET_TEXT_F(MSG_FWRETRACT);
+    #endif
     case ID_Control:        return GET_TEXT_F(MSG_CONTROL);
     case ID_TempMenu:       return GET_TEXT_F(MSG_TEMPERATURE);
     #if ANY(PIDTEMP, PIDTEMPBED)
@@ -4578,7 +4587,9 @@ uint8_t JyersDWIN::getMenuSize(const uint8_t menu) {
     #if ENABLED(HOST_ACTION_COMMANDS) && ENABLED(DRAW_KEYBOARD)
       case ID_HostActions:  return HOSTACTIONS_TOTAL;
     #endif
-    case ID_FWMenu:         return FWRETRACT_TOTAL;
+    #if ENABLED(FWRETRACT)
+      case ID_FWMenu:       return FWRETRACT_TOTAL;
+    #endif
     case ID_Control:        return CONTROL_TOTAL;
     case ID_TempMenu:       return TEMP_TOTAL;
     #if ANY(PIDTEMP, PIDTEMPBED)
