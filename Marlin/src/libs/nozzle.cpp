@@ -254,6 +254,8 @@ Nozzle nozzle;
         _MIN(Z_MAX_POS,                         // Maximum height is fixed
           #ifdef NOZZLE_PARK_Z_RAISE_MIN
             NOZZLE_PARK_Z_RAISE_MIN +           // Minimum raise...
+          #else
+            Z_POST_CLEARANCE +                  // Minimum raise...
           #endif
           current_position.z                    // ...over current position
         )
@@ -275,8 +277,8 @@ Nozzle nozzle;
           do_blocking_move_to_z(_MIN(current_position.z + park.z, Z_MAX_POS), fr_z);
           break;
         
-        case 3: {// Raise by NOZZLE_PARK_Z_RAISE_MIN, move to XY-park position
-          do_blocking_move_to_z(_MIN(current_position.z + NOZZLE_PARK_Z_RAISE_MIN, Z_MAX_POS), fr_z);
+        case 3: {// Raise by NOZZLE_PARK_Z_RAISE_MIN, bypass XY-park position
+          do_blocking_move_to_z(park_mode_0_height(0), fr_z);
           goto EXIT_PARK;
           }
           break;
